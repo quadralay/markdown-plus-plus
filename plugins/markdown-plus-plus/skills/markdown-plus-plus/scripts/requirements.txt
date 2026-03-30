@@ -1,0 +1,7 @@
+# Markdown++ Validation Script Dependencies
+# No external dependencies required - uses Python standard library only
+#
+# Python 3.10+ required for:
+# - dataclasses (built-in since 3.7)
+# - typing features (Optional, etc.)
+# - match/case statements (if used in future)
