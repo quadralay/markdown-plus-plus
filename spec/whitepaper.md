@@ -1,5 +1,5 @@
 ---
-date: 2026-03-28
+date: 2026-03-30
 status: draft
 ---
 
@@ -32,7 +32,7 @@ This is the core design decision. Authors are never locked into a proprietary fo
 
 ## Built on three decades of publishing expertise
 
-Markdown++ did not emerge from a startup experiment or an academic research project. It is the product of Quadralay / WebWorks -- a company that has been solving technical publishing problems since the early 1990s. The design decisions in Markdown++ reflect lessons learned across three decades of real-world structured authoring and multi-format output generation.
+Markdown++ did not emerge from a startup experiment or an academic research project. Its design draws on three decades of real-world structured authoring and multi-format output generation at Quadralay / WebWorks, where publishing pipelines have been built and refined since the early 1990s.
 
 **Structured authoring.** WebWorks began with Adobe FrameMaker integration in the early 1990s, when FrameMaker was the dominant tool for complex technical documentation. That deep understanding of structured content -- book hierarchies, conditional text, variables, cross-references, index markers -- informed every subsequent format WebWorks supported. Microsoft Word publishing support followed in 2005, and DITA XML support arrived in 2007 as the industry moved toward XML-based content reuse. By the time Markdown++ was developed, WebWorks had already built publishing pipelines for every major structured authoring format in the industry.
 
@@ -40,7 +40,7 @@ Markdown++ did not emerge from a startup experiment or an academic research proj
 
 **Markdown and Markdown++.** WebWorks added Markdown as an input format in 2017 as documentation shifted toward developer-centric and agile workflows. Markdown++ followed in 2020, evolving from that foundation: rather than building a new proprietary format, WebWorks extended CommonMark using the invisible-extension pattern (HTML comments and inline tokens) to bring the same structured authoring capabilities -- the ones refined through decades of FrameMaker, Word, and DITA processing -- to the simplest and most widely adopted authoring format in the industry.
 
-The result is a documentation format backed by a company that has processed millions of pages across every major authoring format and refined its publishing pipeline through seven product generations. Markdown++ is not theoretical -- it is production software with a long lineage.
+The result is a documentation format shaped by experience processing millions of pages across every major authoring format and seven generations of publishing tools. Markdown++ is not theoretical -- it is production software with a long lineage.
 
 ## Key benefits
 
@@ -117,7 +117,7 @@ Because Markdown++ files are plain text, they fit into development workflows wit
 
 - **Version control** -- Every change produces a meaningful diff, including changes to table content when tables use readable fixed-width formatting.
 - **Pull request reviews** -- Reviewers see exactly what changed in source content, not a binary diff or an opaque XML restructuring.
-- **CI/CD integration** -- Command-line build tools (such as WebWorks AutoMap) run automated builds triggered by commits or merges.
+- **CI/CD integration** -- Command-line build tools run automated builds triggered by commits or merges.
 - **Branch-based authoring** -- Feature branches for content changes, reviewed and merged through the same process as code.
 - **Golden testing** -- Pretty-printed output baselines enable regression testing: generate output, compare against a known-good baseline, detect unintended changes.
 
@@ -125,14 +125,13 @@ These workflows work today with standard Git hosting, standard CI/CD pipelines, 
 
 ### 6. Multi-format publishing pipeline
 
-A publishing tool that supports Markdown++ transforms source files into multiple output formats from a single source. WebWorks ePublisher, for example, produces:
+A publishing tool that supports Markdown++ transforms source files into multiple output formats from a single source. A Markdown++ publishing pipeline can produce:
 
-- **WebWorks Reverb 2.0** -- WebWorks' 7th-generation web-based online help format (evolving from WebWorks Help 1.0 through 5.0 and WebWorks Reverb 1.0). Reverb 2.0 delivers responsive HTML5 output with full-text search, table of contents navigation, and index.
+- **Responsive HTML5 online help** -- Web-based help output with full-text search, table of contents navigation, and index.
 - **PDF** -- Via XSL-FO transformation for print-ready and archival documentation.
 - **Dynamic HTML** -- Generic HTML output for integration into websites and portals.
 - **Microsoft HTML Help (CHM)** -- Compiled help for Windows desktop applications.
 - **Eclipse Help** -- For Eclipse-based IDE documentation.
-- **Markdown++** -- ePublisher can generate Markdown++ from any of its supported input formats (Word, FrameMaker, DITA), enabling roundtripping for migration testing and format fluency verification.
 
 The same `<!-- style: -->` directives, variables, conditions, and markers apply across all output formats. Write once, publish to any target. The processing tool applies the project's style mappings and output configuration to produce each format.
 
@@ -243,7 +242,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Custom paragraph and character styling (via `<!-- style: -->` directives that map to the same output styles), document structure via headings, image references, and tables.
 
-**How you migrate:** If you already use ePublisher to process Word documents, the migration path is direct. ePublisher generates Markdown++ output from Word input, preserving style mappings and publishing pipeline configuration. The generated Markdown++ files become your new source documents -- same output quality, but now plain text and version controlled.
+**How you migrate:** If you use a publishing tool that supports both Word input and Markdown++ output, the migration path is direct. The tool generates Markdown++ from your Word documents, preserving style mappings and publishing pipeline configuration. The generated Markdown++ files become your new source documents -- same output quality, but now plain text and version controlled.
 
 ### From Adobe FrameMaker
 
@@ -443,15 +442,13 @@ This pipeline can be fully automated. Command-line build tools enable generation
 
 Markdown++ is an open documentation format built on CommonMark. To start working with it:
 
-- **Learn the syntax** -- The [Markdown++ User's Guide](https://static.webworks.com/docs/epublisher/latest/help/#context/md-intro) provides the complete syntax reference with examples for every extension.
+- **Learn the syntax** -- The [syntax reference](plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) provides the complete Markdown++ syntax with examples for every extension.
 
 - **Author** -- Open any text editor and start writing. Markdown++ files are standard `.md` files. Add `<!-- style: -->` directives, `<!-- include: -->` assembly, and other extensions as your documentation needs require.
 
-- **Try it** -- WebWorks ePublisher includes a [free trial](https://static.webworks.com/docs/epublisher/latest/help/#context/md-intro) so you can publish Markdown++ source into Reverb 2.0, PDF, Dynamic HTML, CHM, Eclipse Help, and other formats. ePublisher also generates Markdown++ from Word, FrameMaker, and DITA input, providing a migration path from legacy formats.
+- **Publish** -- Publishing tools that support Markdown++ can produce multiple output formats from a single source -- responsive HTML5 online help, PDF, Dynamic HTML, CHM, Eclipse Help, and more.
 
-- **Already using ePublisher?** -- If you publish from Word, FrameMaker, or DITA today, your existing publishing projects, style mappings, and output configurations carry forward. Switching your input format to Markdown++ modernizes your authoring workflow without rebuilding your publishing pipeline.
-
-- **Tooling** -- The [webworks-claude-skills](https://github.com/quadralay/webworks-claude-skills) plugin for Claude Code provides AI-assisted authoring with Markdown++ syntax awareness, ePublisher project management, and AutoMap build automation.
+- **Tooling** -- The [markdown-plus-plus](https://github.com/quadralay/markdown-plus-plus) plugin for Claude Code provides AI-assisted authoring with Markdown++ syntax awareness.
 
 - **Community** -- The [Markdown++ specification and examples](https://github.com/quadralay/markdown-plus-plus) are hosted publicly on GitHub. Markdown++ is an open documentation format that welcomes third-party tool support and community contributions.
 

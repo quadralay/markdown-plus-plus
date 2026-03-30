@@ -1,7 +1,7 @@
 ---
 title: "docs: Neutralize WebWorks product references in whitepaper"
 type: docs
-status: active
+status: completed
 date: 2026-03-30
 origin: docs/brainstorms/2026-03-30-neutralize-whitepaper-requirements.md
 ---
@@ -57,7 +57,7 @@ The whitepaper is the public-facing introduction to Markdown++. It currently con
 
 ## Implementation Units
 
-- [ ] **Unit 1: Neutralize body references (R1, R2, R3)**
+- [x] **Unit 1: Neutralize body references (R1, R2, R3)**
 
   **Goal:** Replace WebWorks product names in the CI/CD bullet (R1), multi-format output section (R2), and Word migration section (R3) with vendor-neutral language.
 
@@ -78,7 +78,7 @@ The whitepaper is the public-facing introduction to Markdown++. It currently con
   - The multi-format output section lists the same formats but without product branding
   - The Word migration section describes the same capability generically
 
-- [ ] **Unit 2: Rewrite Getting Started section (R4, R5, R6, R7)**
+- [x] **Unit 2: Rewrite Getting Started section (R4, R5, R6, R7)**
 
   **Goal:** Remove sales pitches, update stale links, and make the Getting Started section vendor-neutral.
 
@@ -101,7 +101,7 @@ The whitepaper is the public-facing introduction to Markdown++. It currently con
   - "Already using ePublisher?" bullet is gone
   - Tooling link points to `quadralay/markdown-plus-plus`
 
-- [ ] **Unit 3: Soften historical section tone (R8)**
+- [x] **Unit 3: Soften historical section tone (R8)**
 
   **Goal:** Adjust marketing-tone phrases in the historical section (~lines 33-43) so it reads as credibility context rather than a company pitch.
 
@@ -124,7 +124,7 @@ The whitepaper is the public-facing introduction to Markdown++. It currently con
   - Section reads as origin story / credibility context
   - No factual claims were removed or altered
 
-- [ ] **Unit 4: Update frontmatter date**
+- [x] **Unit 4: Update frontmatter date**
 
   **Goal:** Update the whitepaper's frontmatter date to reflect the edit date.
 
