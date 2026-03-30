@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # Markdown++ Best Practices
 
 Guidelines for effective use of Markdown++ extensions in documentation projects.

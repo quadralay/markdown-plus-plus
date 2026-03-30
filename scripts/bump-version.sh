@@ -17,6 +17,13 @@ if [[ ! "$BUMP_TYPE" =~ ^(patch|minor|major)$ ]]; then
     exit 1
 fi
 
+# Check dependencies
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed."
+    echo "  Install with: apt-get install jq (Debian/Ubuntu) or brew install jq (macOS)"
+    exit 1
+fi
+
 # Check if files exist
 if [[ ! -f "$PLUGIN_JSON" ]]; then
     echo "Error: $PLUGIN_JSON not found"
@@ -31,6 +38,12 @@ fi
 # Get current version
 CURRENT=$(jq -r '.version' "$PLUGIN_JSON")
 echo "Current version: $CURRENT"
+
+# Validate semver format
+if [[ ! "$CURRENT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: Invalid version format: $CURRENT (must be X.Y.Z)"
+    exit 1
+fi
 
 # Parse version components
 IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
@@ -54,11 +67,13 @@ esac
 NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
 echo "New version: $NEW_VERSION ($BUMP_TYPE)"
 
-# Update plugin.json
-jq --arg v "$NEW_VERSION" '.version = $v' "$PLUGIN_JSON" > tmp.json && mv tmp.json "$PLUGIN_JSON"
+# Update plugin.json (using unique temp files to avoid race conditions)
+tmp_plugin=$(mktemp)
+jq --arg v "$NEW_VERSION" '.version = $v' "$PLUGIN_JSON" > "$tmp_plugin" && mv "$tmp_plugin" "$PLUGIN_JSON"
 
 # Update marketplace.json
-jq --arg v "$NEW_VERSION" '.version = $v' "$MARKETPLACE_JSON" > tmp.json && mv tmp.json "$MARKETPLACE_JSON"
+tmp_marketplace=$(mktemp)
+jq --arg v "$NEW_VERSION" '.version = $v' "$MARKETPLACE_JSON" > "$tmp_marketplace" && mv "$tmp_marketplace" "$MARKETPLACE_JSON"
 
 echo "Updated $PLUGIN_JSON"
 echo "Updated $MARKETPLACE_JSON"

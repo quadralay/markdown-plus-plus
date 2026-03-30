@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 <!--markers:{"Keywords": "test, sample, complete, all-features", "Description": "Complete feature test for all Markdown++ extensions"} ; #document-start-->
 # $product_name; Complete Feature Test
 

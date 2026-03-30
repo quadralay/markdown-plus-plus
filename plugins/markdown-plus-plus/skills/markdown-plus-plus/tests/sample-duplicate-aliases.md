@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # Duplicate Alias Test
 
 This file tests detection of duplicate alias values (should produce MDPP008 errors).

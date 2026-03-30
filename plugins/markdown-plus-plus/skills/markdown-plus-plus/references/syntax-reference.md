@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # Markdown++ Syntax Reference
 
 Complete reference for all Markdown++ extensions. This document provides detailed syntax rules, edge cases, and validation requirements.
@@ -693,8 +698,8 @@ The validation script checks for these issues:
 | MDPP001 | Unclosed condition block | Error |
 | MDPP002 | Invalid variable name | Error |
 | MDPP003 | Malformed marker JSON | Error |
-| MDPP004 | Invalid style placement | Warning |
-| MDPP005 | Circular include | Error |
+| MDPP004 | Invalid style placement (reserved, not yet implemented) | Warning |
+| MDPP005 | Circular include (reserved, not yet implemented) | Error |
 | MDPP006 | Missing include file | Warning |
 | MDPP007 | Invalid condition syntax | Error |
 | MDPP008 | Duplicate alias within file | Error |

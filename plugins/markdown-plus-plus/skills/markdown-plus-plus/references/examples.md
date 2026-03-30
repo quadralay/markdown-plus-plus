@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # Markdown++ Examples
 
 Real-world examples demonstrating common patterns and use cases.

@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # Basic Markdown++ Sample
 
 This file demonstrates basic Markdown++ extensions for testing.

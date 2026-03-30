@@ -1,3 +1,8 @@
+---
+date: 2026-03-29
+status: active
+---
+
 # MDPP009 Test: Orphaned Comment Tags
 
 This file tests the MDPP009 validation check for orphaned comment tags.
