@@ -52,6 +52,7 @@ The **$product_name;** application supports...
 - Must end with semicolon
 - No spaces in variable names
 - Case-sensitive: `$Product;` differs from `$product;`
+- Escape with backslash: `\$` prevents variable interpretation
 
 **Valid:** `$product_name;`, `$version-2;`, `$my_var;`
 **Invalid:** `$product name;` (space), `$product` (no semicolon)

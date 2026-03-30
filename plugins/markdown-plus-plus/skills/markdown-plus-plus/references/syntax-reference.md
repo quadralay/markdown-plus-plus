@@ -63,6 +63,7 @@ $variable_name;
 | Spaces | Not allowed in variable names |
 | Case | Case-sensitive (`$Product;` ≠ `$product;`) |
 | Length | No explicit limit, but keep names reasonable |
+| Escaping | Use `\$` to prevent variable interpretation |
 
 ### Valid Examples
 
