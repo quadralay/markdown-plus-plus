@@ -133,6 +133,8 @@ A publishing tool that supports Markdown++ transforms source files into multiple
 - **Microsoft HTML Help (CHM)** -- Compiled help for Windows desktop applications.
 - **Eclipse Help** -- For Eclipse-based IDE documentation.
 
+- **Markdown++ output** -- Publishing tools can also generate Markdown++ from legacy formats such as Word or FrameMaker, providing a migration path from binary document formats to plain-text source.
+
 The same `<!-- style: -->` directives, variables, conditions, and markers apply across all output formats. Write once, publish to any target. The processing tool applies the project's style mappings and output configuration to produce each format.
 
 ### 7. Structured content without XML overhead
@@ -442,7 +444,7 @@ This pipeline can be fully automated. Command-line build tools enable generation
 
 Markdown++ is an open documentation format built on CommonMark. To start working with it:
 
-- **Learn the syntax** -- The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) provides the complete Markdown++ syntax with examples for every extension.
+- **Learn the syntax** -- The [syntax reference](https://github.com/quadralay/markdown-plus-plus/blob/main/plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) provides the complete Markdown++ syntax with examples for every extension.
 
 - **Author** -- Open any text editor and start writing. Markdown++ files are standard `.md` files. Add `<!-- style: -->` directives, `<!-- include: -->` assembly, and other extensions as your documentation needs require.
 
