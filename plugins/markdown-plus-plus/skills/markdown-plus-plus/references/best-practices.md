@@ -7,6 +7,10 @@ status: active
 
 Guidelines for effective use of Markdown++ extensions in documentation projects.
 
+## Start with Markdown, extend where needed
+
+Every Markdown++ file is a valid Markdown file. Start by writing standard Markdown -- headings, paragraphs, lists, tables, links, images -- using any editor or previewer you already know. Add Markdown++ extensions only where they provide value: a `<!-- style: -->` directive when you need custom output formatting, a `$variable;` when a value repeats across documents, a `<!-- condition: -->` block when content varies by audience or output format. Standard Markdown tools remain part of your workflow throughout. The extensions are additive, not a replacement for the Markdown you already write.
+
 ## When to Use Each Extension
 
 ### Variables

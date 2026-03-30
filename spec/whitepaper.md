@@ -15,7 +15,7 @@ On the other side sits Markdown. Readable, diffable, universally supported, welc
 
 Teams choose one or the other. Adopt a powerful but complex format and accept the overhead. Or adopt Markdown and accept its limitations, patching gaps with framework-specific extensions (MDX, AsciiDoc, reStructuredText) that trade portability for capability.
 
-Markdown++ resolves this. It adds professional publishing features through extensions that are invisible to standard Markdown renderers -- every Markdown++ file is a valid CommonMark document that renders cleanly in GitHub, VS Code, MkDocs, and any other Markdown viewer. When processed by a publishing tool, those invisible extensions activate and produce multi-format output with the sophistication that technical documentation demands.
+Markdown++ resolves this. It adds professional publishing features through extensions that are invisible to standard Markdown renderers -- every Markdown++ file is a valid CommonMark document that renders cleanly in GitHub, VS Code, MkDocs, and any other Markdown viewer. This is **interchangeability**: Markdown++ files *are* Markdown files, and the `++` extensions are purely additive. When processed by a publishing tool, those invisible extensions activate and produce multi-format output with the sophistication that technical documentation demands.
 
 This whitepaper explains what Markdown++ is, how it compares to the formats you may be using today, and why it is a better approach to technical documentation.
 
@@ -28,7 +28,7 @@ Markdown++ is a documentation format built on the CommonMark specification. Ever
 
 Standard Markdown renderers treat HTML comments as invisible and pass inline tokens through as plain text. This means every `.md` file authored in Markdown++ is a valid CommonMark document. There is no proprietary syntax, no custom file extension, and no build step required just to preview your content.
 
-This is the core design decision. Authors are never locked into a proprietary format. A Markdown++ file works in every tool that supports Markdown -- and gains professional publishing capabilities when processed by a tool that understands the extensions. Because the extension syntax is openly documented and built on standard HTML comments and inline tokens, any tool or AI agent can be adapted to process Markdown++ content. That's a different proposition from proprietary binary formats that require vendor-specific parsers and are opaque to AI-assisted workflows.
+This is the core design decision. Authors are never locked into a proprietary format. The tool ecosystem is a spectrum: a Markdown-only tool sees a valid document, a Markdown++-aware tool unlocks professional publishing, and the author chooses where on that spectrum to operate. A Markdown++ file works in every tool that supports Markdown -- and gains professional publishing capabilities when processed by a tool that understands the extensions. Because the extension syntax is openly documented and built on standard HTML comments and inline tokens, any tool or AI agent can be adapted to process Markdown++ content. That's a different proposition from proprietary binary formats that require vendor-specific parsers and are opaque to AI-assisted workflows.
 
 ## Built on three decades of publishing expertise
 
@@ -54,6 +54,8 @@ This means Markdown++ files work cleanly in:
 - **VS Code, JetBrains, and other editors** -- standard Markdown preview
 - **Documentation sites** -- MkDocs, Docusaurus, Jekyll, Hugo
 - **Any CommonMark-compliant viewer** -- with no plugins or configuration
+
+These are not fallback experiences -- they are productive parts of a Markdown++ workflow. Authors can write, review, and collaborate using any standard Markdown tool and add `++` extensions incrementally where professional publishing features are needed.
 
 We are not aware of another documentation format with comparable publishing power that renders this cleanly in standard tools.
 
@@ -260,7 +262,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Topic-based authoring, content reuse, conditional processing, metadata, and multi-format output.
 
-**How you migrate:** DITA maps become Markdown++ book structure files with `<!-- include: -->` directives. DITA topics become `.md` files. Topic specialization maps to `<!-- style: -->` directives. Conref and conkeyref reuse patterns map to `<!-- include: -->` for file-level reuse and `$variable;` for value-level reuse. Where DITA conref provides element-level reuse (pulling a single paragraph or list item from within a topic), Markdown++ operates at the file level -- granular reuse requires restructuring shared content into its own files, which is typically a limited refactoring effort. The conceptual model -- topics assembled into maps with conditional processing and metadata -- remains the same. The syntax becomes plain text.
+**How you migrate:** DITA maps become Markdown++ book structure files with `<!-- include: -->` directives. DITA topics become `.md` files. Topic specialization maps to `<!-- style: -->` directives. Conref and conkeyref reuse patterns map to `<!-- include: -->` for file-level reuse and `$variable;` for value-level reuse. Where DITA conref provides element-level reuse (pulling a single paragraph or list item from within a topic), Markdown++ operates at the file level -- granular reuse requires restructuring shared content into its own files, which is typically a limited refactoring effort. The conceptual model -- topics assembled into maps with conditional processing and metadata -- remains the same. The syntax becomes plain text. Your team stays in the Markdown ecosystem -- every migrated file works in the same editors, previewers, and Git workflows they already know.
 
 ### From Other Markdown Systems (MDX, AsciiDoc, rST)
 
@@ -268,7 +270,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Plain text authoring, Git-based workflows, and standard Markdown syntax for all content structure (headings, lists, tables, code blocks, links, images).
 
-**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
+**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully -- no standard renderer is broken by the extensions, and every tool on the Markdown spectrum continues to work. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
 
 ## Worked example
 
@@ -442,11 +444,11 @@ This pipeline can be fully automated. Command-line build tools enable generation
 
 ## Getting started
 
-Markdown++ is an open documentation format built on CommonMark. To start working with it:
+Markdown++ is an open documentation format built on CommonMark. Markdown++ files are standard `.md` files -- they work in every Markdown editor, previewer, and workflow you already use. To start working with it:
 
 - **Learn the syntax** -- The [syntax reference](https://github.com/quadralay/markdown-plus-plus/blob/main/plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) provides the complete Markdown++ syntax with examples for every extension.
 
-- **Author** -- Open any text editor and start writing. Markdown++ files are standard `.md` files. Add `<!-- style: -->` directives, `<!-- include: -->` assembly, and other extensions as your documentation needs require.
+- **Author** -- Open any text editor and start writing. Write plain Markdown first, then add `<!-- style: -->` directives, `<!-- include: -->` assembly, and other extensions incrementally as your documentation needs require.
 
 - **Publish** -- Publishing tools that support Markdown++/Markdown can produce multiple output formats from a single source -- responsive HTML5 online help, PDF, Dynamic HTML, CHM, Eclipse Help, and more.
 
