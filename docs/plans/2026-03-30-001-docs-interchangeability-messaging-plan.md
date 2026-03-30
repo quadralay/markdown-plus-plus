@@ -1,7 +1,7 @@
 ---
 title: "docs: Weave interchangeability messaging into existing documentation"
 type: feat
-status: active
+status: completed
 date: 2026-03-30
 origin: docs/brainstorms/2026-03-30-interchangeability-messaging-requirements.md
 ---
@@ -89,7 +89,7 @@ Skipping external research -- this is pure documentation messaging work with str
 
 ## Implementation Units
 
-- [ ] **Unit 1: Whitepaper introduction and "What is Markdown++?" (R1, R2, R3)**
+- [x] **Unit 1: Whitepaper introduction and "What is Markdown++?" (R1, R2, R3)**
 
   **Goal:** Introduce interchangeability as a named concept in the first sections readers encounter. Establish the tool spectrum.
 
@@ -118,7 +118,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - Read the modified introduction aloud -- it should flow naturally without feeling like messaging was bolted on
 
-- [ ] **Unit 2: Strengthen "Full CommonMark backward compatibility" benefit (R2, R4)**
+- [x] **Unit 2: Strengthen "Full CommonMark backward compatibility" benefit (R2, R4)**
 
   **Goal:** Expand the benefits section to communicate that interchangeability means more than "renders cleanly" -- it means authors can use standard tools for their full workflow and add extensions incrementally.
 
@@ -143,7 +143,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - The section tells a progression story: backward compatible -> actively usable in standard tools -> incrementally extensible
 
-- [ ] **Unit 3: Reinforce in migration paths (R5)**
+- [x] **Unit 3: Reinforce in migration paths (R5)**
 
   **Goal:** Add brief interchangeability reinforcement to migration path sections so teams understand they are not leaving the Markdown ecosystem.
 
@@ -169,7 +169,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - A reader of any single migration section understands they are gaining capabilities without losing Markdown ecosystem compatibility
 
-- [ ] **Unit 4: Reinforce in "Getting started" section (R3)**
+- [x] **Unit 4: Reinforce in "Getting started" section (R3)**
 
   **Goal:** Ensure the Getting Started section makes interchangeability clear to new users -- they can start writing in any editor with no setup, and their files work everywhere.
 
@@ -193,7 +193,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - The section answers the question "Do I need special tools to use Markdown++?" with a clear no
 
-- [ ] **Unit 5: Add interchangeability guidance to best-practices.md (R6)**
+- [x] **Unit 5: Add interchangeability guidance to best-practices.md (R6)**
 
   **Goal:** Add author-facing guidance on incremental adoption and the Markdown/Markdown++ spectrum to the plugin's best practices reference.
 
@@ -221,7 +221,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - Reading the new section followed by any extension section (e.g., Variables) should feel like a natural progression from general principle to specific guidance
 
-- [ ] **Unit 6: Brief note in syntax-reference.md Base Specification (R6)**
+- [x] **Unit 6: Brief note in syntax-reference.md Base Specification (R6)**
 
   **Goal:** Establish the interchangeability principle at the top of the syntax reference so authors encounter it before diving into extension syntax.
 
@@ -246,7 +246,7 @@ Skipping external research -- this is pure documentation messaging work with str
   **Verification:**
   - The section reads as a factual property of the format, not a value proposition
 
-- [ ] **Unit 7: Evaluate and optionally reinforce README.md (R3)**
+- [x] **Unit 7: Evaluate and optionally reinforce README.md (R3)**
 
   **Goal:** Assess whether the README benefits from minor interchangeability reinforcement after the whitepaper changes are complete.
 
