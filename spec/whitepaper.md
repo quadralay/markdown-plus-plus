@@ -242,7 +242,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Custom paragraph and character styling (via `<!-- style: -->` directives that map to the same output styles), document structure via headings, image references, and tables.
 
-**How you migrate:** If you use a publishing tool that supports both Word input and Markdown++ output, the migration path is direct. The tool generates Markdown++ from your Word documents, preserving style mappings and publishing pipeline configuration. The generated Markdown++ files become your new source documents -- same output quality, but now plain text and version controlled.
+**How you migrate:** If you use a publishing tool that supports both Word input and Markdown++/Markdown output, the migration path is direct. The tool generates Markdown++/Markdown from your Word documents, preserving style mappings (Markdown++) and publishing pipeline configuration. The generated Markdown++/Markdown files become your new source documents -- same output quality, but now plain text and version controlled. If your tool only generates Markdown, you can post-edit the Markdown files to insert specific features as needed. Markdown++ was designed to be minimalistic -- add the Markdown++ syntax only where you need it.
 
 ### From Adobe FrameMaker
 
@@ -446,7 +446,7 @@ Markdown++ is an open documentation format built on CommonMark. To start working
 
 - **Author** -- Open any text editor and start writing. Markdown++ files are standard `.md` files. Add `<!-- style: -->` directives, `<!-- include: -->` assembly, and other extensions as your documentation needs require.
 
-- **Publish** -- Publishing tools that support Markdown++ can produce multiple output formats from a single source -- responsive HTML5 online help, PDF, Dynamic HTML, CHM, Eclipse Help, and more.
+- **Publish** -- Publishing tools that support Markdown++/Markdown can produce multiple output formats from a single source -- responsive HTML5 online help, PDF, Dynamic HTML, CHM, Eclipse Help, and more.
 
 - **Tooling** -- The [markdown-plus-plus](https://github.com/quadralay/markdown-plus-plus) plugin for Claude Code provides AI-assisted authoring with Markdown++ syntax awareness.
 
