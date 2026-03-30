@@ -1,0 +1,23 @@
+{
+  "name": "markdown-plus-plus",
+  "version": "1.0.0",
+  "description": "Claude Code skill for Markdown++ authoring: syntax reference, validation, alias generation, and best practices for the open documentation format",
+  "author": {
+    "name": "Quadralay Corporation",
+    "email": "support@webworks.com",
+    "url": "https://github.com/quadralay"
+  },
+  "homepage": "https://github.com/quadralay/markdown-plus-plus",
+  "repository": "https://github.com/quadralay/markdown-plus-plus",
+  "license": "MIT",
+  "keywords": [
+    "markdown",
+    "markdown++",
+    "mdpp",
+    "documentation",
+    "authoring",
+    "technical-writing",
+    "commonmark",
+    "validation"
+  ]
+}

@@ -10,13 +10,22 @@ This is a specification and tooling repo -- no application code.
 
 ```
 markdown-plus-plus/
-├── spec/           # Whitepaper and eventual formal specification
-├── examples/       # Sample .md files demonstrating features
+├── .claude-plugin/
+│   └── marketplace.json        # Marketplace manifest
+├── scripts/
+│   └── bump-version.sh         # Version bump utility
+├── spec/                       # Whitepaper and eventual formal specification
+├── examples/                   # Sample .md files demonstrating features
 └── plugins/
     └── markdown-plus-plus/
+        ├── .claude-plugin/
+        │   └── plugin.json     # Plugin metadata
         └── skills/
             └── markdown-plus-plus/
-                └── SKILL.md    # Claude Code skill for Markdown++ authoring
+                ├── SKILL.md    # Claude Code skill for Markdown++ authoring
+                ├── references/ # Syntax reference, examples, best practices
+                ├── scripts/    # validate-mdpp.py, add-aliases.py
+                └── tests/      # Sample .md files for validation testing
 ```
 
 ## Conventions
@@ -44,10 +53,31 @@ status: draft | active | archived
 - **Feature branches** for all PRs -- never commit directly to `main`
 - **Branch prefixes:** `feature/`, `fix/`, `docs/`, `refactor/`
 
+## Version Management
+
+Bump the plugin version before creating a PR using the bump script:
+
+```bash
+scripts/bump-version.sh patch  # 1.0.0 -> 1.0.1 (bug fixes)
+scripts/bump-version.sh minor  # 1.0.0 -> 1.1.0 (new features)
+scripts/bump-version.sh major  # 1.0.0 -> 2.0.0 (breaking changes)
+```
+
+The script updates both `plugin.json` and `marketplace.json` to keep versions synchronized.
+
+**When to bump:**
+- `patch`: Bug fixes, documentation updates, minor improvements
+- `minor`: New skills, new features, enhancements
+- `major`: Breaking changes, major restructuring
+
+**Workflow:**
+1. Make your changes
+2. Run `scripts/bump-version.sh <type>`
+3. Include the version bump in your PR
+4. Merge PR - version is already updated
+
 ## Ecosystem context
 
 Markdown++ is an open documentation format. WebWorks ePublisher is one tool that processes it, but the format is not tied to any single vendor or product.
 
 - Format specification and skill: this repo
-- ePublisher-specific workflows: `quadralay/webworks-claude-skills`
-- Business strategy and marketing: `quadralay/webworks-brain` (private)

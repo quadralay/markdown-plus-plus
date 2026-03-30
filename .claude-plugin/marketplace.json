@@ -1,0 +1,33 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "markdown-plus-plus",
+  "version": "1.0.0",
+  "description": "Claude Code skill for Markdown++ authoring: syntax reference, validation, alias generation, and best practices for the open documentation format",
+  "owner": {
+    "name": "Quadralay Corporation",
+    "email": "support@webworks.com"
+  },
+  "plugins": [
+    {
+      "name": "markdown-plus-plus",
+      "description": "Authoritative reference for Markdown++ syntax including variables, conditions, custom styles, file includes, markers, multiline tables, and combined commands. Includes validation and alias generation scripts.",
+      "author": {
+        "name": "Quadralay Corporation",
+        "url": "https://github.com/quadralay"
+      },
+      "source": "./plugins/markdown-plus-plus",
+      "category": "development-tools",
+      "tags": [
+        "markdown",
+        "markdown++",
+        "mdpp",
+        "documentation",
+        "authoring",
+        "technical-writing",
+        "commonmark",
+        "validation"
+      ],
+      "strict": false
+    }
+  ]
+}
