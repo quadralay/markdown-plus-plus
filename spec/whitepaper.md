@@ -254,7 +254,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Book structure (FrameMaker `.book` files map directly to Markdown++ book assembly files using `<!-- include: -->` directives), conditional text, variables, cross-references, and index markers.
 
-**How you migrate:** The structural mapping is direct. A FrameMaker book file that defines chapter order becomes a Markdown++ book file with `<!-- include: -->` lines. Chapter files become individual `.md` files. Conditional text expressions become `<!-- condition: -->` directives. Variables become `$variable;` tokens. The chapter structure and content hierarchy are preserved; the authoring format becomes dramatically simpler. The migrated files are standard `.md` documents -- they work in any Markdown tool from day one.
+**How you migrate:** The structural mapping is direct. A FrameMaker book file that defines chapter order becomes a Markdown++ book file with `<!-- include: -->` lines. Chapter files become individual `.md` files. Conditional text expressions become `<!-- condition: -->` directives. Variables become `$variable;` tokens. The chapter structure and content hierarchy are preserved; the authoring format becomes dramatically simpler.
 
 ### From DITA XML
 
@@ -270,7 +270,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Plain text authoring, Git-based workflows, and standard Markdown syntax for all content structure (headings, lists, tables, code blocks, links, images).
 
-**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully -- the extensions are additive, and every tool on the Markdown spectrum continues to work. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
+**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully -- no standard renderer is broken by the extensions, and every tool on the Markdown spectrum continues to work. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
 
 ## Worked example
 

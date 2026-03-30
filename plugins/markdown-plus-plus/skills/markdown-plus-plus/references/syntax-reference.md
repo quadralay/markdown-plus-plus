@@ -9,7 +9,7 @@ Complete reference for all Markdown++ extensions. This document provides detaile
 
 ## Base Specification
 
-Markdown++ extends **CommonMark 0.30** with additional features. Standard CommonMark syntax works as expected. GitHub Flavored Markdown (GFM) tables are also supported. All extensions use HTML comments or inline tokens that standard renderers treat as invisible -- Markdown++ files remain valid `.md` documents that work in any Markdown tool.
+Markdown++ extends **CommonMark 0.30** with additional features. Standard CommonMark syntax works as expected. GitHub Flavored Markdown (GFM) tables are also supported. All extensions use HTML comments or inline tokens -- HTML comments are invisible to standard renderers, and inline tokens pass through as plain text. Markdown++ files remain valid `.md` documents that work in any Markdown tool.
 
 ## Attachment Rules
 
