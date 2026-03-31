@@ -15,7 +15,7 @@ On the other side sits Markdown. Readable, diffable, universally supported, welc
 
 Teams choose one or the other. Adopt a powerful but complex format and accept the overhead. Or adopt Markdown and accept its limitations, patching gaps with framework-specific extensions (MDX, AsciiDoc, reStructuredText) that trade portability for capability.
 
-Markdown++ resolves this. It adds professional publishing features through extensions that are invisible to standard Markdown renderers -- every Markdown++ file is a valid CommonMark document that renders cleanly in GitHub, VS Code, MkDocs, and any other Markdown viewer. This is **interchangeability**: Markdown++ files *are* Markdown files, and the `++` extensions are purely additive. When processed by a publishing tool, those invisible extensions activate and produce multi-format output with the sophistication that technical documentation demands.
+Markdown++ resolves this. It adds professional publishing features through extensions that are invisible to standard Markdown renderers -- every Markdown++ file is a valid CommonMark document that renders cleanly in GitHub, VS Code, MkDocs, and any other Markdown viewer. This is interchangeability: Markdown++ files *are* Markdown files, and the `++` extensions are purely additive. When processed by a publishing tool, those invisible extensions activate and produce multi-format output with the sophistication that technical documentation demands.
 
 This whitepaper explains what Markdown++ is, how it compares to the formats you may be using today, and why it is a better approach to technical documentation.
 
@@ -270,7 +270,7 @@ In DITA, the same structures require `<note>` elements with typed attributes, `<
 
 **What you keep:** Plain text authoring, Git-based workflows, and standard Markdown syntax for all content structure (headings, lists, tables, code blocks, links, images).
 
-**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully -- no standard renderer is broken by the extensions, and every tool on the Markdown spectrum continues to work. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
+**Key differentiator:** Other Markdown-based systems add capabilities by introducing non-standard syntax. MDX adds JSX expressions that break standard renderers. AsciiDoc uses its own syntax that is not Markdown. reStructuredText has a different markup language entirely. Markdown++ adds capabilities through HTML comments and inline tokens that standard renderers handle gracefully -- no standard renderer is broken by the extensions, and every tool on the Markdown spectrum — from basic previewers to full publishing pipelines — continues to work. For AsciiDoc, an open-source converter ([asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)) automates the migration to Markdown++. For MDX and rST, migration is manual -- but the target format is maximally compatible with the Markdown ecosystem you already use.
 
 ## Worked example
 
