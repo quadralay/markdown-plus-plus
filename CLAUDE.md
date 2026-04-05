@@ -10,12 +10,19 @@ This is a specification and tooling repo -- no application code.
 
 ```
 markdown-plus-plus/
+├── .claude/
+│   ├── agents/                 # Agent definitions for ideation teams
+│   ├── prompts/                # Reusable prompt templates
+│   └── external-sources.conf   # Cross-repo resource paths
 ├── .claude-plugin/
 │   └── marketplace.json        # Marketplace manifest
+├── docs/
+│   └── solutions/              # Past solutions and learnings
 ├── scripts/
 │   └── bump-version.sh         # Version bump utility
 ├── spec/                       # Whitepaper and eventual formal specification
 ├── examples/                   # Sample .md files demonstrating features
+├── SECURITY.md                 # Security policy and contact
 └── plugins/
     └── markdown-plus-plus/
         ├── .claude-plugin/
@@ -75,6 +82,11 @@ The script updates both `plugin.json` and `marketplace.json` to keep versions sy
 2. Run `scripts/bump-version.sh <type>`
 3. Include the version bump in your PR
 4. Merge PR - version is already updated
+
+## External Sources
+
+Cross-repo resource locations are defined in `.claude/external-sources.conf`.
+Paths reference environment variables from the operator's ~/.claude/settings.json.
 
 ## Ecosystem context
 

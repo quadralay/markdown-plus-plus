@@ -1,4 +1,4 @@
-# Markdown++ Public Readiness — Ideation Team Prompt (v2)
+# Markdown++ Public Readiness — Ideation Team Prompt
 
 Use the following prompt to launch the agent team in your Claude Code session.
 Copy everything between the --- markers.
