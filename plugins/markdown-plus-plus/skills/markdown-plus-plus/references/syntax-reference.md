@@ -269,6 +269,8 @@ This is <!--style: Emphasis--> **bold text**.
 
 ## Custom Aliases
 
+**Aliases are block-level only.** They must appear as a standalone HTML comment on their own line, directly above the target block element. Inline aliases (e.g., `<!--#name-->` embedded within a paragraph or beside inline formatting) are not supported and will be treated as unrecognized commands by parsers.
+
 ### Syntax
 
 ```
@@ -279,6 +281,7 @@ This is <!--style: Emphasis--> **bold text**.
 
 | Rule | Description |
 |------|-------------|
+| Scope | Block-level only -- must be on its own line above a block element |
 | Start | Must begin with `#` inside the comment |
 | Name | Must follow [Naming Rules](#naming-rules) (digit-first allowed) |
 | Spaces | Not allowed (alias ends at first space) |
@@ -286,7 +289,7 @@ This is <!--style: Emphasis--> **bold text**.
 
 ### Creating Aliases
 
-Place the alias tag on the line directly above the target element with **no blank line** between them. See [Attachment Rules](#attachment-rules) for placement requirements.
+Place the alias tag on its own line directly above the target block element with **no blank line** between them. See [Attachment Rules](#attachment-rules) for placement requirements.
 
 ```markdown
 <!--#introduction-->
@@ -312,7 +315,7 @@ See [API Auth](api-reference.md#authentication) for auth info.
 Standard Markdown auto-generates IDs from headings. Custom aliases:
 - Supplement the auto-generated ID (both the alias and the heading ID are valid anchors)
 - Allow multiple aliases per element
-- Work on non-heading elements
+- Work on non-heading block elements (paragraphs, tables, lists, etc.)
 
 ---
 

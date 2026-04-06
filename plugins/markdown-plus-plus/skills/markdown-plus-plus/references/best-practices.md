@@ -105,6 +105,8 @@ This is just regular text that doesn't need a style.
 
 ### Custom Aliases
 
+**Aliases are block-level only** -- they must appear on their own line above a block element. Inline aliases are not supported.
+
 **Use aliases for:**
 - **All important headings** to ensure stable URL endpoints
 - Stable links that survive document restructuring
