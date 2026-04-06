@@ -310,7 +310,7 @@ See [API Auth](api-reference.md#authentication) for auth info.
 ### Alias vs. Heading IDs
 
 Standard Markdown auto-generates IDs from headings. Custom aliases:
-- Override the auto-generated ID
+- Supplement the auto-generated ID (both the alias and the heading ID are valid anchors)
 - Allow multiple aliases per element
 - Work on non-heading elements
 
