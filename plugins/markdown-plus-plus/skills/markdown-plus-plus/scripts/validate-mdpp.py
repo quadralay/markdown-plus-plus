@@ -62,10 +62,10 @@ PATTERNS = {
     'variable': re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_-]*);'),
     'variable_invalid': re.compile(r'\$([^;]*);'),
     'style': re.compile(r'<!--\s*style:([^>]+?)(?:\s*;|\s*-->)'),
-    'alias': re.compile(r'<!--\s*#([a-zA-Z0-9_-]+?)(?=\s*;|\s*-->)'),
+    'alias': re.compile(r'<!--\s*#([^\s;>]+?)(?=\s*;|\s*-->)'),
     'condition_open': re.compile(r'<!--\s*condition:([^>]+?)\s*-->'),
     'condition_close': re.compile(r'<!--\s*/condition\s*-->'),
-    'include': re.compile(r'<!--\s*include:([^->]+?)\s*-->'),
+    'include': re.compile(r'<!--\s*include:([^>]+?)\s*-->'),
     'markers_json': re.compile(r'<!--\s*markers:(\{[^}]+\})\s*-->'),
     'marker_simple': re.compile(r'<!--\s*marker:([^=]+)="([^"]+)"'),
     'multiline': re.compile(r'<!--\s*multiline\s*-->'),
@@ -123,18 +123,17 @@ def validate_condition_expression(expr: str) -> tuple[bool, str | None]:
     return True, None
 
 
-def validate_json(json_str: str) -> tuple[bool, str | None]:
-    """Validate JSON string."""
+def validate_json(json_str: str) -> tuple[object | None, str | None]:
+    """Validate and parse JSON string. Returns (parsed_object, None) on success or (None, error_message) on failure."""
     try:
-        json.loads(json_str)
-        return True, None
+        return json.loads(json_str), None
     except json.JSONDecodeError as e:
-        return False, str(e)
+        return None, str(e)
 
 
 # Pattern matching non-exempt MDPP comment tags (style, alias, marker, multiline)
 MDPP_TAG_PATTERN = re.compile(
-    r'<!--\s*(?:style:|#[a-zA-Z0-9_-]+|markers?:|multiline)'
+    r'<!--\s*(?:style:|#[^\s;>]+|markers?:|multiline)'
 )
 
 # Code fence opening/closing pattern (CommonMark 0.30)
@@ -292,8 +291,8 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
         # Check markers JSON
         for match in PATTERNS['markers_json'].finditer(line):
             json_str = match.group(1)
-            is_valid, error_msg = validate_json(json_str)
-            if not is_valid:
+            parsed, error_msg = validate_json(json_str)
+            if error_msg:
                 issues.append(ValidationIssue(
                     type=Severity.ERROR.value,
                     code="MDPP003",
@@ -305,7 +304,6 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                 ))
             else:
                 # Validate marker key names in valid JSON
-                parsed = json.loads(json_str)
                 if isinstance(parsed, dict):
                     for key in parsed:
                         if not validate_marker_key(key):

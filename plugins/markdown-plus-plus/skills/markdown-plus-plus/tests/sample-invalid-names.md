@@ -40,6 +40,16 @@ $123start;
 <!--markers:{"123Bad": "val"}-->
 ### Marker Heading Case 6
 
+### Case 16: Alias with special characters -- EXPECT MDPP002
+
+<!--#bad.alias-->
+### Aliased Heading Case 16
+
+### Case 17: Style with special characters -- EXPECT MDPP002
+
+<!--style:Bad!Style-->
+### Styled Heading Case 17
+
 ---
 
 ## NEGATIVE CASES (should NOT trigger MDPP002)

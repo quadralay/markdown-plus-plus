@@ -48,7 +48,7 @@ The **$product_name;** application supports...
 ```
 
 **Rules:**
-- Alphanumeric characters, hyphens, underscores only
+- Names must follow [Naming Rules](references/syntax-reference.md#naming-rules) (letter or underscore first)
 - Must end with semicolon
 - No spaces in variable names
 - Case-sensitive: `$Product;` differs from `$product;`
@@ -93,7 +93,7 @@ See [Getting Started](#getting-started) for an introduction.
 **Cross-document links:** `[API Reference](api.md#authentication)`
 
 **Rules:**
-- Alphanumeric, hyphens, underscores only
+- Names must follow [Naming Rules](references/syntax-reference.md#naming-rules) (digit-first allowed for aliases)
 - No spaces (alias ends at first space)
 - Must start with `#` inside the comment
 - Keep alias values unique within each file
@@ -230,7 +230,7 @@ python scripts/validate-mdpp.py document.md
 
 **Common errors detected:**
 - Unclosed condition blocks
-- Invalid variable names
+- Invalid names — variables, styles, aliases, marker keys (see [Naming Rules](references/syntax-reference.md#naming-rules))
 - Malformed marker JSON
 - Circular file includes
 - Duplicate alias values within a file
@@ -280,7 +280,7 @@ See `references/syntax-reference.md` for complete syntax rules.
 ## Success Criteria
 
 - Markdown++ document uses correct syntax for all extensions
-- Variables use valid names (alphanumeric, hyphens, underscores)
+- All named entities follow [Naming Rules](references/syntax-reference.md#naming-rules)
 - Conditions have matching opening and closing tags
 - File includes use valid relative paths
 - Markers contain valid JSON (for `markers:` format)

@@ -94,7 +94,7 @@ Alias names may also begin with a digit, since aliases often map to numeric iden
 
 ### Non-English Content
 
-For non-English content, the same structural rule applies using the language's UTF-8 letter values in place of `a-zA-Z`.
+For non-English content, the same structural rule applies using the language's UTF-8 letter values in place of `a-zA-Z`. Note: The validation script currently enforces ASCII names only; UTF-8 letter support is a future goal.
 
 ---
 
