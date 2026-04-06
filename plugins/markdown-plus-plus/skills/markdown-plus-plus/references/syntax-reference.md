@@ -422,7 +422,7 @@ Paths are **relative to the containing file's directory**.
 |------|-------------|
 | Placement | Must be alone on its line |
 | Path | Relative to containing file |
-| Extension | Typically `.md` but any text file works |
+| Extension | `.md` files required; processors MAY support additional text formats |
 | Recursion | Included files can include other files |
 | Circular | Circular includes are detected and prevented |
 
