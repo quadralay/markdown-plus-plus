@@ -61,20 +61,39 @@ class ValidationIssue:
 PATTERNS = {
     'variable': re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_-]*);'),
     'variable_invalid': re.compile(r'\$([^;]*);'),
-    'style': re.compile(r'<!--\s*style:([^->]+?)(?:\s*;|\s*-->)'),
-    'alias': re.compile(r'<!--\s*#([a-zA-Z0-9_-]+)'),
-    'condition_open': re.compile(r'<!--\s*condition:([^->]+?)\s*-->'),
+    'style': re.compile(r'<!--\s*style:([^>]+?)(?:\s*;|\s*-->)'),
+    'alias': re.compile(r'<!--\s*#([^\s;>]+?)(?=\s*;|\s*-->)'),
+    'condition_open': re.compile(r'<!--\s*condition:([^>]+?)\s*-->'),
     'condition_close': re.compile(r'<!--\s*/condition\s*-->'),
-    'include': re.compile(r'<!--\s*include:([^->]+?)\s*-->'),
+    'include': re.compile(r'<!--\s*include:([^>]+?)\s*-->'),
     'markers_json': re.compile(r'<!--\s*markers:(\{[^}]+\})\s*-->'),
     'marker_simple': re.compile(r'<!--\s*marker:([^=]+)="([^"]+)"'),
     'multiline': re.compile(r'<!--\s*multiline\s*-->'),
 }
 
 
+STANDARD_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_-]*$')
+ALIAS_NAME_RE = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$')
+
+
 def validate_variable_name(name: str) -> bool:
     """Check if a variable name is valid."""
-    return bool(re.match(r'^[a-zA-Z_][a-zA-Z0-9_-]*$', name))
+    return bool(STANDARD_NAME_RE.match(name))
+
+
+def validate_style_name(name: str) -> bool:
+    """Check if a style name is valid."""
+    return bool(STANDARD_NAME_RE.match(name))
+
+
+def validate_alias_name(name: str) -> bool:
+    """Check if an alias name is valid (digit-first allowed)."""
+    return bool(ALIAS_NAME_RE.match(name))
+
+
+def validate_marker_key(name: str) -> bool:
+    """Check if a marker key name is valid."""
+    return bool(STANDARD_NAME_RE.match(name))
 
 
 def validate_condition_expression(expr: str) -> tuple[bool, str | None]:
@@ -98,24 +117,23 @@ def validate_condition_expression(expr: str) -> tuple[bool, str | None]:
             part = part[1:]
         if not part:
             return False, "Empty condition after NOT operator"
-        if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_-]*$', part):
+        if not STANDARD_NAME_RE.match(part):
             return False, f"Invalid condition name: {part}"
 
     return True, None
 
 
-def validate_json(json_str: str) -> tuple[bool, str | None]:
-    """Validate JSON string."""
+def validate_json(json_str: str) -> tuple[object | None, str | None]:
+    """Validate and parse JSON string. Returns (parsed_object, None) on success or (None, error_message) on failure."""
     try:
-        json.loads(json_str)
-        return True, None
+        return json.loads(json_str), None
     except json.JSONDecodeError as e:
-        return False, str(e)
+        return None, str(e)
 
 
 # Pattern matching non-exempt MDPP comment tags (style, alias, marker, multiline)
 MDPP_TAG_PATTERN = re.compile(
-    r'<!--\s*(?:style:|#[a-zA-Z0-9_-]+|markers?:|multiline)'
+    r'<!--\s*(?:style:|#[^\s;>]+|markers?:|multiline)'
 )
 
 # Code fence opening/closing pattern (CommonMark 0.30)
@@ -218,8 +236,22 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                         file=filepath,
                         line=line_num,
                         context=line.strip()[:60],
-                        suggestion="Variable names must be alphanumeric with hyphens/underscores, no spaces"
+                        suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
                     ))
+
+        # Check for invalid style names
+        for match in PATTERNS['style'].finditer(line):
+            style_name = match.group(1).strip()
+            if not validate_style_name(style_name):
+                issues.append(ValidationIssue(
+                    type=Severity.ERROR.value,
+                    code="MDPP002",
+                    message=f"Invalid style name: {style_name}",
+                    file=filepath,
+                    line=line_num,
+                    context=line.strip()[:60],
+                    suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
+                ))
 
         # Check condition opens
         for match in PATTERNS['condition_open'].finditer(line):
@@ -259,8 +291,8 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
         # Check markers JSON
         for match in PATTERNS['markers_json'].finditer(line):
             json_str = match.group(1)
-            is_valid, error_msg = validate_json(json_str)
-            if not is_valid:
+            parsed, error_msg = validate_json(json_str)
+            if error_msg:
                 issues.append(ValidationIssue(
                     type=Severity.ERROR.value,
                     code="MDPP003",
@@ -269,6 +301,34 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     line=line_num,
                     context=match.group(0)[:60],
                     suggestion="Ensure JSON is valid with double-quoted keys and values"
+                ))
+            else:
+                # Validate marker key names in valid JSON
+                if isinstance(parsed, dict):
+                    for key in parsed:
+                        if not validate_marker_key(key):
+                            issues.append(ValidationIssue(
+                                type=Severity.ERROR.value,
+                                code="MDPP002",
+                                message=f"Invalid marker key name: {key}",
+                                file=filepath,
+                                line=line_num,
+                                context=line.strip()[:60],
+                                suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
+                            ))
+
+        # Check simple marker key names
+        for match in PATTERNS['marker_simple'].finditer(line):
+            marker_key = match.group(1).strip()
+            if not validate_marker_key(marker_key):
+                issues.append(ValidationIssue(
+                    type=Severity.ERROR.value,
+                    code="MDPP002",
+                    message=f"Invalid marker key name: {marker_key}",
+                    file=filepath,
+                    line=line_num,
+                    context=line.strip()[:60],
+                    suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
                 ))
 
         # Check includes (warning if file doesn't exist)
@@ -290,9 +350,19 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
             elif verbose:
                 print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Include found: {include_path}")
 
-        # Check aliases for duplicates
+        # Check aliases for name validity and duplicates
         for match in PATTERNS['alias'].finditer(line):
             alias_name = match.group(1)
+            if not validate_alias_name(alias_name):
+                issues.append(ValidationIssue(
+                    type=Severity.ERROR.value,
+                    code="MDPP002",
+                    message=f"Invalid alias name: #{alias_name}",
+                    file=filepath,
+                    line=line_num,
+                    context=match.group(0),
+                    suggestion="Alias names must start with a letter, digit, or underscore, followed by letters, digits, hyphens, or underscores"
+                ))
             if alias_name in alias_locations:
                 issues.append(ValidationIssue(
                     type=Severity.ERROR.value,
