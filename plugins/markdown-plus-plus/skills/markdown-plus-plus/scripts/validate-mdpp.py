@@ -59,8 +59,8 @@ class ValidationIssue:
 
 # Regex patterns for Markdown++ extensions
 PATTERNS = {
-    'variable': re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_-]*);'),
-    'variable_invalid': re.compile(r'\$([^;]*);'),
+    'variable': re.compile(r'(?<!\\)\$([a-zA-Z_][a-zA-Z0-9_-]*);'),
+    'variable_invalid': re.compile(r'(?<!\\)\$([^;]*);'),
     'style': re.compile(r'<!--\s*style:([^>]+?)(?:\s*;|\s*-->)'),
     'alias': re.compile(r'<!--\s*#([^\s;>]+?)(?=\s*;|\s*-->)'),
     'condition_open': re.compile(r'<!--\s*condition:([^>]+?)\s*-->'),
