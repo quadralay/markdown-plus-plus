@@ -81,7 +81,7 @@ See `references/syntax-reference.md` for nested list indentation rules and table
 
 ### Custom Aliases
 
-Aliases create stable internal link anchors.
+Aliases create stable internal link anchors. **Aliases are block-level only** -- they must appear on their own line above a block element, not inline.
 
 ```markdown
 <!--#getting-started-->
@@ -93,6 +93,7 @@ See [Getting Started](#getting-started) for an introduction.
 **Cross-document links:** `[API Reference](api.md#authentication)`
 
 **Rules:**
+- Block-level only -- must be on its own line above a block element (inline aliases are not supported)
 - Names must follow [Naming Rules](references/syntax-reference.md#naming-rules) (digit-first allowed for aliases)
 - No spaces (alias ends at first space)
 - Must start with `#` inside the comment
