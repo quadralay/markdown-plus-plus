@@ -1,7 +1,7 @@
 ---
 title: "feat: Unified naming rule for all Markdown++ name types"
 type: feat
-status: active
+status: completed
 date: 2026-04-06
 origin: docs/brainstorms/2026-04-05-unified-naming-rule-requirements.md
 ---
@@ -81,7 +81,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
 
 ## Implementation Units
 
-- [ ] **Unit 1: Add shared "Naming Rules" section to syntax-reference.md**
+- [x] **Unit 1: Add shared "Naming Rules" section to syntax-reference.md**
 
   **Goal:** Create the authoritative naming rule definition in one place
 
@@ -108,7 +108,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   - Both the standard and alias-exception regexes are documented
   - The section is self-contained (a reader can understand the rule without jumping elsewhere)
 
-- [ ] **Unit 2: Update extension sections to cross-reference the shared rule**
+- [x] **Unit 2: Update extension sections to cross-reference the shared rule**
 
   **Goal:** Replace per-extension naming rules with references to the shared section
 
@@ -135,7 +135,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   - Each section links to `#naming-rules`
   - The Variables invalid example `$123start;` comment is now definitive
 
-- [ ] **Unit 3: Update MDPP002 description in Validation Checks table**
+- [x] **Unit 3: Update MDPP002 description in Validation Checks table**
 
   **Goal:** Reflect that MDPP002 now covers all name types, not just variables
 
@@ -153,7 +153,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   **Verification:**
   - MDPP002 description in the Validation Checks table reflects all name types
 
-- [ ] **Unit 4: Add name validation functions for styles, aliases, and marker keys in validate-mdpp.py**
+- [x] **Unit 4: Add name validation functions for styles, aliases, and marker keys in validate-mdpp.py**
 
   **Goal:** Add the validation functions needed to enforce the naming rule across all entity types
 
@@ -188,7 +188,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   **Verification:**
   - All four validation functions exist and use the correct regex per R2
 
-- [ ] **Unit 5: Wire validation into the main loop for styles, aliases, and marker keys**
+- [x] **Unit 5: Wire validation into the main loop for styles, aliases, and marker keys**
 
   **Goal:** Call the new validation functions during document processing and report MDPP002 for invalid names
 
@@ -224,7 +224,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   - Running `validate-mdpp.py` on a file with invalid style/alias/marker names reports MDPP002
   - Running on existing test files (`sample-basic.md`, `sample-full.md`) produces no new errors
 
-- [ ] **Unit 6: Add test file for name validation (sample-invalid-names.md)**
+- [x] **Unit 6: Add test file for name validation (sample-invalid-names.md)**
 
   **Goal:** Create a targeted test file that exercises MDPP002 for all name types
 
@@ -260,7 +260,7 @@ All existing names in examples, tests, and the whitepaper comply with the unifie
   **Verification:**
   - Running `validate-mdpp.py` on the test file produces MDPP002 for all positive cases and no MDPP002 for negative cases
 
-- [ ] **Unit 7: Verify existing content compliance**
+- [x] **Unit 7: Verify existing content compliance**
 
   **Goal:** Confirm no existing examples or whitepaper content violates the unified rule
 

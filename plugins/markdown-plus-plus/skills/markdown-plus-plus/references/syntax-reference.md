@@ -50,6 +50,54 @@ This paragraph will not receive the marker or alias.
 
 ---
 
+## Naming Rules
+
+All named entities in Markdown++ (variables, styles, aliases, conditions, and marker keys) follow a shared naming grammar.
+
+### Standard Rule
+
+**Regex:** `[a-zA-Z_][a-zA-Z0-9_\-]*`
+
+- First character must be a letter (`a-z`, `A-Z`) or underscore (`_`)
+- Subsequent characters may be letters, digits (`0-9`), hyphens (`-`), or underscores (`_`)
+- Minimum length is 1 character
+- No whitespace or punctuation
+
+### Alias Exception
+
+Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `#04499224`).
+
+**Regex:** `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`
+
+### Valid Name Examples
+
+| Name | Entity | Why Valid |
+|------|--------|-----------|
+| `product_name` | Variable | Underscore-separated |
+| `release-date` | Variable | Hyphen-separated |
+| `_internal` | Variable | Underscore-first |
+| `CustomHeading` | Style | PascalCase |
+| `BQ_Warning` | Style | Mixed with underscore |
+| `introduction` | Alias | Lowercase alpha |
+| `316492` | Alias | Digit-first (alias exception) |
+| `web` | Condition | Single word |
+| `Keywords` | Marker key | PascalCase |
+
+### Invalid Name Examples
+
+| Name | Why Invalid |
+|------|-------------|
+| `123start` | Digit-first (not an alias) |
+| `-hyphen-first` | Starts with hyphen |
+| `has space` | Contains whitespace |
+| `special!char` | Contains punctuation |
+
+### Non-English Content
+
+For non-English content, the same structural rule applies using the language's UTF-8 letter values in place of `a-zA-Z`.
+
+---
+
 ## Variables
 
 ### Syntax
@@ -63,7 +111,7 @@ $variable_name;
 | Rule | Description |
 |------|-------------|
 | Start | Must begin with `$` |
-| Name | Alphanumeric characters, hyphens (`-`), underscores (`_`) |
+| Name | Must follow [Naming Rules](#naming-rules) |
 | End | Must end with semicolon (`;`) |
 | Spaces | Not allowed in variable names |
 | Case | Case-sensitive (`$Product;` ≠ `$product;`) |
@@ -85,7 +133,7 @@ $_internal;
 ```markdown
 $product name;     # Space in name
 $product           # Missing semicolon
-$123start;         # Cannot start with number (recommended)
+$123start;         # Violates naming rule: cannot start with digit
 $ variable;        # Space after $
 ```
 
@@ -184,7 +232,7 @@ This is <!--style: Emphasis--> **bold text**.
 
 | Rule | Description |
 |------|-------------|
-| Characters | Alphanumeric, hyphens, underscores |
+| Name | Must follow [Naming Rules](#naming-rules) |
 | Spaces | Not allowed in style names |
 | Case | Typically PascalCase by convention |
 
@@ -203,7 +251,7 @@ This is <!--style: Emphasis--> **bold text**.
 | Rule | Description |
 |------|-------------|
 | Start | Must begin with `#` inside the comment |
-| Name | Alphanumeric, hyphens, underscores |
+| Name | Must follow [Naming Rules](#naming-rules) (digit-first allowed) |
 | Spaces | Not allowed (alias ends at first space) |
 | Case | Case-sensitive |
 
@@ -272,7 +320,7 @@ content
 
 | Rule | Description |
 |------|-------------|
-| Characters | Alphanumeric, hyphens, underscores |
+| Name | Must follow [Naming Rules](#naming-rules) |
 | Spaces | Separator for AND operator |
 | Commas | Separator for OR operator |
 | Case | Condition names are case-sensitive |
@@ -401,6 +449,7 @@ Use `marker:key="value"` for single markers, JSON format for multiple.
 
 ### Simple Format Rules
 
+- Key names must follow [Naming Rules](#naming-rules)
 - Key followed by `=` and quoted value
 - Value in double quotes
 - No spaces around `=`
@@ -696,7 +745,7 @@ The validation script checks for these issues:
 | Code | Check | Severity |
 |------|-------|----------|
 | MDPP001 | Unclosed condition block | Error |
-| MDPP002 | Invalid variable name | Error |
+| MDPP002 | Invalid name (variable, style, alias, or marker key) | Error |
 | MDPP003 | Malformed marker JSON | Error |
 | MDPP004 | Invalid style placement (reserved, not yet implemented) | Warning |
 | MDPP005 | Circular include (reserved, not yet implemented) | Error |
