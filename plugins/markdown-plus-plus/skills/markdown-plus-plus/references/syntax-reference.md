@@ -69,7 +69,7 @@ A processor recognizes an HTML comment as a Markdown++ directive only when its c
 | `include:path` | File include | `<!-- include:chapter.md -->` |
 | `multiline` | Multiline table | `<!-- multiline -->` |
 
-Any combination of these patterns joined by semicolons is also recognized as a directive (see [Combined Commands](#combined-commands)).
+Any comment containing at least one of these patterns is recognized as a directive. Multiple commands can be joined by semicolons, and unrecognized segments are silently ignored as inline comments (see [Combined Commands](#combined-commands)).
 
 ### Regular HTML Comments
 
@@ -800,25 +800,34 @@ Spaces around semicolons are optional but recommended for readability:
 
 ### Unrecognized Segments in Combined Commands
 
-When a combined command contains a mix of recognized and unrecognized segments, the **entire comment** is treated as unrecognized. A processor MUST NOT partially interpret a combined command.
+When a combined command contains a mix of recognized and unrecognized segments, a processor MUST interpret the recognized segments normally and silently ignore the unrecognized segments. Unrecognized segments function as **inline comments** within the directive.
 
 ```markdown
-<!-- style:Note ; this is a comment -->
+<!-- style:CustomHeading ; #alias-here ; TODO: add Keywords/Description markers -->
+# My Heading Text
 ```
 
-The segment `this is a comment` does not match any command pattern. Because the comment contains an unrecognized segment, the entire comment is treated as a regular HTML comment -- the `style:Note` directive is **not** applied.
+The segments `style:CustomHeading` and `#alias-here` match known command patterns and are applied to the heading. The segment `TODO: add Keywords/Description markers` does not match any command pattern, so it is ignored. The heading receives both the custom style and the alias.
 
-**Rationale:** Partial interpretation would create ambiguous and hard-to-debug behavior. If an author writes `<!-- style:Note ; reminder to fix this -->`, silently applying the style while discarding the unrecognized text would hide the author's likely mistake. Treating the entire comment as unrecognized surfaces the problem: the element below it will lack the intended style, prompting the author to fix the comment.
-
-**To use regular comments alongside directives**, place them in separate HTML comments:
+**Why this is useful:** Inline comments within combined commands provide a clean, readable way to annotate directives without affecting processing. Authors can include notes, TODOs, or explanations directly alongside the commands they relate to.
 
 ```markdown
-<!-- This is a regular comment -->
-<!-- style:Note -->
+<!-- style:NoteBox ; marker:Keywords="setup" ; #getting-started ; Reviewed 2026-03 -->
+## Getting Started
+```
+
+**Avoid stacking separate HTML comments.** Placing multiple HTML comments on consecutive lines above an element can cause scanning errors and reduces readability. Combining recognized commands with inline comments in a single directive is the preferred pattern:
+
+```markdown
+<!-- Good: single combined command with inline comment -->
+<!-- style:Note ; marker:Priority="high" ; needs review before release -->
+> Important information here.
+
+<!-- Bad: stacked comments risk scanning errors and reduce readability -->
+<!-- needs review before release -->
+<!-- style:Note ; marker:Priority="high" -->
 > Important information here.
 ```
-
-The regular comment is ignored (see [Comment Disambiguation](#comment-disambiguation)). The `style:Note` directive is recognized and attached to the blockquote.
 
 ---
 
