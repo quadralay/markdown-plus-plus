@@ -50,6 +50,51 @@ This paragraph will not receive the marker or alias.
 
 ---
 
+## Comment Disambiguation
+
+Markdown++ directives use HTML comment syntax (`<!-- ... -->`), which creates a question: how does a processor distinguish a Markdown++ directive from a regular HTML comment?
+
+### Recognition Rule
+
+A processor recognizes an HTML comment as a Markdown++ directive only when its content matches a known command pattern. The recognized patterns are:
+
+| Pattern | Directive Type | Example |
+|---------|---------------|---------|
+| `style:Name` | Custom style | `<!-- style:Note -->` |
+| `#name` | Custom alias | `<!-- #introduction -->` |
+| `marker:Key="value"` | Simple marker | `<!-- marker:Keywords="api" -->` |
+| `markers:{...}` | JSON markers | `<!-- markers:{"Key": "value"} -->` |
+| `condition:expr` | Condition open | `<!-- condition:web -->` |
+| `/condition` | Condition close | `<!-- /condition -->` |
+| `include:path` | File include | `<!-- include:chapter.md -->` |
+| `multiline` | Multiline table | `<!-- multiline -->` |
+
+Any comment containing at least one of these patterns is recognized as a directive. Multiple commands can be joined by semicolons, and unrecognized segments are silently ignored as inline comments (see [Combined Commands](#combined-commands)).
+
+### Regular HTML Comments
+
+An HTML comment whose content does **not** match any recognized command pattern is a regular HTML comment. Processors MUST ignore it -- the comment passes through to output or is discarded, exactly as a standard Markdown renderer would handle it.
+
+```markdown
+<!-- This is a regular HTML comment -- ignored by Markdown++ processors -->
+## Heading
+
+<!-- TODO: revise this section before release -->
+Some paragraph text.
+```
+
+Neither comment above matches a command pattern, so both are treated as plain HTML comments with no Markdown++ effect. The heading and paragraph receive no directives.
+
+### Why This Matters
+
+Without this rule, any comment placed on a line above content could be misinterpreted as having directive intent. The pattern-matching rule ensures that authors can freely use standard HTML comments for notes, TODOs, and documentation without affecting Markdown++ processing.
+
+### Passthrough Marker (Distinct Concept)
+
+The `Passthrough` marker key (`<!-- marker:Passthrough="content" -->`) is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is unrelated to the pass-through behavior of unrecognized comments. See [Markers > Passthrough Marker](#passthrough-marker) for details.
+
+---
+
 ## Naming Rules
 
 All named entities in Markdown++ (variables, styles, aliases, conditions, and marker keys) follow a shared naming grammar.
@@ -518,7 +563,40 @@ API Reference
 | `IndexMarker` | Index entries (see below) |
 | `Author` | Document author |
 | `Category` | Content categorization |
-| `Passthrough` | Content that bypasses processing |
+| `Passthrough` | Content that bypasses processing (see below) |
+
+### Passthrough Marker
+
+The `Passthrough` marker injects literal content into published output without Markdown or Markdown++ processing. The marker value is passed directly to the output format.
+
+**Syntax:**
+```markdown
+<!-- marker:Passthrough="<custom-element />" -->
+## Section Title
+```
+
+**Semantics:**
+
+| Aspect | Behavior |
+|--------|----------|
+| Processing | The marker value is emitted as-is in the output, with no Markdown parsing or variable substitution |
+| Attachment | Follows standard marker attachment rules -- must be on the line directly above the target element with no blank line |
+| Target element | The passthrough content is associated with the element it is attached to; the element itself is still processed normally |
+| Output format | The raw content is inserted at the position of the attached element; how it renders depends on the output format (e.g., HTML tags in HTML output) |
+| Multiple values | Use JSON markers format for multiple passthrough entries |
+
+**Use cases:**
+- Injecting format-specific markup (e.g., custom HTML elements, processing instructions)
+- Embedding content that should not be interpreted as Markdown
+- Inserting output-format-specific directives that have no Markdown++ equivalent
+
+**Example -- injecting a custom HTML element:**
+```markdown
+<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+## Migration Guide
+```
+
+**Note:** The `Passthrough` marker is a recognized Markdown++ directive (it matches the `marker:Key="value"` pattern). It is distinct from the general behavior where unrecognized HTML comments are ignored -- see [Comment Disambiguation](#comment-disambiguation).
 
 ### Index Markers
 
@@ -721,6 +799,37 @@ Spaces around semicolons are optional but recommended for readability:
 ```markdown
 <!-- style:A;#b;marker:C="d" -->      # Valid
 <!-- style:A ; #b ; marker:C="d" -->  # Valid, more readable
+```
+
+### Unrecognized Segments in Combined Commands
+
+When a combined command contains a mix of recognized and unrecognized segments, a processor MUST interpret the recognized segments normally and silently ignore the unrecognized segments. Unrecognized segments function as **inline comments** within the directive.
+
+```markdown
+<!-- style:CustomHeading ; #alias-here ; TODO: add Keywords/Description markers -->
+# My Heading Text
+```
+
+The segments `style:CustomHeading` and `#alias-here` match known command patterns and are applied to the heading. The segment `TODO: add Keywords/Description markers` does not match any command pattern, so it is ignored. The heading receives both the custom style and the alias.
+
+**Why this is useful:** Inline comments within combined commands provide a clean, readable way to annotate directives without affecting processing. Authors can include notes, TODOs, or explanations directly alongside the commands they relate to.
+
+```markdown
+<!-- style:NoteBox ; marker:Keywords="setup" ; #getting-started ; Reviewed 2026-03 -->
+## Getting Started
+```
+
+**Avoid stacking separate HTML comments.** Placing multiple HTML comments on consecutive lines above an element can cause scanning errors and reduces readability. Combining recognized commands with inline comments in a single directive is the preferred pattern:
+
+```markdown
+<!-- Good: single combined command with inline comment -->
+<!-- style:Note ; marker:Priority="high" ; needs review before release -->
+> Important information here.
+
+<!-- Bad: stacked comments risk scanning errors and reduce readability -->
+<!-- needs review before release -->
+<!-- style:Note ; marker:Priority="high" -->
+> Important information here.
 ```
 
 ---

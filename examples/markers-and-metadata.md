@@ -108,4 +108,23 @@ This heading has a custom style, a keywords marker, and a stable alias -- all in
 | `IndexMarker` | Generated index entries | `"authentication:OAuth 2.0"` |
 | `Author` | Document author | `"Documentation Team"` |
 | `Category` | Content categorization | `"Reference"` |
-| `Passthrough` | Content that bypasses processing | `"<custom-element />"` |
+| `Passthrough` | Content that bypasses processing (see [Passthrough content](#passthrough-content) below) | `"<custom-element />"` |
+
+<!-- style:Heading2; #300008 -->
+## Passthrough content
+
+[passthrough-content]: #300008 "Passthrough content"
+
+The `Passthrough` marker injects literal content into published output without any Markdown or Markdown++ processing. The marker value is emitted as-is.
+
+<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+### Injecting a custom HTML element
+
+The heading above has a Passthrough marker that injects a legacy anchor tag into the output. The heading itself is processed normally -- only the marker value bypasses processing.
+
+```markdown
+<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+### Injecting a custom HTML element
+```
+
+**Note:** The `Passthrough` marker is a recognized Markdown++ directive. It is distinct from regular HTML comments, which are simply ignored by Markdown++ processors. See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#comment-disambiguation) section of the syntax reference for details.
