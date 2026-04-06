@@ -24,7 +24,7 @@ This whitepaper explains what Markdown++ is, how it compares to the formats you 
 Markdown++ is a documentation format built on the CommonMark specification. Every Markdown++ feature uses one of two extension mechanisms:
 
 - **HTML comment directives** -- `<!-- style: -->`, `<!-- include: -->`, `<!-- condition: -->`, `<!-- markers:{} -->`
-- **Inline tokens** -- `$variable_name;` (escaped with backslash when a literal dollar-semicolon sequence is needed: `\$`)
+- **Inline tokens** -- `$variable_name;` (escaped with `\$` when a literal dollar-semicolon sequence is needed, or excluded inside inline code spans)
 
 Standard Markdown renderers treat HTML comments as invisible and pass inline tokens through as plain text. This means every `.md` file authored in Markdown++ is a valid CommonMark document. There is no proprietary syntax, no custom file extension, and no build step required just to preview your content.
 

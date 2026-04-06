@@ -33,6 +33,22 @@ Welcome to $product_name; version $version;.
 Download from $download_url;.
 ```
 
+**Escaping variables:**
+
+When you need a literal `$name;` in published output, use one of two mechanisms:
+
+```markdown
+The variable syntax is \$variable_name; with a trailing semicolon.
+```
+
+Or use inline code when showing syntax examples:
+
+```markdown
+Use the `$variable_name;` syntax to define variables.
+```
+
+Use backslash escaping (`\$`) for running prose; use inline code for syntax examples and code references.
+
 **Example - Avoid:**
 ```markdown
 $intro_paragraph;  <!-- Too much content in a variable -->

@@ -29,7 +29,17 @@ For installation instructions, visit the $product_name; documentation portal.
 
 Variables are defined centrally in the publishing project and resolved during output generation. In a Markdown viewer, they appear as literal text (e.g., `$product_version;`).
 
-To use a literal dollar sign followed by a semicolon, escape it with a backslash: \$not_a_variable;
+### Escaping variables
+
+Two mechanisms prevent variable interpretation:
+
+**Backslash escaping** -- use `\$` to produce a literal dollar sign:
+
+\$not_a_variable; appears as literal text in published output.
+
+**Inline code spans** -- content inside backticks is never treated as a variable:
+
+Use the `$variable_name;` syntax to define reusable values.
 
 ## Content islands using blockquotes
 

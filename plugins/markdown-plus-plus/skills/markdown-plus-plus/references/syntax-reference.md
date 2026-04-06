@@ -116,7 +116,36 @@ $variable_name;
 | Spaces | Not allowed in variable names |
 | Case | Case-sensitive (`$Product;` ≠ `$product;`) |
 | Length | No explicit limit, but keep names reasonable |
-| Escaping | Use `\$` to prevent variable interpretation |
+| Escaping | Use `\$` or inline code to prevent variable interpretation |
+
+### Escaping Variables
+
+Two mechanisms prevent variable interpretation:
+
+**1. Backslash escaping:**
+
+```markdown
+The syntax is \$variable_name; with a trailing semicolon.
+```
+
+The `\$` sequence is recognized and removed during processing — the backslash is consumed, the `$` becomes a literal character, and the rest of the text passes through without variable substitution. The result in published output is the literal text `$variable_name;`.
+
+Backslash escaping is resolved *before* variable substitution in the processing pipeline. This is distinct from CommonMark's backslash escaping (which operates during Markdown parsing in a later phase).
+
+**2. Inline code spans:**
+
+```markdown
+Use the `$variable_name;` syntax to define variables.
+```
+
+Code spans are excluded from variable scanning entirely. Content inside backticks is never interpreted as a variable reference. This is the natural choice when showing Markdown++ syntax in documentation.
+
+**When to use each:**
+
+| Mechanism | Use When |
+|-----------|----------|
+| `\$` | You want the literal text `$name;` to appear in running prose |
+| `` `$name;` `` | You are showing syntax examples or code |
 
 ### Valid Examples
 
