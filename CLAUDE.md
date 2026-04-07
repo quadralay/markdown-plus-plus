@@ -22,6 +22,9 @@ markdown-plus-plus/
 │   └── bump-version.sh         # Version bump utility
 ├── spec/                       # Whitepaper and eventual formal specification
 ├── examples/                   # Sample .md files demonstrating features
+├── CHANGELOG.md                # Format and tooling change history
+├── CONTRIBUTING.md             # How to report issues and propose changes
+├── GOVERNANCE.md               # Spec maintainership and versioning process
 ├── SECURITY.md                 # Security policy and contact
 └── plugins/
     └── markdown-plus-plus/

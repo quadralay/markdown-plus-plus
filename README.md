@@ -54,6 +54,14 @@ A Claude Code marketplace plugin for AI-assisted Markdown++ authoring.
 
 - **[asciidoctor-mdpp](https://github.com/quadralay/asciidoctor-mdpp)** -- Convert AsciiDoc documents to Markdown++.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues, propose spec changes, and submit pull requests.
+
+For governance, spec versioning, and the decision-making process, see [GOVERNANCE.md](GOVERNANCE.md).
+
+For a history of changes, see [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 [MIT](LICENSE)
