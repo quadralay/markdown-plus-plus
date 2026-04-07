@@ -13,7 +13,7 @@ Markdown++ extends **CommonMark 0.30** with additional features. Standard Common
 
 ## Attachment Rules
 
-> **This is the most important rule in Markdown++.** A blank line between a comment tag and its target element silently breaks the association. The tag passes through as a regular HTML comment with no visible error in standard preview. See the [formal Attachment Rule specification](../../../../spec/attachment-rule.md) for the complete definition, all edge cases, and validation details.
+> **This is the most important rule in Markdown++.** A blank line between a comment tag and its target element silently breaks the association. The tag passes through as a regular HTML comment with no visible error in standard preview. See the [formal Attachment Rule specification](../../../../../spec/attachment-rule.md) for the complete definition, all edge cases, and validation details.
 
 Markdown++ comment tags must be **attached** to their target element -- they cannot float alone separated by whitespace. **"Attached" means the tag and target appear on immediately adjacent lines with zero blank lines between them.** Tags attach downward only; a tag placed below content does not apply to the content above it.
 

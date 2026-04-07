@@ -356,7 +356,7 @@ The top-level file (`_user-guide.md`) contains the document title, markers, and 
 
 ### 1. Breaking the Attachment Rule (Blank Lines, Ordering, Stacking)
 
-**The attachment rule is the most common source of Markdown++ errors.** Styles, aliases, markers, and combined commands must be on the line directly above their target element with no blank line between. A blank line silently breaks the association -- the tag passes through as a regular HTML comment with no visible error. See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for the formal definition and all edge cases.
+**The attachment rule is the most common source of Markdown++ errors.** Styles, aliases, markers, and combined commands must be on the line directly above their target element with no blank line between. A blank line silently breaks the association -- the tag passes through as a regular HTML comment with no visible error. See the [Attachment Rule specification](../../../../../spec/attachment-rule.md) for the formal definition and all edge cases.
 
 **Wrong -- blank line breaks attachment (styles):**
 ```markdown
