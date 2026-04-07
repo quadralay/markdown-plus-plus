@@ -258,9 +258,55 @@ See `references/syntax-reference.md` for complete syntax rules.
 
 ## Common Mistakes
 
-**A blank line between a Markdown++ comment tag and its element breaks the association.** This applies to styles, aliases, and markers equally -- all must be attached to a paragraph element. Detached or misindented comments pass through as regular Markdown comments and have no Markdown++ effect. Only conditions (which wrap content) are exempt from this rule. See `references/syntax-reference.md` for the complete attachment rules table.
+### 1. Blank Line Breaks Tag Attachment (The Attachment Rule)
+
+**This is the #1 source of Markdown++ errors.** A blank line between a comment tag and its target element silently breaks the association. The tag passes through as a regular HTML comment with no visible error. This applies to styles, aliases, markers, and combined commands equally. Only conditions (which wrap content) and includes (standalone directives) are exempt.
+
+**Wrong -- blank line breaks attachment:**
+```markdown
+<!-- style:NoteBox -->
+
+> This blockquote will NOT receive the style.
+```
+
+**Right -- tag directly above target, no blank line:**
+```markdown
+<!-- style:NoteBox -->
+> This blockquote receives the style.
+```
+
+**Wrong -- tag below content (tags attach downward only):**
+```markdown
+## Getting Started
+<!-- #getting-started -->
+```
+
+**Right -- tag above content:**
+```markdown
+<!-- #getting-started -->
+## Getting Started
+```
+
+**Wrong -- stacked tags (top tag is orphaned):**
+```markdown
+<!-- style:CustomHeading -->
+<!-- #my-alias -->
+## Heading
+```
+
+**Right -- combine with semicolons:**
+```markdown
+<!-- style:CustomHeading ; #my-alias -->
+## Heading
+```
+
+See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for the formal definition and all edge cases.
+
+### 2. Mismatched Indentation on Nested Lists
 
 **Indentation of Markdown++ comment tags must match the content line.** In nested lists, if the comment tag is indented but the following content is not (or vice versa), the style passes through as a regular Markdown comment and is not applied.
+
+### 3. Missing Semicolon on Variables
 
 **Variables without a trailing semicolon are not recognized.** `$product_name` is literal text; `$product_name;` is a variable reference. The semicolon is required.
 

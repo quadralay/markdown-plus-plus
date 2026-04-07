@@ -13,39 +13,67 @@ Markdown++ extends **CommonMark 0.30** with additional features. Standard Common
 
 ## Attachment Rules
 
-Markdown++ comment tags must be **associated with a paragraph element** -- they cannot float alone separated by whitespace. A blank line between a comment tag and its element breaks the association, causing the tag to pass through as a regular HTML comment with no Markdown++ effect.
+> **This is the most important rule in Markdown++.** A blank line between a comment tag and its target element silently breaks the association. The tag passes through as a regular HTML comment with no visible error in standard preview. See the [formal Attachment Rule specification](../../../../../spec/attachment-rule.md) for the complete definition, all edge cases, and validation details.
 
-The following table summarizes attachment requirements for each command type:
+Markdown++ comment tags must be **attached** to their target element -- they cannot float alone separated by whitespace. **"Attached" means the tag and target appear on immediately adjacent lines with zero blank lines between them.** Tags attach downward only; a tag placed below content does not apply to the content above it.
+
+### Attachment Requirements by Command
 
 | Command | Attachment Required | Blank Line Permitted | Can Be Standalone |
 |---------|:-------------------:|:--------------------:|:-----------------:|
 | Styles (`style:`) | Yes | No | No |
 | Aliases (`#name`) | Yes | No | No |
 | Markers (`marker:`/`markers:`) | Yes | No | No |
+| Combined commands (`;`) | Yes | No | No |
+| Multiline (`multiline`) | Yes (above table) | No | No |
 | Conditions (`condition:`) | N/A (wraps content) | Yes (within block) | Yes |
 | Includes (`include:`) | N/A (standalone directive) | N/A | Yes |
-| Multiline (`multiline`) | Yes (above table) | No | No |
 
-**Correct -- tag attached to element (no blank line):**
+### Correct -- tag attached to element (no blank line)
+
 ```markdown
 <!-- marker:IndexMarker="setup" ; #getting-started -->
 ## Getting Started
 ```
 
-**Correct -- document-level markers attached to the Title paragraph:**
+### Correct -- document-level markers attached to the Title paragraph
+
 ```markdown
 <!-- markers:{"Keywords": "api, docs", "Description": "API reference"} -->
 Heading Title
 =============
 ```
 
-**Wrong -- blank line breaks the association:**
+### Wrong -- blank line breaks attachment
+
+```markdown
+<!-- style:NoteBox -->
+
+> This blockquote will NOT receive the style.
+```
+
+### Wrong -- tag below content (tags attach downward only)
+
 ```markdown
 ## Getting Started
+<!-- #getting-started -->
+```
 
-<!-- marker:IndexMarker="setup" ; #getting-started -->
+The alias does not attach to the heading above it. Place the tag on the line **above** the heading.
 
-This paragraph will not receive the marker or alias.
+### Wrong -- stacked tags (top tag is orphaned)
+
+```markdown
+<!-- style:CustomHeading -->
+<!-- #my-alias -->
+## Heading Text
+```
+
+Only `#my-alias` attaches to the heading. The style tag is orphaned because its next line is another tag, not content. Use combined commands instead:
+
+```markdown
+<!-- style:CustomHeading ; #my-alias -->
+## Heading Text
 ```
 
 ---

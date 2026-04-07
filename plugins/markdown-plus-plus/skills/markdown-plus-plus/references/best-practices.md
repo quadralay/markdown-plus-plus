@@ -354,7 +354,66 @@ The top-level file (`_user-guide.md`) contains the document title, markers, and 
 
 ## Common Mistakes to Avoid
 
-### 1. Missing Semicolons on Variables
+### 1. Breaking the Attachment Rule (Blank Lines, Ordering, Stacking)
+
+**The attachment rule is the most common source of Markdown++ errors.** Styles, aliases, markers, and combined commands must be on the line directly above their target element with no blank line between. A blank line silently breaks the association -- the tag passes through as a regular HTML comment with no visible error. See the [Attachment Rule specification](../../../../../spec/attachment-rule.md) for the formal definition and all edge cases.
+
+**Wrong -- blank line breaks attachment (styles):**
+```markdown
+<!--style:CustomHeading-->
+
+# Heading
+```
+
+**Wrong -- blank line breaks attachment (aliases and markers):**
+```markdown
+### Installation
+
+<!-- marker:IndexMarker="setup" ; #installation -->
+
+Follow these steps to install...
+```
+
+**Wrong -- tag below content (tags attach downward only):**
+```markdown
+## Getting Started
+<!-- #getting-started -->
+```
+
+**Wrong -- stacked tags (top tag is orphaned):**
+```markdown
+<!-- style:CustomHeading -->
+<!-- #my-alias -->
+## Heading
+```
+
+**Right -- all commands attached directly above target:**
+```markdown
+<!--style:CustomHeading-->
+# Heading
+```
+
+```markdown
+<!-- marker:IndexMarker="setup" ; #installation -->
+### Installation
+
+Follow these steps to install...
+```
+
+```markdown
+<!-- #getting-started -->
+## Getting Started
+```
+
+**Right -- combine commands with semicolons instead of stacking:**
+```markdown
+<!-- style:CustomHeading ; #my-alias -->
+## Heading
+```
+
+**Note:** Conditions (`condition:`/`/condition`) are exempt because they wrap content. Includes (`include:`) are exempt because they are standalone directives. Markers at the start of a file are not exempt -- they are attached to the Title paragraph that follows them.
+
+### 2. Missing Semicolons on Variables
 
 **Wrong:**
 ```markdown
@@ -364,21 +423,6 @@ Welcome to $product_name, version $version.
 **Right:**
 ```markdown
 Welcome to $product_name;, version $version;.
-```
-
-### 2. Blank Line After Block Style
-
-**Wrong:**
-```markdown
-<!--style:CustomHeading-->
-
-# Heading
-```
-
-**Right:**
-```markdown
-<!--style:CustomHeading-->
-# Heading
 ```
 
 ### 3. Space Before Inline Style Target
@@ -431,29 +475,6 @@ header.md includes main.md  <!-- Circular! -->
 
 **Right:**
 Ensure include chains never loop back.
-
-### 7. Orphaned Aliases and Markers
-
-Aliases and element-level markers follow the same attachment rule as styles -- they must be on the line directly above the element they apply to, with no blank line between.
-
-**Wrong:**
-```markdown
-### Installation
-
-<!-- marker:IndexMarker="setup" ; #installation -->
-
-Follow these steps to install...
-```
-
-**Right:**
-```markdown
-<!-- marker:IndexMarker="setup" ; #installation -->
-### Installation
-
-Follow these steps to install...
-```
-
-**Note:** Markers at the start of a file are not exempt -- they are attached to the Title paragraph that follows them. Conditions are exempt because they wrap content rather than attaching to a single element.
 
 ## Performance Considerations
 
