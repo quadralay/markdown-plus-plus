@@ -77,6 +77,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 - **Attachment rule formal spec** (`docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md`): Established the pattern for moving scattered implementation details into a single authoritative spec document. Key lesson: enumerate all edge cases before writing, cross-reference from existing docs, align validation codes with user-facing spec.
 - **Processing model specification** (`docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md`): Demonstrated how to formalize implicit behavior from the ePublisher implementation with RFC 2119 normative language and numbered requirements.
+- **Unified naming rule** (`docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md`): Compound style names (e.g., `"Blockquote Heading 1"`) contain spaces and fall outside both `STANDARD_NAME_RE` and `ALIAS_NAME_RE`. The element interactions spec must explicitly document that compound names are structural compositions of individual identifier names, not bare identifiers subject to the naming rule regex.
 
 ## Key Technical Decisions
 
@@ -87,6 +88,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 - **Auto-generated aliases supplement custom aliases**: Custom aliases via `<!--#name-->` create additional anchors alongside the auto-generated heading alias. Both are valid anchors. (see origin)
 - **TOC section is informational, not normative**: TOC generation is output-specific behavior. The spec documents the mapping as a SHOULD-level recommendation rather than a MUST requirement. Rationale: different output formats may handle TOC differently.
 - **Block/inline HTML output-format dependency noted as processor-defined**: The spec notes that HTML element styling availability depends on the output format, with a SHOULD-level recommendation. Rationale: this is genuinely processor-dependent behavior.
+- **Compound names are compositions, not identifiers**: Compound style names contain spaces (`"Blockquote Heading 1"`) and do not match the `STANDARD_NAME_RE` naming rule. The spec must define compound names as structural compositions of individual identifier names (each component conforming to the naming rule) joined by spaces, with a formal composition rule. Cross-reference the syntax reference Naming Rules section rather than redefining identifier constraints.
 
 ## Open Questions
 
@@ -231,7 +233,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 - Blockquotes (R7): "Blockquote" default, content island semantics, nested content gets compound names
 - Ordered lists (R8): "OList" container / "OList Item" items, nested content compound naming
 - Unordered lists (R9): "UList" container / "UList Item" items, unlike-marker list-breaking behavior
-- Compound naming rule (R14): formal definition -- when content is nested inside a styled container, the style name is `"ContainerStyle ElementDefault"` (space-separated). Recursive at each container boundary. Include compound naming examples table
+- Compound naming rule (R14): formal definition -- when content is nested inside a styled container, the style name is `"ContainerStyle ElementDefault"` (space-separated). Recursive at each container boundary. Include compound naming examples table. Explicitly note that compound names are structural compositions (space-separated sequences of individual identifiers), not bare identifiers -- they fall outside `STANDARD_NAME_RE` by design. Cross-reference the syntax reference Naming Rules section for individual component naming constraints
 - Non-inheritance (R15): nested lists do not inherit parent custom styles. Each nesting level requires its own style tag
 - Code examples showing: simple styled container, compound naming with default names, compound naming with custom names, deeply nested compounding, non-inheritance demonstration
 
@@ -349,5 +351,6 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 - Related reference: [syntax-reference.md](../../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md)
 - Related solution: [docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md](../solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md)
 - Related solution: [docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md](../solutions/documentation-gaps/processing-model-specification-2026-04-08.md)
+- Related solution: [docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md](../solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md)
 - Related issue: [#9](https://github.com/quadralay/markdown-plus-plus/issues/9) -- Document standard element interactions
 - Related issue: [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) -- Write a formal Markdown++ specification
