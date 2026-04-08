@@ -11,6 +11,51 @@ Complete reference for all Markdown++ extensions. This document provides detaile
 
 Markdown++ extends **CommonMark 0.30** with additional features. Standard CommonMark syntax works as expected. GitHub Flavored Markdown (GFM) tables are also supported. All extensions use HTML comments or inline tokens -- HTML comments are invisible to standard renderers, and inline tokens pass through as plain text. Markdown++ files remain valid `.md` documents that work in any Markdown tool.
 
+## Version Declaration
+
+Markdown++ documents can declare which specification version they target using the `mdpp-version` field in YAML frontmatter:
+
+```yaml
+---
+mdpp-version: 1.0
+date: 2026-04-08
+status: active
+---
+```
+
+### Rules
+
+| Rule | Description |
+|------|-------------|
+| Field name | `mdpp-version` |
+| Format | `MAJOR.MINOR` (e.g., `1.0`, `1.2`) |
+| Required | No -- omitting `mdpp-version` is valid |
+| Scope | Only spec-defined frontmatter field |
+| Multi-file | Root document's declaration is authoritative |
+
+### Current Version
+
+The current Markdown++ specification version is **1.0**. Documents authored against the current specification should declare `mdpp-version: 1.0`.
+
+### What It Does
+
+When a processing tool encounters a document with `mdpp-version`, it compares the declared version against its own supported version:
+
+| Situation | Result |
+|-----------|--------|
+| Versions match | Process normally |
+| Document minor version ahead | Warning (MDPP015), best-effort processing |
+| Different major version | Warning (MDPP016), processor may refuse |
+| No `mdpp-version` field | Process normally, no diagnostic |
+
+### Note
+
+The specification version (`mdpp-version: 1.0`) is separate from tool/plugin versions. Document authors declare the specification version, not a tool version.
+
+For the complete normative rules, see the [Format Versioning specification](../../../../../spec/versioning.md).
+
+---
+
 ## Attachment Rules
 
 > **This is the most important rule in Markdown++.** A blank line between a comment tag and its target element silently breaks the association. The tag passes through as a regular HTML comment with no visible error in standard preview. See the [formal Attachment Rule specification](../../../../../spec/attachment-rule.md) for the complete definition, all edge cases, and validation details.

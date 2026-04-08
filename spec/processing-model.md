@@ -9,7 +9,7 @@ status: draft
 
 This document specifies how a conformant Markdown++ processor evaluates extensions to produce deterministic output. It defines the processing pipeline, evaluation order, scoping rules, error behavior, and output model that all conformant implementations MUST follow.
 
-The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) defines what each extension looks like. This document defines how those extensions are evaluated at processing time. The [Attachment Rule](attachment-rule.md) defines how block-level tags bind to content elements. Together, these three documents form the normative specification for the Markdown++ format.
+The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) defines what each extension looks like. This document defines how those extensions are evaluated at processing time. The [Attachment Rule](attachment-rule.md) defines how block-level tags bind to content elements. [Format Versioning](versioning.md) defines how documents declare their target specification version and how processors handle version mismatches. Together, these four documents form the normative specification for the Markdown++ format.
 
 The processing model formalizes the two-phase pipeline that the ePublisher Markdown++ adapter has used in production. By extracting and standardizing this model, Markdown++ becomes a format that other tools can implement with confidence.
 
@@ -41,7 +41,11 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 
 ## Pipeline Overview
 
-Processing a Markdown++ document is a two-phase operation. **Phase 1** operates on raw text before any Markdown parsing occurs. **Phase 2** parses the resolved text as Markdown with extension-aware grammars. The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is complete.
+Processing a Markdown++ document is a two-phase operation with an optional preamble step. **Phase 1** operates on raw text before any Markdown parsing occurs. **Phase 2** parses the resolved text as Markdown with extension-aware grammars. The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is complete.
+
+**Preamble: Version Check** (optional)
+
+0. **Version Check** -- Extract the `mdpp-version` field from the root document's YAML frontmatter. If present, compare the declared version against the processor's supported specification version and emit MDPP015 or MDPP016 if a mismatch is detected. See [Format Versioning](versioning.md) for the complete rules.
 
 **Phase 1: Pre-Processing** (text-level transforms)
 
@@ -475,6 +479,8 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP012** | Cross-file condition span | Error | Phase 1, Step 1 | A condition block opens in one file and closes in another |
 | **MDPP013** | Include cycle detected during processing | Error | Phase 1, Step 1 | A file appears in its own include chain during recursive expansion |
 | **MDPP014** | Duplicate link reference slug across files | Warning | Phase 2 | Two or more link reference definitions with the same slug originate from different source files in the assembled document. See [Cross-File Link Reference Resolution](cross-file-link-resolution.md). |
+| **MDPP015** | Document targets newer minor version than processor supports | Warning | Preamble | The `mdpp-version` minor version exceeds the processor's supported minor version within the same major series. See [Format Versioning](versioning.md). |
+| **MDPP016** | Document targets different major version than processor supports | Warning | Preamble | The `mdpp-version` major version differs from the processor's supported major version. See [Format Versioning](versioning.md). |
 
 Implementations MAY define additional diagnostic codes beyond this registry for implementation-specific checks. Custom codes SHOULD use numbers MDPP100 and above to avoid conflicts with future specification-defined codes.
 
@@ -495,7 +501,7 @@ A conformant Markdown++ processor MUST implement all of the following:
 7. **Multiline table processing** -- Recognition and processing of `multiline` commands on table elements.
 8. **Attachment rule enforcement** -- Block-level and inline attachment as specified in the [Attachment Rule](attachment-rule.md).
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
-10. **Diagnostic reporting** -- Emission of all MDPP diagnostic codes defined in this specification at their specified severity levels.
+10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
 
 ### Optional Features
 
@@ -503,10 +509,11 @@ The following features are OPTIONAL. A conformant processor MAY implement them b
 
 1. **Combined commands** -- Semicolon-separated commands in a single comment tag. A processor that supports combined commands MUST evaluate them in the order specified in [Combined Command Evaluation Order](#combined-command-evaluation-order).
 2. **Maximum include depth enforcement** -- A processor MAY impose a maximum include depth. If it does, it SHOULD use a default of 10 and MUST emit **MDPP011** when the limit is exceeded.
+3. **Version checking** -- A processor MAY implement the version check preamble described in [Format Versioning](versioning.md). If it does, it MUST emit **MDPP015** and **MDPP016** at their specified severities and follow the compatibility rules defined in that specification.
 
 ### Conformance Statement
 
-A processor that implements all required features, handles all MDPP diagnostic codes at their specified severities, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
+A processor that implements all required features, handles MDPP diagnostic codes at their specified severities for all features it implements, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
 
 A processor that implements all required features plus one or more optional features is a **conformant Markdown++ processor with extensions** and SHOULD document which optional features are supported.
 

@@ -51,6 +51,8 @@ The Markdown++ specification uses [Semantic Versioning](https://semver.org/):
 - **Minor** (1.x.0) -- New extensions or features that are backward compatible. Existing documents continue to work unchanged.
 - **Major** (x.0.0) -- Changes that alter the behavior of existing syntax or remove features. These require a deprecation cycle.
 
+The [Format Versioning specification](spec/versioning.md) defines how documents declare their target spec version (`mdpp-version` frontmatter field) and how processors handle version mismatches. This governance document defines the versioning scheme and process; the spec defines the technical mechanism.
+
 ### Version release process
 
 1. Changes accumulate on `main` and are tracked in the `[Unreleased]` section of the changelog.

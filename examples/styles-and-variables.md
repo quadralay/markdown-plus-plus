@@ -1,4 +1,5 @@
 ---
+mdpp-version: 1.0
 date: 2026-03-29
 status: active
 ---
