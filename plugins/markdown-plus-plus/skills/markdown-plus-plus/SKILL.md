@@ -24,6 +24,7 @@ Markdown++ extends CommonMark with HTML comment-based extensions. All extensions
 
 ### Quick Reference
 
+- **Version Declaration**: `mdpp-version: 1.0` -- Spec version in YAML frontmatter
 - **Variables**: `$variable_name;` -- Inline, reusable content
 - **Styles**: `<!--style:Name-->` -- Block (above) or Inline (before)
 - **Aliases**: `<!--#alias-name-->` -- Anchor for `[text](#alias-name)` links
@@ -328,6 +329,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 ## Success Criteria
 
 - Markdown++ document uses correct syntax for all extensions
+- Documents SHOULD declare `mdpp-version: 1.0` in YAML frontmatter (see [Format Versioning](../../../../spec/versioning.md))
 - All named entities follow [Naming Rules](references/syntax-reference.md#naming-rules)
 - Conditions have matching opening and closing tags
 - File includes use valid relative paths

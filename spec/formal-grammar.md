@@ -16,6 +16,8 @@ Markdown++ adds two syntactic forms to CommonMark:
 
 All other content is standard CommonMark and is outside the scope of this grammar.
 
+YAML frontmatter, including the `mdpp-version` field defined in [Format Versioning](versioning.md), is document metadata. It is not a Markdown++ extension construct and is outside the scope of this grammar. Frontmatter processing rules are defined in the versioning specification.
+
 ## Relationship to CommonMark
 
 A Markdown++ document is a valid CommonMark 0.30 document. Markdown++ extensions are expressed through mechanisms that CommonMark already defines:
@@ -354,6 +356,7 @@ The grammar defines the **syntactic form** of Markdown++ extensions. It does not
 - **Semantic processing** -- how variables are resolved, how conditions are evaluated, or how includes are processed
 - **Error recovery** -- how a parser should behave when encountering malformed constructs
 - **Output generation** -- how parsed constructs map to output formats
+- **Frontmatter processing** -- how YAML frontmatter (including `mdpp-version`) is parsed and interpreted. See [Format Versioning](versioning.md)
 
 These are implementation concerns outside the scope of this grammar.
 
@@ -534,4 +537,5 @@ All constructs in the five example files (`examples/*.md`) parse correctly under
 - [W3C EBNF Notation](https://www.w3.org/TR/xml/#sec-notation) -- Grammar notation used in this document
 - [Bryan Ford, "Parsing Expression Grammars: A Recognition-Based Syntactic Foundation" (2004)](https://bford.info/pub/lang/peg.pdf) -- PEG formalism used in the transliteration section
 - [Attachment Rule](attachment-rule.md) -- Structural constraints for tag-to-element binding
+- [Format Versioning](versioning.md) -- Version declaration syntax and frontmatter processing rules
 - [Syntax Reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) -- Prose definitions and usage details for all constructs
