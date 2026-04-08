@@ -442,6 +442,26 @@ The path from Markdown++ source to published output:
 
 This pipeline can be fully automated. Command-line build tools enable generation as part of CI/CD workflows, triggered by commits, merges, or scheduled builds. The same source files produce consistent output across all formats without manual intervention.
 
+## Format versioning
+
+Mature documentation formats provide versioning so that documents can declare which specification they target and processors can detect compatibility issues. Markdown++ includes a versioning mechanism designed with the same principles as the rest of the format: simple, optional, and backward compatible.
+
+A document declares its target specification version using a single YAML frontmatter field:
+
+```yaml
+---
+mdpp-version: 1.0
+---
+```
+
+The `mdpp-version` field is optional -- existing documents without it continue to work unchanged. When present, it tells a processing tool which version of the Markdown++ specification the document was authored against. If the processor supports a different version, it can warn the author about potential compatibility issues rather than silently producing unexpected output.
+
+Compatibility follows the same guarantees defined in the project's governance: minor version updates are backward compatible (a processor supporting 1.2 handles 1.0 documents without issue), and major version changes signal that document authors should review their content. The versioning mechanism is deliberately lightweight -- one frontmatter field, clear compatibility rules, and graceful degradation when versions differ.
+
+The specification version (e.g., 1.0) is distinct from any tool or plugin version. A publishing tool at version 5.0 might implement specification version 1.2. Document authors declare the specification version, not a tool version. This separation ensures that documents remain portable across different tools and tool versions.
+
+For the complete normative rules -- version declaration syntax, compatibility behavior, multi-file assembly rules, and diagnostic codes -- see the [Format Versioning specification](versioning.md). For the versioning scheme, release process, and backward compatibility guarantees, see [GOVERNANCE.md](../GOVERNANCE.md).
+
 ## Getting started
 
 Markdown++ is an open documentation format built on CommonMark. Markdown++ files are standard `.md` files -- they work in every Markdown editor, previewer, and workflow you already use. To start working with it:

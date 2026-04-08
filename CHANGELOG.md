@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Spec
 
+- Added format versioning mechanism: `mdpp-version` frontmatter field for document-level version declaration, compatibility rules, MDPP015/MDPP016 diagnostic codes, and initial spec version 1.0 ([#25](https://github.com/quadralay/markdown-plus-plus/issues/25))
+
 ### Tooling
 
 ### Project

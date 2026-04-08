@@ -1,7 +1,7 @@
 ---
 title: "feat: Add format versioning mechanism to Markdown++ specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-format-versioning-requirements.md
 ---
@@ -147,7 +147,7 @@ Document Lifecycle with Version Check:
 
 ## Implementation Units
 
-- [ ] **Unit 1: Create `spec/versioning.md` -- the normative versioning specification**
+- [x] **Unit 1: Create `spec/versioning.md` -- the normative versioning specification**
 
   **Goal:** Define the complete versioning mechanism as a standalone spec document following established patterns.
 
@@ -194,7 +194,7 @@ Document Lifecycle with Version Check:
   - RFC 2119 language is consistent (no SHOULD/MUST contradictions)
   - Cross-references to other spec documents are accurate
 
-- [ ] **Unit 2: Update `spec/processing-model.md` -- add version check preamble and diagnostic codes**
+- [x] **Unit 2: Update `spec/processing-model.md` -- add version check preamble and diagnostic codes**
 
   **Goal:** Integrate the version check step into the processing pipeline and register MDPP015/MDPP016 in the diagnostic code registry.
 
@@ -231,7 +231,7 @@ Document Lifecycle with Version Check:
   - The introduction reflects the updated normative document set
   - Version checking appears in Optional Features
 
-- [ ] **Unit 3: Update `spec/formal-grammar.md` -- add frontmatter scope note**
+- [x] **Unit 3: Update `spec/formal-grammar.md` -- add frontmatter scope note**
 
   **Goal:** Explicitly note that YAML frontmatter processing is outside the grammar's scope, directing readers to `spec/versioning.md`.
 
@@ -260,7 +260,7 @@ Document Lifecycle with Version Check:
   - The grammar document does not introduce any new productions for frontmatter
   - Readers are directed to the correct spec document for frontmatter rules
 
-- [ ] **Unit 4: Update `spec/whitepaper.md` -- add versioning section**
+- [x] **Unit 4: Update `spec/whitepaper.md` -- add versioning section**
 
   **Goal:** Introduce the versioning concept in the whitepaper with a brief section that directs readers to the normative spec.
 
@@ -289,7 +289,7 @@ Document Lifecycle with Version Check:
   - Whitepaper readers understand the versioning concept and know where to find the details
   - No normative language (MUST/SHOULD/MAY) appears in the whitepaper versioning section
 
-- [ ] **Unit 5: Update syntax reference and examples**
+- [x] **Unit 5: Update syntax reference and examples**
 
   **Goal:** Document the `mdpp-version` frontmatter field in the syntax reference and add version declarations to example files.
 
@@ -319,7 +319,7 @@ Document Lifecycle with Version Check:
   - A reader can learn how to use `mdpp-version` from the syntax reference alone
   - Example files demonstrate the versioning feature
 
-- [ ] **Unit 6: Update GOVERNANCE.md and CHANGELOG.md -- cross-references and release notes**
+- [x] **Unit 6: Update GOVERNANCE.md and CHANGELOG.md -- cross-references and release notes**
 
   **Goal:** Add cross-reference from GOVERNANCE.md to the new versioning spec, and add the changelog entry.
 
