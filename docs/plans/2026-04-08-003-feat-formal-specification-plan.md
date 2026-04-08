@@ -120,9 +120,10 @@ The specification follows a layered architecture:
 │  6. Attachment Rule (→ attachment-rule)          │
 │  7. Processing Model (→ processing-model)       │
 │  8–15. Extension Definitions (NEW content)      │
-│  16. Advanced Topics                            │
-│  17. Diagnostic Registry (consolidated)         │
-│  18. References                                 │
+│  16. Combined Commands                          │
+│  17. Advanced Topics                            │
+│  18. Diagnostic Registry (consolidated)         │
+│  19. References                                 │
 └───────┬─────────┬──────────┬──────────┬─────────┘
         │         │          │          │
         ▼         ▼          ▼          ▼
@@ -382,8 +383,9 @@ Key interactions to specify normatively:
 - Modify: `spec/specification.md`
 
 **Approach:**
+- **Combined Commands** (section 16): Standalone section for the semicolon-separated combined command syntax. Covers: evaluation order (style → multiline → marker → alias), whitespace rules (spaces around semicolons optional but recommended), unrecognized segment behavior (silently ignored as inline comments — a normative MUST), and the processing model's classification of combined commands as an OPTIONAL feature (`spec/processing-model.md` lines 504-505). This warrants its own section because it has its own evaluation order, whitespace rules, and the inline comment behavior for unrecognized segments. Source: syntax-reference.md lines 780-863.
 - **Inline Styling for Images and Links**: Normative definition of inline style placement for images (`<!-- style:Name -->![alt](src)`) and links (`[<!-- style:Name -->*text*](url)`). The image pattern places the style before the image syntax. The link pattern places the style inside the link text brackets. Both follow the inline attachment rule (no space between closing `-->` and element). Source: syntax-reference.md lines 865-892.
-- **Book Assembly**: Describe the assembly pattern: a root document that uses `<!-- include: -->` directives to compose chapters into a publication. The processing model's Phase 1 include expansion is the assembly mechanism. Cross-document concerns (link references, variable scope, condition evaluation) are covered by the processing model and cross-file link resolution specs. This section is descriptive guidance, not new normative requirements — the normative rules are already in the processing model. Note: cross-document numbering and pagination are processor-specific output concerns, out of scope.
+- **Book Assembly**: Describe the assembly pattern: a root document that uses `<!-- include: -->` directives to compose chapters into a publication. The processing model's Phase 1 include expansion is the assembly mechanism. Cross-document concerns (link references, variable scope, condition evaluation) are covered by the processing model and cross-file link resolution specs. This section is descriptive guidance, not new normative requirements — the normative rules are already in the processing model. Frame cross-file resolution as a derived behavior (consequence of Phase 1 assembly), not an independent feature. Note: cross-document numbering and pagination are processor-specific output concerns, out of scope.
 - **Link Reference Definitions**: Summarize the cross-file link reference resolution model — document-global scope after assembly, first-definition-wins for conflicts, slug case-insensitivity per CommonMark 0.30. Describe the semantic cross-reference pattern (combined command + heading + link reference definition). Reference `spec/cross-file-link-resolution.md` normatively for the complete definition including MDPP014 diagnostic.
 
 **Patterns to follow:**
