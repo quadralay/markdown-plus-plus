@@ -65,6 +65,10 @@ Tool authors who want to implement Markdown++ support must currently reverse-eng
 - **Normative reference approach**: The processing model already references the attachment rule and syntax reference normatively. This establishes the cross-referencing convention.
 - **Diagnostic code organization**: Static codes (MDPP001-009) live in syntax-reference.md, processing codes (MDPP010-014) in processing-model.md and cross-file-link-resolution.md. The unified spec consolidates these into one registry.
 - **Content Islands are thin**: Only ~13 lines in syntax-reference.md. Content Islands are styled blockquotes — standard CommonMark with a style convention. The spec section should be proportionally brief.
+- **Use relative markdown links to sub-specs, not repo-root paths**: The cross-file link resolution review caught and corrected inline code paths to relative links. Apply this consistently in the unified spec.
+- **SHOULD/MUST consistency audit**: The cross-file link resolution spec had a SHOULD/MUST contradiction for MDPP014 emission that was caught in review. The unified spec must audit all RFC 2119 keywords for consistency between the main document's summaries and the sub-specs' definitions.
+- **Present derived behaviors as consequences**: Cross-file link resolution is a consequence of Phase 1 assembly, not an independent feature. The unified spec should frame it this way to help implementors understand the dependency chain.
+- **MDPP002 expanded scope**: Originally "Invalid variable name," now covers all named entities. The unified naming rules established `identifier` and `alias_name` as the two patterns — aliases permit digit-first names.
 
 ## Key Technical Decisions
 
@@ -410,7 +414,7 @@ Key interactions to specify normatively:
 - Modify: `spec/specification.md`
 
 **Approach:**
-- **Diagnostic Registry**: Single table consolidating all 14 diagnostic codes with columns: Code, Name, Severity, Phase (Static/Processing), Description, Triggering Condition, Required Level (Pass-through: N/A, Full: MUST/SHOULD). Recovery behavior is referenced via the processing model, not re-specified. Sources: syntax-reference.md lines 910-925 for MDPP001-009, processing-model.md lines 452-477 for MDPP010-014.
+- **Diagnostic Registry**: Single table consolidating all 14 diagnostic codes with columns: Code, Name, Severity, Phase (Static/Processing), Description, Triggering Condition, Required Level (Pass-through: N/A, Full: MUST/SHOULD). Recovery behavior is referenced via the processing model, not re-specified. Sources: syntax-reference.md lines 910-925 for MDPP001-009, processing-model.md lines 452-477 for MDPP010-014. Note: MDPP002 description must use the expanded scope "Invalid name (variable, style, alias, or marker key)" not the original "Invalid variable name" — this was expanded when naming rules were unified (see `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md`).
 - **Normative References**: CommonMark 0.30, RFC 2119, and the four sub-specs (formal-grammar.md, processing-model.md, attachment-rule.md, cross-file-link-resolution.md)
 - **Informative References**: The whitepaper, GFM spec (for table support), examples directory
 
@@ -445,7 +449,7 @@ Key interactions to specify normatively:
 - Verify every requirement (R1-R14) is addressed in the specification
 - Check all cross-references to sub-specs point to correct sections and use consistent normative language
 - Verify terminology is used consistently throughout (terms match definitions in the terminology section)
-- Confirm RFC 2119 keywords are used correctly (MUST for absolute requirements, SHOULD for recommendations, MAY for optional behavior)
+- Confirm RFC 2119 keywords are used correctly (MUST for absolute requirements, SHOULD for recommendations, MAY for optional behavior). **Critical**: Audit for SHOULD/MUST inconsistencies between the main spec's summaries and sub-spec definitions — the cross-file link resolution spec had a SHOULD/MUST contradiction for MDPP014 emission that was caught in review (see `docs/solutions/documentation-gaps/cross-file-link-resolution-semantics-2026-04-08.md`)
 - Check that each extension section covers all seven template subsections
 - Verify the diagnostic registry matches the codes referenced in individual extension sections
 - Confirm conformance levels are referenced consistently in the diagnostic registry
