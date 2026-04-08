@@ -271,13 +271,15 @@ Variable names MUST match the naming rule `[a-zA-Z_][a-zA-Z0-9_\-]*`. Variable r
 
 #### Processing Order
 
-Variable substitution MUST run after include expansion and condition evaluation are complete. This ordering has three critical implications that processors MUST observe:
+Variable substitution MUST run after include expansion and condition evaluation are complete. This ordering has four critical implications that processors MUST observe:
 
 1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned.
 
 2. **Variable values cannot contain condition syntax.** Because conditions are already resolved before variable substitution, a variable value containing `<!--condition:name-->` will not be evaluated as a condition directive. It will pass through as literal text into Phase 2.
 
 3. **Variable values can contain Markdown syntax.** Because variable substitution runs before Markdown parsing (Phase 2), a variable value containing `**bold**` or `[link](url)` will be parsed as Markdown in Phase 2 and rendered accordingly.
+
+4. **Variable values cannot contain include syntax.** Because includes are already expanded before variable substitution, a variable value containing `<!-- include:path -->` will not be evaluated as an include directive. It will pass through as literal text into Phase 2.
 
 #### Scanning and Replacement
 
