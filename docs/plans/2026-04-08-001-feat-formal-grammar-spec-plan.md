@@ -1,7 +1,7 @@
 ---
 title: "feat: Add formal EBNF/PEG grammar for Markdown++ extensions"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-formal-grammar-requirements.md
 ---
@@ -147,7 +147,7 @@ The PEG transliteration will express the same grammar using PEG conventions: `<-
 
 ## Implementation Units
 
-- [ ] **Unit 1: Create EBNF grammar specification document**
+- [x] **Unit 1: Create EBNF grammar specification document**
 
 **Goal:** Produce the complete EBNF grammar covering all Markdown++ extension constructs as a formal specification document in `spec/`.
 
@@ -191,7 +191,7 @@ The PEG transliteration will express the same grammar using PEG conventions: `<-
 - Every regex pattern in `validate-mdpp.py` has a corresponding grammar production that accepts a superset of valid inputs (the grammar is the spec; the regex may have implementation limitations)
 - The grammar is internally consistent -- no undefined non-terminals, no unreachable productions
 
-- [ ] **Unit 2: Add PEG transliteration section**
+- [x] **Unit 2: Add PEG transliteration section**
 
 **Goal:** Provide an idiomatic PEG grammar as a secondary format within the same document, enabling parser authors who prefer PEG to work directly from a PEG-native notation.
 
@@ -223,7 +223,7 @@ The PEG transliteration will express the same grammar using PEG conventions: `<-
 - PEG section has its own notation legend
 - Any semantic differences between the two notations are explicitly documented
 
-- [ ] **Unit 3: Validate grammar against test corpus**
+- [x] **Unit 3: Validate grammar against test corpus**
 
 **Goal:** Systematically verify the grammar correctly accepts all valid constructs and rejects known invalid constructs across the existing example and test files.
 
