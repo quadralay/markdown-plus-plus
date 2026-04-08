@@ -229,7 +229,7 @@ python scripts/validate-mdpp.py document.md
 - `--json` - Output errors as JSON
 - `--strict` - Treat warnings as errors
 
-**Common errors detected:**
+**Common errors detected** (see [Error Code Reference](references/error-codes.md) for details):
 - Unclosed condition blocks
 - Invalid names — variables, styles, aliases, marker keys (see [Naming Rules](references/syntax-reference.md#naming-rules))
 - Malformed marker JSON
@@ -317,6 +317,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 ## Reference Files
 
 - `references/syntax-reference.md` - Detailed syntax rules, edge cases, and validation codes
+- `references/error-codes.md` - Error code reference with detection logic, trigger examples, and fixes
 - `references/examples.md` - Real-world document examples
 - `references/best-practices.md` - Usage guidance, naming conventions, and common mistakes
 - `../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation

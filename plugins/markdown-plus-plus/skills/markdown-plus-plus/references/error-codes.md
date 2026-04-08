@@ -28,9 +28,9 @@ All line-based checks skip lines inside fenced code blocks. A fenced code block 
 
 ## Naming Rule
 
-All named entities share a single naming grammar. MDPP002 validates this rule consistently across variable names, condition names, style names, marker key names, and alias names.
+Most named entities share a standard naming grammar. MDPP002 validates this rule across variable names, condition names, style names, and marker key names.
 
-**Regex:** `^[a-zA-Z_][a-zA-Z0-9_\-]*$`
+**Standard rule regex:** `^[a-zA-Z_][a-zA-Z0-9_\-]*$`
 
 - First character must be a letter (`a-z`, `A-Z`) or underscore (`_`)
 - Subsequent characters may be letters, digits (`0-9`), hyphens (`-`), or underscores (`_`)
@@ -38,7 +38,13 @@ All named entities share a single naming grammar. MDPP002 validates this rule co
 - No whitespace or punctuation characters
 - Hyphens are explicitly allowed
 
-For non-English content, the same structural rule applies using the language's UTF-8 letter values in place of `a-zA-Z`.
+### Alias Exception
+
+Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`).
+
+**Alias rule regex:** `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$`
+
+For non-English content, the same structural rules apply using the language's UTF-8 letter values in place of `a-zA-Z`.
 
 ---
 
@@ -98,13 +104,13 @@ This content is conditional.
 
 **Description:** A named entity (variable, condition name, style, marker key, or alias) contains characters that violate the naming rule.
 
-**Detection logic:** Each name is tested against the naming rule regex `^[a-zA-Z_][a-zA-Z0-9_\-]*$`. The check applies to:
+**Detection logic:** Each name is tested against the appropriate naming rule regex. The check applies to:
 
-- **Variables:** The name portion of `$name;` references
-- **Style names:** The name in `<!--style:name-->`
-- **Alias names:** The name in `<!--#name-->`
-- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->`
-- **Condition names:** Individual names within condition expressions (see also MDPP007)
+- **Variables:** The name portion of `$name;` references (standard rule)
+- **Style names:** The name in `<!--style:name-->` (standard rule)
+- **Alias names:** The name in `<!--#name-->` (alias rule -- digit-first allowed)
+- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (standard rule)
+- **Condition names:** Individual names within condition expressions (standard rule; see also MDPP007)
 
 **Trigger examples:**
 
@@ -122,7 +128,7 @@ $my variable;
 <!--markers:{"invalid key": "value"}-->
 ```
 
-**Suggested fix:** Rename the entity to start with a letter or underscore, using only letters, digits, hyphens, and underscores for subsequent characters.
+**Suggested fix:** Rename the entity to start with a letter or underscore, using only letters, digits, hyphens, and underscores for subsequent characters. Alias names may also start with a digit.
 
 ---
 
