@@ -14,12 +14,14 @@ symptoms:
 root_cause: inadequate_documentation
 resolution_type: documentation_update
 severity: high
+last_updated: 2026-04-08
 tags:
   - cross-file-resolution
   - link-references
   - specification
   - includes
   - processing-model
+  - mdpp014
 ---
 
 # Cross-file link reference resolution semantics
@@ -67,6 +69,12 @@ Created `spec/cross-file-link-resolution.md` — a normative specification defin
 3. `plugins/.../references/syntax-reference.md` — expanded note on cross-file visibility with spec cross-reference
 4. `plugins/.../references/best-practices.md` — new cross-file cross-reference example in the Link References section
 
+**Review-phase corrections** (commit `cc509a7`):
+
+- Changed `SHOULD` to `MUST` for MDPP014 emission in the Conformance section, resolving a contradiction with the Diagnostic Reporting section and `processing-model.md`
+- Converted inline code repo-root paths to proper relative markdown links in syntax-reference and best-practices
+- Corrected the Introduction to say the syntax reference defines "Markdown++ extensions" rather than "link reference definitions" (which are a CommonMark construct)
+
 ## Why This Works
 
 The key insight is that cross-file link reference resolution is not a separate feature — it is a direct consequence of the two-phase processing model. Phase 1 assembles all includes into a single text. Phase 2 parses that text as CommonMark 0.30, which collects link reference definitions at document scope. The "cross-file" behavior is entirely a Phase 1 artifact. By Phase 2, the parser sees one document.
@@ -78,6 +86,7 @@ Formalizing this as a standalone spec (rather than appending to the processing m
 - **Specify derived behaviors explicitly**: When a feature's behavior follows from an underlying model (as cross-file resolution follows from two-phase processing), the derived behavior should still be explicitly specified. Correct behavior that is "obvious" to the spec author is not obvious to implementors.
 - **Define diagnostics for common mistakes**: Cross-file duplicate slugs are an authoring mistake that is easy to make and hard to debug. MDPP014 catches this at build time.
 - **Use worked examples as conformance inputs**: The two examples in the spec serve double duty — they explain the feature to readers and provide test inputs for implementors.
+- **Audit the spec for implicit cross-cutting behaviors**: The processing model defines include expansion, conditions, variables, styles, aliases, markers, and multiline tables. Any feature that interacts with includes has cross-file implications. A periodic review of the spec for under-specified feature interactions (the matrix of "what happens when feature X meets feature Y across file boundaries") would catch similar gaps early.
 
 ## Related Issues
 
@@ -85,4 +94,8 @@ Formalizing this as a standalone spec (rather than appending to the processing m
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) — Processing model specification (dependency — defines the two-phase pipeline)
 - [#9](https://github.com/quadralay/markdown-plus-plus/issues/9) — Element interactions (cross-reference behavior)
 - [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) — Formal specification (cross-referencing is a major spec section)
-- `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Related specification pattern
+- [#42](https://github.com/quadralay/markdown-plus-plus/issues/42) — Follow-up: add cross-file resolution to SKILL.md and MDPP014 to validation table
+- [#14](https://github.com/quadralay/markdown-plus-plus/issues/14) — Standalone error code reference (MDPP014 extends the range beyond MDPP009)
+- [#12](https://github.com/quadralay/markdown-plus-plus/issues/12) — Graceful degradation (link references degrade partially — in-page works, cross-file lost)
+- `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Processing model solution (dependency)
+- `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` — Pattern precedent for spec documents
