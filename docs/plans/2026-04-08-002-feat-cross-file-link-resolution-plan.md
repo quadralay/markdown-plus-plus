@@ -1,7 +1,7 @@
 ---
 title: "feat: Add cross-file link reference resolution specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-cross-file-link-resolution-requirements.md
 ---
@@ -125,7 +125,7 @@ The "cross-file" behavior is entirely a Phase 1 artifact -- by Phase 2, the pars
 
 ## Implementation Units
 
-- [ ] **Unit 1: Create `spec/cross-file-link-resolution.md`**
+- [x] **Unit 1: Create `spec/cross-file-link-resolution.md`**
 
 **Goal:** Write the normative specification for cross-file link reference resolution semantics.
 
@@ -167,7 +167,7 @@ The "cross-file" behavior is entirely a Phase 1 artifact -- by Phase 2, the pars
 - The four questions (scope, conflict, order, assembled vs. per-file) all have explicit normative answers
 - The rules are consistent with CommonMark 0.30 section 4.7
 
-- [ ] **Unit 2: Add worked examples to the spec**
+- [x] **Unit 2: Add worked examples to the spec**
 
 **Goal:** Provide two inline worked examples demonstrating cross-file link reference resolution.
 
@@ -195,7 +195,7 @@ The "cross-file" behavior is entirely a Phase 1 artifact -- by Phase 2, the pars
 - Each example shows the complete resolution chain from source files through assembly to resolved references
 - The conflict example clearly shows which definition wins and why
 
-- [ ] **Unit 3: Register MDPP014 in the processing model diagnostic registry**
+- [x] **Unit 3: Register MDPP014 in the processing model diagnostic registry**
 
 **Goal:** Add MDPP014 to the MDPP diagnostic code registry in `spec/processing-model.md`.
 
@@ -223,7 +223,7 @@ The "cross-file" behavior is entirely a Phase 1 artifact -- by Phase 2, the pars
 - The diagnostic code registry is complete and sequential through MDPP014
 - The triggering condition accurately reflects the spec's conflict detection rule
 
-- [ ] **Unit 4: Update syntax reference and best-practices**
+- [x] **Unit 4: Update syntax reference and best-practices**
 
 **Goal:** Update the syntax reference Custom Aliases note and the best-practices Link References section to describe cross-file resolution behavior.
 
@@ -253,7 +253,7 @@ The "cross-file" behavior is entirely a Phase 1 artifact -- by Phase 2, the pars
 - The syntax reference remains focused on syntax, not processing semantics
 - Best-practices provides actionable guidance without duplicating normative rules
 
-- [ ] **Unit 5: Add solution document**
+- [x] **Unit 5: Add solution document**
 
 **Goal:** Document the solution for future institutional learning, following the established pattern.
 

@@ -381,7 +381,7 @@ See [Introduction](#introduction) for details.
 See [API Auth](api-reference.md#authentication) for auth info.
 ```
 
-**Note:** Reference-style links (`[text][ref]` with `[ref]: url`) are supported but generally not recommended. See the **Advanced Patterns** section in [best-practices.md](best-practices.md#link-references) for guidance on when to use them.
+**Note:** Reference-style links (`[text][ref]` with `[ref]: url`) are supported but generally not recommended for simple use cases. See the **Advanced Patterns** section in [best-practices.md](best-practices.md#link-references) for guidance on when to use them. In multi-file assemblies, link reference definitions from all included files are visible throughout the assembled document — this is the foundation of the semantic cross-reference pattern. See `spec/cross-file-link-resolution.md` for the normative resolution rules.
 
 ### Alias vs. Heading IDs
 

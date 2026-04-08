@@ -474,6 +474,7 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP011** | Maximum include depth exceeded | Error | Phase 1, Step 1 | Include nesting exceeds the processor's configured maximum depth |
 | **MDPP012** | Cross-file condition span | Error | Phase 1, Step 1 | A condition block opens in one file and closes in another |
 | **MDPP013** | Include cycle detected during processing | Error | Phase 1, Step 1 | A file appears in its own include chain during recursive expansion |
+| **MDPP014** | Duplicate link reference slug across files | Warning | Phase 2 | Two or more link reference definitions with the same slug originate from different source files in the assembled document. See [Cross-File Link Reference Resolution](cross-file-link-resolution.md). |
 
 Implementations MAY define additional diagnostic codes beyond this registry for implementation-specific checks. Custom codes SHOULD use numbers MDPP100 and above to avoid conflicts with future specification-defined codes.
 
