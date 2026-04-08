@@ -51,11 +51,11 @@ A BOM MUST only appear at the very beginning of a file. If include expansion pro
 
 ### Encoding Errors
 
-When a processor encounters an invalid UTF-8 byte sequence while reading a file, it MUST emit diagnostic **MDPP014** (severity: Error). The diagnostic MUST include the file path of the file containing the invalid byte sequence.
+When a processor encounters an invalid UTF-8 byte sequence while reading a file, it MUST emit diagnostic **MDPP014** (severity: Error). The diagnostic MUST include the file path of the file containing the invalid byte sequence. The line number SHOULD be the line containing the first invalid byte, computed from the valid bytes decoded before the error. If the processor cannot determine a meaningful line number (for example, when the error occurs before any line ending is decoded), it SHOULD report line 1.
 
-A processor SHOULD emit **MDPP014** on the first invalid byte sequence in a file. Invalid encoding corrupts character boundaries, making further parsing of the affected file unreliable. The processor MUST stop processing the affected file but SHOULD continue processing other files in the include chain.
+A processor SHOULD emit **MDPP014** on the first invalid byte sequence in a file. Invalid encoding corrupts character boundaries, making further parsing of the affected file unreliable. A processor MAY attempt to collect multiple encoding errors within a single file, but MUST NOT use the file's content for further pipeline processing (variable substitution, Markdown parsing, or output generation). The processor SHOULD continue processing other files in the include chain.
 
-A processor MAY attempt to collect multiple encoding errors within a single file before stopping, but is not required to do so. Recovery behavior (such as byte substitution or fallback to an alternative encoding) is implementation-defined. A processor that implements recovery MUST still emit **MDPP014** before applying any fallback.
+Recovery behavior (such as byte substitution or fallback to an alternative encoding) is implementation-defined. A processor that implements recovery MUST still emit **MDPP014** regardless of whether recovery succeeds.
 
 ### Include Chain Encoding Consistency
 
@@ -88,7 +88,7 @@ Include expansion resolves all `<!-- include:path -->` directives in the documen
 
 A processor MUST resolve includes using the following depth-first recursive algorithm:
 
-1. Read the current file's content. The processor MUST decode the file as UTF-8 and validate the encoding at this point. If the file contains invalid UTF-8, emit diagnostic **MDPP014** and stop processing the affected file (see [Character Encoding](#character-encoding)). If the file begins with a UTF-8 BOM, strip it before further processing.
+1. Read the current file's content, decoding as UTF-8 and stripping any leading BOM per [Character Encoding](#character-encoding). If the file contains invalid UTF-8, emit **MDPP014** and stop processing the affected file.
 2. Evaluate the current file's condition blocks using the project's condition set (see [Per-File Condition Evaluation](#per-file-condition-evaluation) below).
 3. Scan the resolved content for `<!-- include:path -->` directives.
 4. For each include directive, in document order:
@@ -96,9 +96,10 @@ A processor MUST resolve includes using the following depth-first recursive algo
    b. Check the include chain for cycles. If the resolved path already appears in the chain, skip the include with diagnostic **MDPP013** and leave the include tag in place as a regular HTML comment.
    c. Check the include depth. If the depth exceeds the processor's configured maximum, skip the include with diagnostic **MDPP011** and leave the include tag in place.
    d. If the file does not exist or cannot be read, emit diagnostic **MDPP006** and leave the include tag in place as a regular HTML comment.
-   e. Otherwise, push the resolved path onto the include chain and recursively process the included file starting from step 1.
-   f. Replace the include directive with the included file's resolved content, surrounded by blank lines (`\n\n`) to ensure block-level separation.
-   g. Pop the resolved path from the include chain.
+   e. If the file contains invalid UTF-8 encoding (detected during step 1), emit diagnostic **MDPP014** and leave the include tag in place as a regular HTML comment.
+   f. Otherwise, push the resolved path onto the include chain and recursively process the included file starting from step 1.
+   g. Replace the include directive with the included file's resolved content, surrounded by blank lines (`\n\n`) to ensure block-level separation.
+   h. Pop the resolved path from the include chain.
 
 #### Path Resolution
 
@@ -454,7 +455,7 @@ A **fatal error** prevents the processor from producing a meaningful output tree
 
 | Classification | Behavior | Examples |
 |---------------|----------|----------|
-| **Fatal error** | Processor MUST report the error. Processing of the affected construct stops, but the processor SHOULD continue processing the remainder of the document. | Invalid UTF-8 encoding (MDPP014), cross-file condition span (MDPP012), include cycle (MDPP013), max include depth exceeded (MDPP011) |
+| **Fatal error** | Processor MUST report the error. The affected construct's content MUST NOT be used for further pipeline processing, but the processor SHOULD continue processing the remainder of the document. A processor MAY implement an implementation-defined recovery strategy (e.g., encoding fallback for MDPP014), but MUST still emit the diagnostic regardless. | Invalid UTF-8 encoding (MDPP014), cross-file condition span (MDPP012), include cycle (MDPP013), max include depth exceeded (MDPP011) |
 | **Recoverable warning** | Processor MUST report the warning. Processing continues with a documented fallback behavior. | Missing include file (MDPP006), undefined variable (MDPP010), orphaned tag (MDPP009) |
 
 ### Diagnostic Collection
@@ -498,7 +499,7 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP011** | Maximum include depth exceeded | Error | Phase 1, Step 1 | Include nesting exceeds the processor's configured maximum depth |
 | **MDPP012** | Cross-file condition span | Error | Phase 1, Step 1 | A condition block opens in one file and closes in another |
 | **MDPP013** | Include cycle detected during processing | Error | Phase 1, Step 1 | A file appears in its own include chain during recursive expansion |
-| **MDPP014** | Invalid UTF-8 encoding | Error | Phase 1, Step 1 | A file contains an invalid UTF-8 byte sequence when read during include expansion |
+| **MDPP014** | Invalid UTF-8 encoding | Error | Phase 1, Step 1 | The root document or an included file contains an invalid UTF-8 byte sequence when read during processing |
 
 Implementations MAY define additional diagnostic codes beyond this registry for implementation-specific checks. Custom codes SHOULD use numbers MDPP100 and above to avoid conflicts with future specification-defined codes.
 
