@@ -1,7 +1,7 @@
 ---
 title: "docs: Add standalone error code reference for MDPP000-MDPP009"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 ---
 
@@ -160,7 +160,7 @@ Error codes MDPP001-MDPP009 are defined only in `validate-mdpp.py` and summarize
 
 **Status:** Completed in commit `f395afe`.
 
-- [ ] **Unit 4: Add CHANGELOG entry**
+- [x] **Unit 4: Add CHANGELOG entry**
 
 **Goal:** Document the new error code reference in the project changelog.
 
@@ -185,7 +185,7 @@ Error codes MDPP001-MDPP009 are defined only in `validate-mdpp.py` and summarize
 **Verification:**
 - `[Unreleased]` > `Tooling` section contains the error code reference entry
 
-- [ ] **Unit 5: Write solution doc**
+- [x] **Unit 5: Write solution doc**
 
 **Goal:** Capture institutional learning from this work for future reference.
 
