@@ -277,7 +277,7 @@ Files requiring updates, with current problematic language:
 - **Interaction graph:** No runtime behavior changes — documentation only. The syntax reference, SKILL.md, and spec documents are consumed by human authors and Claude Code agents.
 - **Error propagation:** N/A (no code changes)
 - **State lifecycle risks:** N/A
-- **API surface parity:** All seven files that describe multiline table behavior will be updated to use consistent terminology
+- **API surface parity:** All eight files that describe multiline table behavior will be updated to use consistent terminology
 - **Integration coverage:** Verify terminology consistency across all updated files
 
 ## Risks & Dependencies

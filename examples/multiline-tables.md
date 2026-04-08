@@ -59,4 +59,4 @@ Headers can span multiple physical lines using continuation rows above the delim
 | Rate Limiting  | Per-endpoint limits      |
 |                | - Default: 100 req/min   |
 
-The header row `Feature | Description` is extended by the continuation row `| and Requirements |` before the delimiter row.
+The header row `Feature | Description` is extended by a continuation row with an empty first cell and `and Requirements` in the second cell, before the delimiter row.

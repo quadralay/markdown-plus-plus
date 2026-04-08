@@ -695,7 +695,7 @@ Header rows can span multiple physical lines using the same continuation row mec
 |                | - Client Credentials     |
 ```
 
-In this example, the header row `Feature | Description` is extended by the continuation row `| and additional context |` before the delimiter row `|---|---|`.
+In this example, the header row `Feature | Description` is extended by a continuation row with an empty first cell and `and additional context` in the second cell, before the delimiter row.
 
 ### Cell Content Dedent
 
@@ -715,7 +715,7 @@ When a cell spans multiple physical lines, the processor strips the minimum comm
 - Refresh tokens
 ```
 
-The two leading spaces common to all three lines are stripped. If one line had no leading whitespace, no stripping would occur.
+The single leading space common to all three lines is stripped. If one line had no leading whitespace, no stripping would occur.
 
 ### Basic Example
 
