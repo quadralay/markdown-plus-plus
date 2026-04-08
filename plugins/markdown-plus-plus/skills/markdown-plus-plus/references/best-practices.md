@@ -529,6 +529,7 @@ Visit the [API Documentation][api-docs].
 - Redirecting links based on document context (e.g., pointing to the latest API version)
 - Conditional link targets for different output formats
 - Very long URLs that clutter the text
+- **Semantic cross-references in multi-file assemblies** -- the primary use case for link references in Markdown++
 
 **Example - version redirection:**
 ```markdown
@@ -538,6 +539,25 @@ See the [API Reference][latest-api] for endpoint details.
 ```
 
 When a new API version is released, only the reference definition needs updating.
+
+**Example - semantic cross-references across files:**
+
+In multi-file documentation assembled with `<!-- include: -->`, link reference definitions bridge human-readable slugs to alias IDs across all included files:
+
+```markdown
+<!-- In chapters/installation.md -->
+<!-- style:Heading2; #200020 -->
+## Installation
+
+[installation]: #200020 "Installation"
+```
+
+```markdown
+<!-- In chapters/troubleshooting.md -->
+If the issue persists, re-run [Installation][installation].
+```
+
+The reference in `troubleshooting.md` resolves to the definition in `installation.md` because all included files share document-global scope after assembly. If two files define the same slug with different targets, the first definition in assembled document order wins and the processor emits **MDPP014**. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the full resolution rules.
 
 **Tradeoffs:**
 - Adds complexity and indirection

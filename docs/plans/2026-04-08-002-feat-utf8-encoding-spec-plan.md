@@ -10,7 +10,7 @@ origin: docs/brainstorms/2026-04-08-utf8-encoding-requirements.md
 
 ## Overview
 
-Add a normative UTF-8 encoding requirement to the Markdown++ processing model specification. This includes the encoding requirement itself, BOM handling rules, encoding error diagnostic (MDPP014), and conformance updates. The change ensures that processors agree on how to decode document bytes before any Markdown++ processing begins.
+Add a normative UTF-8 encoding requirement to the Markdown++ processing model specification. This includes the encoding requirement itself, BOM handling rules, encoding error diagnostic (MDPP015), and conformance updates. The change ensures that processors agree on how to decode document bytes before any Markdown++ processing begins.
 
 ## Problem Frame
 
@@ -22,9 +22,9 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 
 - R1. Normative UTF-8 requirement — Markdown++ documents MUST be encoded in UTF-8
 - R2. BOM handling — UTF-8 BOM is OPTIONAL; processors MUST strip/ignore a leading BOM; mid-file BOM is not valid content
-- R3. Encoding error diagnostic MDPP014 (severity: Error) emitted on invalid UTF-8
+- R3. Encoding error diagnostic MDPP015 (severity: Error) emitted on invalid UTF-8
 - R4. Encoding error recovery is implementation-defined; no mandated fallback encoding
-- R5. Include chain encoding consistency — all files MUST be UTF-8; MDPP014 includes the offending file path
+- R5. Include chain encoding consistency — all files MUST be UTF-8; MDPP015 includes the offending file path
 
 ## Scope Boundaries
 
@@ -57,11 +57,11 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 
 - **Position within processing model — before Pipeline Overview:** Encoding validation is logically "Phase 0" — it happens when a file is read, before any Phase 1 processing. The section should appear after Definitions and before Pipeline Overview, establishing encoding as a pre-condition.
 
-- **MDPP014 triggers on first invalid byte sequence:** Invalid encoding corrupts character boundaries, making further parsing of the affected file unreliable. The processor stops processing the affected file but SHOULD continue with other files in the include chain. A processor MAY attempt to collect multiple encoding errors within a single file but is not required to.
+- **MDPP015 triggers on first invalid byte sequence:** Invalid encoding corrupts character boundaries, making further parsing of the affected file unreliable. The processor stops processing the affected file but SHOULD continue with other files in the include chain. A processor MAY attempt to collect multiple encoding errors within a single file but is not required to.
 
 - **Encoding validated during include expansion, not before it:** The natural validation point is when a file is read (step 1 of the include algorithm). Pre-expansion validation is impractical since the full file list isn't known until expansion begins. This is consistent with how MDPP006 (missing include file) is detected during expansion.
 
-- **No mandated fallback encoding:** The ePublisher parser falls back to ISO-8859-1, but encoding this into the spec would bless data corruption as a feature. Implementations MAY implement fallback, but the spec requires MDPP014 regardless.
+- **No mandated fallback encoding:** The ePublisher parser falls back to ISO-8859-1, but encoding this into the spec would bless data corruption as a feature. Implementations MAY implement fallback, but the spec requires MDPP015 regardless.
 
 - **BOM allowed but ignored, not forbidden:** Forbidding BOM would reject files from editors that add BOM by default (notably older Windows editors). Allowing-but-ignoring matches CommonMark and existing ePublisher behavior.
 
@@ -71,7 +71,7 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 
 - **Where should the encoding section live?** (affects all requirements): In `spec/processing-model.md` as a new section before Pipeline Overview. The processing model owns the pipeline, diagnostics, and conformance. Encoding is a pre-condition for the pipeline, not a standalone concern.
 
-- **MDPP014 trigger behavior** (affects R3): Emit on the first invalid byte sequence. Invalid encoding corrupts character boundaries. Consistent with Error severity. Processor stops the affected file but continues with others.
+- **MDPP015 trigger behavior** (affects R3): Emit on the first invalid byte sequence. Invalid encoding corrupts character boundaries. Consistent with Error severity. Processor stops the affected file but continues with others.
 
 - **Validate before or during include expansion?** (affects R5): During expansion. The natural validation point is file read time. Pre-expansion validation is impractical. Consistent with MDPP006 pattern.
 
@@ -81,7 +81,7 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 
 ## Implementation Units
 
-- [x] **Unit 1: Add encoding section and MDPP014 to processing model**
+- [x] **Unit 1: Add encoding section and MDPP015 to processing model**
 
 **Goal:** Add the normative UTF-8 encoding requirement, BOM handling rules, encoding error diagnostic, and include chain encoding consistency to the processing model specification.
 
@@ -97,9 +97,9 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 - Structure the section with subsections: Encoding Requirement, BOM Handling, Encoding Errors, Include Chain Encoding Consistency
 - Encoding Requirement: normative UTF-8 statement aligned with CommonMark 0.30
 - BOM Handling: OPTIONAL leading BOM, processors MUST strip/ignore, mid-file BOM after include expansion is invalid
-- Encoding Errors: MDPP014 definition, Error severity, triggers on first invalid byte sequence, recovery is implementation-defined
-- Include Chain Encoding Consistency: all files MUST be UTF-8, MDPP014 includes offending file path
-- Register MDPP014 in the diagnostic registry table under Processing-Phase Codes (MDPP014 follows MDPP013)
+- Encoding Errors: MDPP015 definition, Error severity, triggers on first invalid byte sequence, recovery is implementation-defined
+- Include Chain Encoding Consistency: all files MUST be UTF-8, MDPP015 includes offending file path
+- Register MDPP015 in the diagnostic registry table under Processing-Phase Codes (MDPP015 follows MDPP013)
 - Add a note in Phase 1, Step 1 (Include Expansion) algorithm step 1 ("Read the current file's content") referencing the encoding requirement — this is where encoding validation naturally occurs
 
 **Patterns to follow:**
@@ -110,15 +110,15 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 **Test scenarios:**
 - A UTF-8 document with no BOM processes normally (R1 baseline)
 - A UTF-8 document with leading BOM processes normally after BOM stripping (R2)
-- A file with invalid UTF-8 byte sequence emits MDPP014 with file path (R3, R5)
-- A processor that implements ISO-8859-1 fallback still emits MDPP014 before falling back (R3, R4)
-- An included file with invalid encoding emits MDPP014 with the included file's path, not the root document's path (R5)
+- A file with invalid UTF-8 byte sequence emits MDPP015 with file path (R3, R5)
+- A processor that implements ISO-8859-1 fallback still emits MDPP015 before falling back (R3, R4)
+- An included file with invalid encoding emits MDPP015 with the included file's path, not the root document's path (R5)
 - A mid-file BOM resulting from include expansion is treated as invalid content (R2)
 
 **Verification:**
 - The processing model contains a normative statement that documents MUST be UTF-8
 - BOM handling is defined precisely enough that two independent implementations would behave identically
-- MDPP014 appears in the diagnostic registry with severity Error and a clear triggering condition
+- MDPP015 appears in the diagnostic registry with severity Error and a clear triggering condition
 - The encoding section uses RFC 2119 keywords consistently with the rest of the processing model
 
 - [x] **Unit 2: Update conformance section and cross-references**
@@ -133,10 +133,10 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 - Modify: `spec/processing-model.md`
 
 **Approach:**
-- Add a new required feature to the Conformance > Required Features list (item 11): "Encoding validation — UTF-8 encoding validation with BOM handling and MDPP014 emission, as specified in [Character Encoding](#character-encoding)"
+- Add a new required feature to the Conformance > Required Features list (item 11): "Encoding validation — UTF-8 encoding validation with BOM handling and MDPP015 emission, as specified in [Character Encoding](#character-encoding)"
 - Update the introduction paragraph to mention encoding as part of the specification scope (currently lists "processing pipeline, evaluation order, scoping rules, error behavior, and output model")
-- Verify the diagnostic reporting requirement (item 10) implicitly covers MDPP014 via "all MDPP diagnostic codes defined in this specification" — no change needed if the wording is already general
-- Add MDPP014 to the error handling section's classification table if the existing table is exhaustive (check whether the table lists all codes or just examples)
+- Verify the diagnostic reporting requirement (item 10) implicitly covers MDPP015 via "all MDPP diagnostic codes defined in this specification" — no change needed if the wording is already general
+- Add MDPP015 to the error handling section's classification table if the existing table is exhaustive (check whether the table lists all codes or just examples)
 
 **Patterns to follow:**
 - Existing required features list structure (numbered, with brief description and spec section reference)
@@ -145,17 +145,17 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 **Test scenarios:**
 - The conformance section explicitly lists encoding validation as a required feature
 - A reader can trace from the conformance requirement back to the encoding section for the full specification
-- MDPP014 appears in all relevant tables (diagnostic registry and error classification)
+- MDPP015 appears in all relevant tables (diagnostic registry and error classification)
 
 **Verification:**
 - Required features list includes encoding validation
-- Error classification table includes MDPP014 with correct severity
+- Error classification table includes MDPP015 with correct severity
 - Introduction reflects the expanded scope
 - All internal cross-references resolve correctly
 
 ## Risks & Dependencies
 
-- **Dependency on stable diagnostic registry:** MDPP014 is the next available code (MDPP000–MDPP013 allocated). If another concurrent change allocates MDPP014, renumbering will be needed. Low risk given the current development pace.
+- **Dependency on stable diagnostic registry:** MDPP015 is the next available code (MDPP000–MDPP013 allocated). If another concurrent change allocates MDPP015, renumbering will be needed. Low risk given the current development pace.
 - **Risk: Normative over-specification of BOM.** The BOM stripping requirement must be precise enough for interop but not so prescriptive that it conflicts with existing tools. The "allowed but ignored" approach (matching CommonMark) mitigates this.
 
 ## Sources & References
