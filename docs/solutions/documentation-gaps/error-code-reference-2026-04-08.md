@@ -33,6 +33,8 @@ Markdown++ validation codes MDPP000 through MDPP009 were defined only in the `va
 - MDPP000 (file error) was missing from the `syntax-reference.md` validation table entirely
 - The unified naming rule for MDPP002 was documented in a solution doc but not in any user-facing reference
 - Reserved codes (MDPP004, MDPP005) had no documented intended behavior
+- Wording inconsistency: MDPP001 was called "Unclosed" in some places and "Unmatched" in others
+- The alias naming exception (digit-first allowed for aliases like `<!--#04499224-->`) was undocumented, meaning alternative validators would silently reject valid alias names
 
 ## What Didn't Work
 
@@ -59,6 +61,12 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 
 - `syntax-reference.md` updated to cross-reference the new document for detailed error code information
 - MDPP000 added to the `syntax-reference.md` validation checks table (was previously missing)
+- `SKILL.md` updated with `error-codes.md` in the references section and a validation cross-reference link
+
+**Review-phase refinements:**
+
+- MDPP002 section enhanced with alias naming exception (`^[a-zA-Z0-9_][a-zA-Z0-9_-]*$` for aliases, allowing digit-first)
+- MDPP001 wording unified to "Unmatched" across all documents (was inconsistently "Unclosed" in some files)
 
 ## Why This Works
 
@@ -70,7 +78,8 @@ This also fulfills the principle established in the attachment rule solution doc
 
 - **Document error codes alongside implementation:** When adding a new validation check, create the reference entry at the same time as the code. The error-codes.md document provides the template for new entries.
 - **Keep detection logic implementation-independent:** Describe algorithms in terms of data structures and conditions, not language-specific constructs, so the reference serves any implementation language.
-- **Maintain the diagnostic code registry:** The processing model (`spec/processing-model.md`) owns the registry of all MDPP codes. Static validation codes (000-009) are detailed in `error-codes.md`; processing-phase codes (010-013) are detailed in the processing model itself.
+- **Maintain the diagnostic code registry:** The processing model (`spec/processing-model.md`) owns the registry of all MDPP codes. Static validation codes (000-009) are detailed in `error-codes.md`; processing-phase codes (010-013) are detailed in the processing model itself. New codes must be registered in both locations.
+- **Treat wording consistency as a reviewable concern:** When a concept has a canonical name (e.g., "Unmatched" not "Unclosed" for MDPP001), grep across all documents during review to catch drift before it ships.
 
 ## Related Issues
 
@@ -81,3 +90,5 @@ This also fulfills the principle established in the attachment rule solution doc
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` -- MDPP002 scope expansion
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` -- Prevention principle fulfilled
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` -- Diagnostic code registry
+- [#42](https://github.com/quadralay/markdown-plus-plus/issues/42) -- MDPP014 addition (follow-up: error-codes.md may need updating)
+- [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) -- Formal specification umbrella (parent initiative)
