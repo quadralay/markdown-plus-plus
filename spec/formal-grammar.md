@@ -438,8 +438,6 @@ json_nested        <- '{' json_content '}'
 json_string        <- '"' (!'"' ('\\' . / .))* '"'
 
 # Lexical terminals
-letter             <- [a-zA-Z]
-digit              <- [0-9]
 ws                 <- [ \t]+
 ```
 
@@ -465,7 +463,7 @@ The following constructs from `tests/sample-full.md` were verified against the g
 |---------|-----------|---------------|
 | 6 | `<!--markers:{...} ; #document-start-->` | `markers_cmd` + `alias_cmd` in `command_list` |
 | 7 | `$product_name;` | `variable` |
-| 20 | `$my-var;`, `$my_var;`, `$var2;` | `variable` (hyphenated, underscored, digit-containing) |
+| 21 | `$my-var;`, `$my_var;`, `$var2;` | `variable` (hyphenated, underscored, digit-containing) |
 | 27 | `<!--style:CustomHeading-->` | `style_cmd` (no whitespace) |
 | 54 | `<!--style:Emphasis-->**inline**` | `style_cmd` (inline placement) |
 | 62 | `<!--#introduction-->` | `alias_cmd` |
