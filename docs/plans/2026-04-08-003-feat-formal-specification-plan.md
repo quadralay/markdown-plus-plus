@@ -1,7 +1,7 @@
 ---
 title: "feat: Create unified Markdown++ 1.0 specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-formal-specification-requirements.md
 deepened: 2026-04-08
