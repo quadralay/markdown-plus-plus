@@ -11,7 +11,7 @@ This document specifies how link reference definitions resolve across files in a
 
 The [Processing Model](processing-model.md) defines the two-phase pipeline that governs all Markdown++ processing. Phase 1, Step 1 assembles all included files into a single text via depth-first recursive include expansion. Phase 2 parses that assembled text as [CommonMark 0.30](https://spec.commonmark.org/0.30/). Link reference definitions are a CommonMark construct resolved during Phase 2. Cross-file link reference resolution is a direct consequence of this architecture -- it requires no additional processing phase.
 
-The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) defines what link reference definitions and custom aliases look like. This document defines how link reference definitions behave when multiple files contribute definitions to the same assembled document.
+The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) defines Markdown++ extensions including custom aliases. Link reference definitions are a standard [CommonMark 0.30](https://spec.commonmark.org/0.30/#link-reference-definitions) construct. This document defines how link reference definitions behave when multiple files contribute definitions to the same assembled document.
 
 ## Definitions
 
@@ -97,7 +97,7 @@ A processor MUST NOT reorder include content during assembly. The assembled docu
 
 ### MDPP014: Duplicate Link Reference Slug Across Files
 
-When two or more link reference definitions with the same slug originate from **different source files** in the assembled document, a conformant processor SHOULD emit diagnostic **MDPP014**.
+When two or more link reference definitions with the same slug originate from **different source files** in the assembled document, a conformant processor MUST emit diagnostic **MDPP014**.
 
 | Property | Value |
 |----------|-------|

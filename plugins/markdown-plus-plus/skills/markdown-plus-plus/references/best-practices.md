@@ -557,7 +557,7 @@ In multi-file documentation assembled with `<!-- include: -->`, link reference d
 If the issue persists, re-run [Installation][installation].
 ```
 
-The reference in `troubleshooting.md` resolves to the definition in `installation.md` because all included files share document-global scope after assembly. If two files define the same slug with different targets, the first definition in assembled document order wins and the processor emits **MDPP014**. See `spec/cross-file-link-resolution.md` for the full resolution rules.
+The reference in `troubleshooting.md` resolves to the definition in `installation.md` because all included files share document-global scope after assembly. If two files define the same slug with different targets, the first definition in assembled document order wins and the processor emits **MDPP014**. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the full resolution rules.
 
 **Tradeoffs:**
 - Adds complexity and indirection
