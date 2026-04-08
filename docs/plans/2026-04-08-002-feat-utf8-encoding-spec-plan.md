@@ -1,7 +1,7 @@
 ---
 title: "feat: Add UTF-8 character encoding requirement to specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-utf8-encoding-requirements.md
 ---
@@ -81,7 +81,7 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 
 ## Implementation Units
 
-- [ ] **Unit 1: Add encoding section and MDPP014 to processing model**
+- [x] **Unit 1: Add encoding section and MDPP014 to processing model**
 
 **Goal:** Add the normative UTF-8 encoding requirement, BOM handling rules, encoding error diagnostic, and include chain encoding consistency to the processing model specification.
 
@@ -121,7 +121,7 @@ Without an encoding requirement, processors may disagree on how to decode non-AS
 - MDPP014 appears in the diagnostic registry with severity Error and a clear triggering condition
 - The encoding section uses RFC 2119 keywords consistently with the rest of the processing model
 
-- [ ] **Unit 2: Update conformance section and cross-references**
+- [x] **Unit 2: Update conformance section and cross-references**
 
 **Goal:** Add encoding validation as a required conformance feature and ensure cross-references are consistent.
 
