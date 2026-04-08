@@ -1,7 +1,7 @@
 ---
 title: "feat: Document extension behavior in multiline table cells"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-multiline-cell-extensions-requirements.md
 ---
@@ -89,7 +89,7 @@ Without this documentation, implementors must guess which extensions are valid i
 
 ## Implementation Units
 
-- [ ] **Unit 1: Document skeleton with frontmatter, introduction, and phase-ordering framework**
+- [x] **Unit 1: Document skeleton with frontmatter, introduction, and phase-ordering framework**
 
 **Goal:** Create `spec/multiline-cell-extensions.md` with the document structure, introduction explaining purpose and scope, and the phase-ordering principle (R12) that organizes the rest of the document.
 
@@ -122,7 +122,7 @@ Without this documentation, implementors must guess which extensions are valid i
 
 ---
 
-- [ ] **Unit 2: Phase 1 extensions in cells — variables, conditions, includes**
+- [x] **Unit 2: Phase 1 extensions in cells — variables, conditions, includes**
 
 **Goal:** Write the Phase 1 extensions section covering variables (R1), conditions (R2), and includes (R3), with examples and edge cases for each.
 
@@ -155,7 +155,7 @@ Without this documentation, implementors must guess which extensions are valid i
 
 ---
 
-- [ ] **Unit 3: Phase 2 extensions in cells — styles, aliases, markers, nested tables, combined commands**
+- [x] **Unit 3: Phase 2 extensions in cells — styles, aliases, markers, nested tables, combined commands**
 
 **Goal:** Write the Phase 2 extensions section covering block styles (R4), inline styles (R5), aliases (R6), markers (R7), nested tables (R8), and combined commands (R13).
 
@@ -192,7 +192,7 @@ Without this documentation, implementors must guess which extensions are valid i
 
 ---
 
-- [ ] **Unit 4: Standard Markdown in cells, edge cases, and cross-references**
+- [x] **Unit 4: Standard Markdown in cells, edge cases, and cross-references**
 
 **Goal:** Write the standard Markdown section (R9, R10, R11), add edge case documentation, and finalize cross-references to the processing model and syntax reference.
 
