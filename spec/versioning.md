@@ -84,6 +84,8 @@ Valid values: `1.0`, `1.2`, `2.0`, `10.3`
 
 Invalid values: `1`, `1.0.0`, `v1.0`, `1.0-beta`, `latest`
 
+When the `mdpp-version` field is present but its value does not match the MAJOR.MINOR format, a processor SHOULD treat the field as absent -- no version check is performed and no version-related diagnostic is emitted. A processor MAY emit an implementation-defined diagnostic to alert the author about the malformed value.
+
 ### Optional Declaration
 
 The `mdpp-version` field is OPTIONAL. A document without an `mdpp-version` field is valid Markdown++. Omitting the field is not an error and does not produce a diagnostic.

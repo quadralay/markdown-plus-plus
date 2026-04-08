@@ -501,7 +501,7 @@ A conformant Markdown++ processor MUST implement all of the following:
 7. **Multiline table processing** -- Recognition and processing of `multiline` commands on table elements.
 8. **Attachment rule enforcement** -- Block-level and inline attachment as specified in the [Attachment Rule](attachment-rule.md).
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
-10. **Diagnostic reporting** -- Emission of all MDPP diagnostic codes defined in this specification at their specified severity levels.
+10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
 
 ### Optional Features
 
@@ -513,7 +513,7 @@ The following features are OPTIONAL. A conformant processor MAY implement them b
 
 ### Conformance Statement
 
-A processor that implements all required features, handles all MDPP diagnostic codes at their specified severities, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
+A processor that implements all required features, handles MDPP diagnostic codes at their specified severities for all features it implements, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
 
 A processor that implements all required features plus one or more optional features is a **conformant Markdown++ processor with extensions** and SHOULD document which optional features are supported.
 
