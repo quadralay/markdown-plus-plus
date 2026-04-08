@@ -101,6 +101,8 @@ A **fully conformant processor** is a tool that evaluates all Markdown++ extensi
 
 A fully conformant processor that also implements one or more optional features (such as combined commands) is a **fully conformant processor with extensions** and SHOULD document which optional features are supported.
 
+> **Note:** The [Processing Model](processing-model.md#conformance) uses the equivalent terms "conformant Markdown++ processor" and "conformant Markdown++ processor with extensions" for the same conformance levels defined here.
+
 ### 2.3 Determinism Guarantee
 
 Given the same input document, variable map, and condition set, a fully conformant processor MUST produce the same output. The processing pipeline is deterministic -- there is no implementation-defined ordering or randomness in extension evaluation.
@@ -128,6 +130,10 @@ The following terms are used normatively throughout this specification.
 **Extension comment** -- An HTML comment that contains one or more Markdown++ commands. Distinguished from a regular HTML comment by pattern matching. See [section 5](#5-extension-comment-syntax).
 
 **Inline element** -- A CommonMark element that appears within a line of text: emphasis, strong emphasis, links, images, code spans, and line breaks.
+
+**Orphaned tag** -- A recognized Markdown++ comment tag that fails to attach to a content element. Orphaned tags produce diagnostic MDPP009 and do not affect the output tree. See [section 6.3](#63-orphaned-tags).
+
+**Output tree** -- The structured representation of a processed Markdown++ document produced by a conformant processor. The output tree contains content elements with attached metadata (styles, aliases, markers) as defined by Phase 2 processing.
 
 **Processor** -- A software tool that reads a Markdown++ document, evaluates its extensions according to this specification, and produces an output tree.
 
@@ -162,7 +168,7 @@ Names are case-sensitive. `$Product;` and `$product;` are distinct variable refe
 
 ### 4.3 RFC 2119 Keywords
 
-The keywords MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY in this document are to be interpreted as described in [RFC 2119][rfc2119].
+See [section 2](#2-conformance) for the interpretation of RFC 2119 keywords used in this specification.
 
 ---
 
@@ -256,7 +262,7 @@ Processing a Markdown++ document is a two-phase operation. This section summariz
 
 **Phase 2: Markdown Parsing with Extension Extraction**
 
-3. **Parsing and Rendering** -- Parse the fully resolved text as CommonMark 0.30 with GFM table support. During parsing, extract style, alias, marker, and multiline commands from recognized HTML comments and attach them to target elements per the attachment rule.
+3. **Parsing and Rendering** -- Parse the assembled document as CommonMark 0.30 with GFM table support. During parsing, extract style, alias, marker, and multiline commands from recognized HTML comments and attach them to target elements per the attachment rule.
 
 The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is complete.
 
@@ -304,7 +310,7 @@ Variable names MUST match the standard identifier pattern: `[a-zA-Z_][a-zA-Z0-9_
 
 Variable substitution is performed during Phase 1, Step 2 of the processing pipeline, as specified in the [Processing Model](processing-model.md#phase-1-step-2-variable-substitution).
 
-For each `$name;` token in the resolved text:
+For each `$name;` token in the text produced by the preceding steps:
 
 1. The processor MUST look up the variable name in the variable map.
 2. If the name exists, the processor MUST replace the entire token with the variable's value.
@@ -341,8 +347,8 @@ Variables are inline tokens, not comment directives. The attachment rule does no
 
 ### 8.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP002** | Variable name does not match the standard identifier pattern | Error |
 | **MDPP010** | Variable reference has no corresponding entry in the variable map | Warning |
 
@@ -438,8 +444,8 @@ Inline placement applies only to `style:` commands; all other commands that requ
 
 ### 9.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP002** | Style name does not match the standard identifier pattern | Error |
 | **MDPP004** | Invalid style placement | Warning |
 | **MDPP009** | Orphaned style tag (not attached to an element) | Warning |
@@ -498,8 +504,8 @@ Alias commands require block-level attachment. The alias tag MUST appear on the 
 
 ### 10.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP002** | Alias name does not match the alias name pattern | Error |
 | **MDPP008** | Duplicate alias identifier within the same file | Error |
 | **MDPP009** | Orphaned alias tag (not attached to an element) | Warning |
@@ -611,8 +617,8 @@ Condition tags are **exempt** from the attachment rule. Conditions wrap content 
 
 ### 11.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP001** | Unclosed condition block (missing `<!-- /condition -->`) or unmatched closing tag | Error |
 | **MDPP007** | Invalid condition expression syntax | Error |
 | **MDPP012** | Condition block spans across an include boundary (opens in one file, closes in another) | Error |
@@ -675,7 +681,7 @@ A processor MUST track the include chain and MUST detect circular references. Wh
 
 #### Include Depth
 
-Implementations SHOULD impose a maximum include depth to prevent resource exhaustion. A maximum depth of **10** is RECOMMENDED. When exceeded, the processor MUST skip the include and emit diagnostic **MDPP011**.
+Implementations MAY impose a maximum include depth to prevent resource exhaustion. If a maximum depth is enforced, a depth of **10** is RECOMMENDED. When the limit is exceeded, the processor MUST skip the include and emit diagnostic **MDPP011**.
 
 #### File Not Found
 
@@ -695,8 +701,8 @@ Include directives are **exempt** from the attachment rule. An include is a stan
 
 ### 12.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP005** | Circular include detected (static analysis) | Error |
 | **MDPP006** | Missing or unreadable include file | Warning |
 | **MDPP011** | Maximum include depth exceeded | Error |
@@ -789,8 +795,8 @@ Marker commands require block-level attachment. The marker tag MUST appear on th
 
 ### 13.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP002** | Marker key does not match the standard identifier pattern | Error |
 | **MDPP003** | Malformed JSON in `markers:` command | Error |
 | **MDPP009** | Orphaned marker tag (not attached to an element) | Warning |
@@ -880,8 +886,8 @@ The multiline directive requires block-level attachment. The `<!-- multiline -->
 
 ### 14.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP009** | Orphaned multiline tag (not attached to a table element) | Warning |
 
 ### 14.7 Examples
@@ -929,7 +935,7 @@ A content island is a standard CommonMark blockquote with a style tag on the lin
 
 A content island is a blockquote element that carries a style annotation in the output tree. The style name determines how the processor renders the content island (e.g., as a callout box, warning panel, or information card). The rendering is implementation-defined.
 
-### 15.4 Supported Nested Content
+#### Supported Nested Content
 
 Blockquotes in CommonMark support rich nested content. Within a content island, the following are supported:
 
@@ -939,7 +945,7 @@ Blockquotes in CommonMark support rich nested content. Within a content island, 
 - Nested formatting (bold, italic, links)
 - Other Markdown++ extensions (variables, conditions, inline styles)
 
-### 15.5 Interaction with Other Extensions
+### 15.4 Interaction with Other Extensions
 
 **Content Islands and Styles:** The style tag above the blockquote follows standard block-level attachment rules.
 
@@ -947,17 +953,17 @@ Blockquotes in CommonMark support rich nested content. Within a content island, 
 
 **Content Islands and Conditions:** Conditions MAY wrap or appear within content islands.
 
-### 15.6 Attachment Requirements
+### 15.5 Attachment Requirements
 
 Content islands use standard block-level style attachment. The style tag MUST appear on the line directly above the blockquote with no blank line.
 
-### 15.7 Diagnostics
+### 15.6 Diagnostics
 
-| Code | Condition | Severity |
-|------|-----------|----------|
+| Code | Description | Severity |
+|------|-------------|----------|
 | **MDPP009** | Orphaned style tag above a blockquote (blank line breaks attachment) | Warning |
 
-### 15.8 Examples
+### 15.7 Examples
 
 ```markdown
 <!-- style:NoteBox -->
@@ -1149,7 +1155,7 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 
 | Code | Name | Severity | Phase | Description | Triggering Condition |
 |------|------|----------|-------|-------------|---------------------|
-| **MDPP000** | File not found | Error | Pre-processing | The input file does not exist or cannot be read | Root document path is invalid or inaccessible |
+| **MDPP000** | File not found or cannot be read | Error | Pre-processing | The input file does not exist or cannot be read | Root document path is invalid or inaccessible |
 | **MDPP001** | Unclosed condition block | Error | Pre-processing | A condition block is missing its closing tag, or a closing tag has no matching opening tag | `<!-- condition:expr -->` without `<!-- /condition -->`, or vice versa |
 | **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard) or `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias) |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 | The JSON content in a `markers:` command is not valid JSON | `markers:{invalid}` |
