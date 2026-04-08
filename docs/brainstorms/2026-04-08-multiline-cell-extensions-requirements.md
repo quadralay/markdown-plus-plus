@@ -24,7 +24,7 @@ Without this documentation:
 
 - R2. The spec MUST document that **conditions** work in multiline table cells at the raw-text level. Conditions are evaluated per-file in Phase 1, Step 1 before table parsing. A condition block that wraps complete table rows (first row + continuation rows + separator) works correctly — the hidden rows are removed before Phase 2 sees the table. The spec MUST document that a condition block wrapping partial rows (e.g., some continuation rows but not others within a logical row) produces undefined table structure and SHOULD be avoided.
 
-- R3. The spec MUST document that **include** directives are expanded in Phase 1, Step 1 before table parsing. An include directive in a cell position is technically expanded, but the included content would need to conform to the pipe-delimited table row format to preserve table structure. The spec SHOULD document this as not recommended because expanded content is unlikely to maintain valid table syntax, and the result is fragile and unportable.
+- R3. The spec MUST document that **include** directives inside multiline table cells are NOT supported. Although includes are expanded in Phase 1, Step 1 before table parsing, the included content would need to conform to the pipe-delimited table row format to preserve table structure. Since expanded content is unlikely to maintain valid table syntax, and the result is fragile and unportable, implementations MUST NOT support include directives within table cell content.
 
 ### Phase 2 extensions in cells
 
@@ -36,7 +36,7 @@ Without this documentation:
 
 - R7. The spec MUST document that **markers** (`marker:Key="value"`, `markers:{json}`) are syntactically valid inside multiline table cells but are unusual. Markers attach metadata to block elements, and attaching them to elements within a cell is a valid but uncommon use case (e.g., marking a specific cell's content for indexing).
 
-- R8. The spec MUST document that **nested multiline tables** are technically possible since each cell is parsed as a full Markdown document, but SHOULD be strongly discouraged. The authoring constraints of pipe-delimited continuation rows make nested tables extremely difficult to write, read, and maintain. The spec SHOULD note that alternative approaches (restructuring content, using separate tables, or using styled lists) are preferred.
+- R8. The spec MUST document that **nested multiline tables** inside multiline table cells are NOT supported. Although each cell is parsed as a full Markdown document, implementations MUST NOT support nested multiline tables within cells. The authoring constraints of pipe-delimited continuation rows make nested tables extremely difficult to write, read, and maintain. The spec MUST note that alternative approaches (restructuring content, using separate tables, or using styled lists) are required instead.
 
 ### Standard Markdown in cells
 
@@ -71,7 +71,7 @@ Without this documentation:
 
 - **Phase ordering is the organizing principle**: Rather than an arbitrary list of "works / doesn't work," the document should explain that Phase 1 vs. Phase 2 determines everything. This gives authors and implementors a mental model, not just a lookup table. **Why:** The processing model is already the authoritative source for phase ordering; this document applies that model to the specific context of cells. **How to apply:** Structure the spec section around Phase 1 extensions in cells vs. Phase 2 extensions in cells.
 
-- **"Valid but not recommended" is a useful category**: Some extensions (aliases in cells, nested tables, includes in cells) are syntactically valid but practically problematic. The spec should acknowledge validity while providing clear guidance. **Why:** Forbidding valid syntax creates spec/implementation divergence; silently allowing it creates author confusion. **How to apply:** Use SHOULD NOT or "not recommended" language rather than MUST NOT for these cases.
+- **Three categories: supported, valid-but-not-recommended, and not supported**: Extensions fall into distinct categories. Nested tables and includes in cells are explicitly not supported (MUST NOT). Some extensions (aliases in cells) are syntactically valid but not recommended (SHOULD NOT). The rest are fully supported. **Why:** Clear categories prevent author confusion and give implementors unambiguous conformance requirements. **How to apply:** Use MUST NOT for unsupported features (nested tables, includes), SHOULD NOT for valid-but-not-recommended features (aliases in cells), and normative language for supported features.
 
 - **Existing syntax reference examples are normative**: The styles-in-cells examples already in the syntax reference establish that block and inline styles work in cells. This requirements document formalizes and extends that. **Why:** Avoids contradicting existing documentation. **How to apply:** Reference existing examples rather than replacing them.
 
@@ -88,7 +88,7 @@ Without this documentation:
 ### Deferred to Planning
 
 - [Affects R2][Needs research] How should the spec handle a condition block that wraps some but not all continuation rows within a logical row? The Phase 1 text removal could leave orphaned continuation rows. Need to determine whether to specify this as an error (with a diagnostic code) or simply as "undefined behavior that authors should avoid."
-- [Affects R8][Technical] Should nested multiline tables be explicitly prohibited with a MUST NOT, or merely discouraged with SHOULD NOT? The difference affects conformance testing — MUST NOT requires implementations to detect and reject, SHOULD NOT allows but discourages.
+- ~~[Affects R8][Technical] Should nested multiline tables be explicitly prohibited with a MUST NOT, or merely discouraged with SHOULD NOT?~~ **Resolved:** MUST NOT — nested tables are not supported per maintainer direction.
 - [Affects R11][Needs research] What is the practical behavior of fenced code blocks inside multiline table cells in the ePublisher parser? Need to verify this works before specifying it.
 - [Affects all][Technical] Where should this specification live? Options: (a) a new subsection in `spec/processing-model.md` under Phase 2, (b) a dedicated `spec/multiline-cell-extensions.md`, or (c) integrated into a broader `spec/element-interactions.md` when issue #9 is addressed. Planning should evaluate based on document size and cross-referencing needs.
 
