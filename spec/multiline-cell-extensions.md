@@ -283,9 +283,9 @@ The combined command applies the style "Important" and the marker `Keywords="cri
 
 ## Standard Markdown in Cells
 
-### Block Elements
+### Block and Inline Elements
 
-Standard Markdown block elements work in multiline table cells. Each cell is parsed as a full Markdown document, so all CommonMark block-level content is valid:
+Standard Markdown block and inline elements work in multiline table cells. Each cell is parsed as a full Markdown document, so all CommonMark content is valid:
 
 - **Paragraphs** -- Text on continuation rows forms paragraphs within the cell.
 - **Unordered lists** -- Lines starting with `-`, `*`, or `+` on continuation rows.
