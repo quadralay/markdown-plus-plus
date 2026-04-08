@@ -1,7 +1,7 @@
 ---
 title: "docs: Document multiline table separator pattern, headers, and dedent"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-multiline-table-separators-requirements.md
 ---
@@ -74,7 +74,7 @@ Files requiring updates, with current problematic language:
 
 ## Implementation Units
 
-- [ ] **Unit 1: Update syntax-reference.md — canonical multiline table documentation**
+- [x] **Unit 1: Update syntax-reference.md — canonical multiline table documentation**
 
   **Goal:** Replace the ambiguous "Structure Rules" section with precise documentation covering all four requirements. This is the primary detailed location that other files will reference.
 
@@ -108,7 +108,7 @@ Files requiring updates, with current problematic language:
   - No instance of "empty row" without qualification remains in the Multiline Tables section
   - Examples are syntactically valid Markdown++ tables
 
-- [ ] **Unit 2: Update SKILL.md — concise corrected summary**
+- [x] **Unit 2: Update SKILL.md — concise corrected summary**
 
   **Goal:** Fix the misleading "empty row separates records" language in the SKILL.md quick reference.
 
@@ -135,7 +135,7 @@ Files requiring updates, with current problematic language:
   - Line 169 area uses corrected terminology
   - Reference to syntax-reference.md for details is preserved
 
-- [ ] **Unit 3: Update best-practices.md and examples.md — corrected terminology**
+- [x] **Unit 3: Update best-practices.md and examples.md — corrected terminology**
 
   **Goal:** Fix misleading terminology in both reference files.
 
@@ -161,7 +161,7 @@ Files requiring updates, with current problematic language:
   **Verification:**
   - Both files use terminology consistent with the syntax reference
 
-- [ ] **Unit 4: Update examples/multiline-tables.md — add multiline header example**
+- [x] **Unit 4: Update examples/multiline-tables.md — add multiline header example**
 
   **Goal:** Fix terminology and add a multiline header example to the standalone example file.
 
@@ -187,7 +187,7 @@ Files requiring updates, with current problematic language:
   **Verification:**
   - The file demonstrates all three documented patterns: continuation rows, separator rows, and multiline headers
 
-- [ ] **Unit 5: Update spec/whitepaper.md — precise terminology**
+- [x] **Unit 5: Update spec/whitepaper.md — precise terminology**
 
   **Goal:** Fix the "empty separator rows" language in the whitepaper.
 
@@ -211,7 +211,7 @@ Files requiring updates, with current problematic language:
   **Verification:**
   - Line 237 area uses corrected terminology consistent with the syntax reference
 
-- [ ] **Unit 6: Update spec/processing-model.md — define multiline table processing**
+- [x] **Unit 6: Update spec/processing-model.md — define multiline table processing**
 
   **Goal:** Expand required feature #7 from a one-line stub to a defined conformance requirement that specifies what "multiline table processing" means.
 
@@ -243,7 +243,7 @@ Files requiring updates, with current problematic language:
   - Required feature #7 now defines four concrete sub-requirements
   - RFC 2119 language (MUST) is used consistently
 
-- [ ] **Unit 7: Update spec/formal-grammar.md — structural constraint for multiline tables**
+- [x] **Unit 7: Update spec/formal-grammar.md — structural constraint for multiline tables**
 
   **Goal:** Add a prose note in the Structural Constraints section describing multiline table row structure behavior, following the pattern used for attachment rules.
 

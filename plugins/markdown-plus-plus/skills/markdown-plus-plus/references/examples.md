@@ -211,7 +211,7 @@ When you first launch $product_name;, the setup wizard guides you through:
 
 ## Example 4: Multiline Tables
 
-Complex tables with rich content in cells. Each row uses continuation lines (empty first cell) and is separated by an empty row with cell borders.
+Complex tables with rich content in cells. Each row uses continuation lines (empty first cell) and is separated by a row with pipes and whitespace-only cells. A completely blank line ends the table.
 
 ```markdown
 # Feature Comparison

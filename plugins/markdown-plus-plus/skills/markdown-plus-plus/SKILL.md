@@ -166,7 +166,7 @@ Enable block content (lists, blockquotes, styled elements) inside table cells.
 |      | - Enjoys cycling |
 ```
 
-Empty first cell continues previous row; empty row separates records. Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
+Empty first cell continues previous row; a row with pipes and whitespace-only cells separates rows (a blank line ends the table). Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
 
 ### Combined Commands
 

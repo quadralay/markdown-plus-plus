@@ -672,9 +672,50 @@ Index markers create entries in generated indexes (back-of-book style).
 
 Multiline tables use a specific row structure:
 
-1. **First content row** - Contains the row identifier in the first cell
-2. **Continuation rows** - Empty first cell (`|          |`) continues the previous row
-3. **Row separator** - Empty row with cell borders separates table rows
+1. **First content row** -- Contains the row identifier in the first cell
+2. **Continuation rows** -- Empty first cell (`|          |`) continues the previous row
+3. **Row separator** -- A table row where every cell contains only whitespace (pipes must be present). Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`
+
+> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Only rows with pipe characters and whitespace-only cells act as row separators.
+
+The multiline algorithm applies to both header rows (above the delimiter) and body rows (below it).
+
+### Multiline Headers
+
+Header rows can span multiple physical lines using the same continuation row mechanism. Continuation rows above the delimiter row extend the header, just as continuation rows below the delimiter extend body rows.
+
+```markdown
+<!-- multiline -->
+| Feature        | Description              |
+|                | and additional context   |
+|----------------|--------------------------|
+| Authentication | OAuth 2.0 implementation |
+|                | Supports:                |
+|                | - Authorization Code     |
+|                | - Client Credentials     |
+```
+
+In this example, the header row `Feature | Description` is extended by the continuation row `| and additional context |` before the delimiter row `|---|---|`.
+
+### Cell Content Dedent
+
+When a cell spans multiple physical lines, the processor strips the minimum common leading whitespace from all lines of that cell's content. This dedent algorithm ensures that indentation used for visual alignment in the source table does not appear in the output.
+
+**Before (source):**
+```
+|            | - Authorization Code     |
+|            | - Client Credentials     |
+|            | - Refresh tokens         |
+```
+
+**After (dedent applied):**
+```
+- Authorization Code
+- Client Credentials
+- Refresh tokens
+```
+
+The two leading spaces common to all three lines are stripped. If one line had no leading whitespace, no stripping would occur.
 
 ### Basic Example
 

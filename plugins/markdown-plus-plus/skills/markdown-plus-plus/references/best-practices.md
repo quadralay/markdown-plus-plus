@@ -237,7 +237,7 @@ Click <!--condition:windows10-->Start<!--/condition--><!--condition:windows11-->
 ```
 
 - Continuation rows use empty first cell (`|      |`)
-- Empty row with borders separates table rows
+- Row separator: pipes with whitespace-only cells (blank line ends the table)
 
 ### Combined Commands
 
