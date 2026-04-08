@@ -333,7 +333,7 @@ This behavior enables incremental authoring workflows where not all variables ar
 
 ### Phase 2: Markdown Parsing with Extension Extraction
 
-Phase 2 receives the fully resolved text from Phase 1 -- all includes expanded, conditions evaluated, variables substituted -- and parses it as Markdown with extension-aware grammars.
+Phase 2 receives the fully resolved text from Phase 1 -- all includes expanded, conditions evaluated, variables substituted -- and parses it as Markdown with extension-aware grammars. For the specific behavior of extensions within multiline table cells, see [Extensions in Multiline Table Cells](multiline-cell-extensions.md).
 
 #### Input
 
