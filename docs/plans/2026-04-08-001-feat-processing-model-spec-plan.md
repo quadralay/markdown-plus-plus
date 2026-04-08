@@ -1,7 +1,7 @@
 ---
 title: "feat: Add processing model specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-processing-model-requirements.md
 ---
@@ -110,7 +110,7 @@ The ePublisher adapter contains an implicit processing model that has been in pr
 
 ## Implementation Units
 
-- [ ] **Unit 1: Document skeleton with frontmatter, introduction, and definitions**
+- [x] **Unit 1: Document skeleton with frontmatter, introduction, and definitions**
 
 **Goal:** Create `spec/processing-model.md` with the document structure, introduction explaining purpose and scope, and a definitions section establishing terminology used throughout.
 
@@ -141,7 +141,7 @@ The ePublisher adapter contains an implicit processing model that has been in pr
 
 ---
 
-- [ ] **Unit 2: Phase 1 specification -- include expansion with per-file condition evaluation**
+- [x] **Unit 2: Phase 1 specification -- include expansion with per-file condition evaluation**
 
 **Goal:** Write the Phase 1, Step 1 section covering include expansion, per-file condition evaluation during include processing, cycle detection, path resolution, and depth limits.
 
@@ -193,7 +193,7 @@ The ePublisher adapter contains an implicit processing model that has been in pr
 
 ---
 
-- [ ] **Unit 3: Phase 1 specification -- variable substitution**
+- [x] **Unit 3: Phase 1 specification -- variable substitution**
 
 **Goal:** Write Phase 1, Step 2 covering variable resolution, escaping, undefined behavior, and the critical ordering implications.
 
@@ -235,7 +235,7 @@ The ePublisher adapter contains an implicit processing model that has been in pr
 
 ---
 
-- [ ] **Unit 4: Phase 2 specification -- Markdown parsing, extension extraction, and output model**
+- [x] **Unit 4: Phase 2 specification -- Markdown parsing, extension extraction, and output model**
 
 **Goal:** Write the Phase 2 section covering Markdown parsing with extension-aware grammars, the attachment rule cross-reference, combined command evaluation order, and the abstract output model.
 
@@ -280,7 +280,7 @@ The ePublisher adapter contains an implicit processing model that has been in pr
 
 ---
 
-- [ ] **Unit 5: Error handling, conformance, and document finalization**
+- [x] **Unit 5: Error handling, conformance, and document finalization**
 
 **Goal:** Write the error handling section with MDPP diagnostic codes, the conformance section with required/optional feature definitions, and add cross-references and a summary table.
 
