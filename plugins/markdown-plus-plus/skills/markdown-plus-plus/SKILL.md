@@ -320,6 +320,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 - `references/examples.md` - Real-world document examples
 - `references/best-practices.md` - Usage guidance, naming conventions, and common mistakes
 - `../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation
+- `../../../spec/graceful-degradation.md` - Graceful degradation behavior in standard CommonMark renderers
 
 </references>
 
