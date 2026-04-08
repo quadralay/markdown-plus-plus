@@ -57,6 +57,8 @@ This means Markdown++ files work cleanly in:
 
 These are not fallback experiences -- they are productive parts of a Markdown++ workflow. Authors can write, review, and collaborate using any standard Markdown tool and add `++` extensions incrementally where professional publishing features are needed.
 
+The degree of invisibility varies by extension type. Comment-based extensions (styles, aliases, markers, conditions, includes, multiline table directives) are fully hidden -- standard renderers treat HTML comments as invisible per the CommonMark specification. Inline token extensions (variables) pass through as literal text, so a reader sees `$product_name;` rather than the resolved value. And content that depends on processing -- included files and cross-file link resolution -- is absent in standard views. For the full per-extension breakdown, see the [Graceful Degradation appendix](graceful-degradation.md).
+
 We are not aware of another documentation format with comparable publishing power that renders this cleanly in standard tools.
 
 ### 2. Dual-use files: standalone and composite
