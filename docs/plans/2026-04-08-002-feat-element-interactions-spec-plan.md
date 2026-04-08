@@ -1,7 +1,7 @@
 ---
 title: "feat: Add standard element interactions specification"
 type: feat
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-element-interactions-requirements.md
 ---
@@ -110,7 +110,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ## Implementation Units
 
-- [ ] **Unit 1: Document skeleton with style type taxonomy and element catalog table**
+- [x] **Unit 1: Document skeleton with style type taxonomy and element catalog table**
 
 **Goal:** Create `spec/element-interactions.md` with frontmatter, introduction, relationship to other spec documents, style type taxonomy definitions, and a complete element-to-style-type mapping table.
 
@@ -144,7 +144,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ---
 
-- [ ] **Unit 2: Block-level element specifications (titles, headings, paragraphs, horizontal rules, code blocks)**
+- [x] **Unit 2: Block-level element specifications (titles, headings, paragraphs, horizontal rules, code blocks)**
 
 **Goal:** Write detailed specifications for each block-level element that produces Paragraph style type, covering style tag behavior, default names, and element-specific details.
 
@@ -180,7 +180,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ---
 
-- [ ] **Unit 3: Heading alias auto-generation algorithm**
+- [x] **Unit 3: Heading alias auto-generation algorithm**
 
 **Goal:** Specify the heading alias auto-generation algorithm precisely enough that two independent implementations produce the same alias for any given heading text.
 
@@ -218,7 +218,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ---
 
-- [ ] **Unit 4: Container elements and compound style naming (blockquotes, lists)**
+- [x] **Unit 4: Container elements and compound style naming (blockquotes, lists)**
 
 **Goal:** Specify how blockquotes and lists interact with style tags, including the compound naming rule for nested content and nested list non-inheritance behavior.
 
@@ -258,7 +258,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ---
 
-- [ ] **Unit 5: Inline elements and special types (bold, italic, links, images, tables, HTML)**
+- [x] **Unit 5: Inline elements and special types (bold, italic, links, images, tables, HTML)**
 
 **Goal:** Specify how inline elements (Character type), images (Graphic type), tables (Table type), and block/inline HTML interact with style tags.
 
@@ -296,7 +296,7 @@ The legacy ePublisher documentation contains 15 detailed pages covering these in
 
 ---
 
-- [ ] **Unit 6: TOC integration, cross-references, and document finalization**
+- [x] **Unit 6: TOC integration, cross-references, and document finalization**
 
 **Goal:** Add the informational TOC section, ensure all cross-references to other spec documents are correct, and verify internal consistency of the complete document.
 
