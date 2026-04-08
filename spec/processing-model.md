@@ -7,7 +7,7 @@ status: draft
 
 ## Introduction
 
-This document specifies how a conformant Markdown++ processor evaluates extensions to produce deterministic output. It defines the processing pipeline, evaluation order, scoping rules, error behavior, and output model that all conformant implementations MUST follow.
+This document specifies how a conformant Markdown++ processor evaluates extensions to produce deterministic output. It defines the character encoding requirement, processing pipeline, evaluation order, scoping rules, error behavior, and output model that all conformant implementations MUST follow.
 
 The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md) defines what each extension looks like. This document defines how those extensions are evaluated at processing time. The [Attachment Rule](attachment-rule.md) defines how block-level tags bind to content elements. [Format Versioning](versioning.md) defines how documents declare their target specification version and how processors handle version mismatches. Together, these four documents form the normative specification for the Markdown++ format.
 
@@ -39,6 +39,30 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 
 **Conformance keywords** -- The keywords MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). All conformance statements apply to processors, not to document authors.
 
+## Character Encoding
+
+Markdown++ documents MUST be encoded in UTF-8, consistent with [CommonMark 0.30 §2.1](https://spec.commonmark.org/0.30/#characters-and-lines). A conformant processor MUST decode document bytes as UTF-8 before any Phase 1 processing begins. This requirement applies to the root document and all files resolved through include expansion.
+
+### BOM Handling
+
+A UTF-8 Byte Order Mark (U+FEFF, encoded as the byte sequence `EF BB BF`) at the start of a file is OPTIONAL. A conformant processor MUST strip a leading BOM before further processing -- the BOM is not considered part of the document content.
+
+A BOM MUST only appear at the very beginning of a file. If include expansion produces a BOM at a position other than the start of the final resolved document (for example, when an included file begins with a BOM and is spliced into the middle of a parent document), the processor MUST strip the embedded BOM during include expansion so it does not appear in the resolved text.
+
+### Encoding Errors
+
+When a processor encounters an invalid UTF-8 byte sequence while reading a file, it MUST emit diagnostic **MDPP017** (severity: Error). The diagnostic MUST include the file path of the file containing the invalid byte sequence. The line number SHOULD be the line containing the first invalid byte, computed from the valid bytes decoded before the error. If the processor cannot determine a meaningful line number (for example, when the error occurs before any line ending is decoded), it SHOULD report line 1.
+
+A processor SHOULD emit **MDPP017** on the first invalid byte sequence in a file. Invalid encoding corrupts character boundaries, making further parsing of the affected file unreliable. A processor MAY attempt to collect multiple encoding errors within a single file, but MUST NOT use the file's content for further pipeline processing (variable substitution, Markdown parsing, or output generation). The processor SHOULD continue processing other files in the include chain.
+
+Recovery behavior (such as byte substitution or fallback to an alternative encoding) is implementation-defined. A processor that implements recovery MUST still emit **MDPP017** regardless of whether recovery succeeds.
+
+### Include Chain Encoding Consistency
+
+All files in an include chain MUST be encoded in UTF-8. When a processor reads a file during include expansion (step 1 of the [include algorithm](#algorithm)), it MUST validate the file's encoding. If the file contains invalid UTF-8, the processor MUST emit **MDPP017** with the offending file's path -- not the path of the root document or the parent file that referenced it.
+
+This ensures that encoding errors are traceable to their source file, even in deeply nested include chains.
+
 ## Pipeline Overview
 
 Processing a Markdown++ document is a two-phase operation with an optional preamble step. **Phase 1** operates on raw text before any Markdown parsing occurs. **Phase 2** parses the resolved text as Markdown with extension-aware grammars. The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is complete.
@@ -68,7 +92,7 @@ Include expansion resolves all `<!-- include:path -->` directives in the documen
 
 A processor MUST resolve includes using the following depth-first recursive algorithm:
 
-1. Read the current file's content.
+1. Read the current file's content, decoding as UTF-8 and stripping any leading BOM per [Character Encoding](#character-encoding). If the file contains invalid UTF-8, emit **MDPP017** and stop processing the affected file.
 2. Evaluate the current file's condition blocks using the project's condition set (see [Per-File Condition Evaluation](#per-file-condition-evaluation) below).
 3. Scan the resolved content for `<!-- include:path -->` directives.
 4. For each include directive, in document order:
@@ -76,9 +100,10 @@ A processor MUST resolve includes using the following depth-first recursive algo
    b. Check the include chain for cycles. If the resolved path already appears in the chain, skip the include with diagnostic **MDPP013** and leave the include tag in place as a regular HTML comment.
    c. Check the include depth. If the depth exceeds the processor's configured maximum, skip the include with diagnostic **MDPP011** and leave the include tag in place.
    d. If the file does not exist or cannot be read, emit diagnostic **MDPP006** and leave the include tag in place as a regular HTML comment.
-   e. Otherwise, push the resolved path onto the include chain and recursively process the included file starting from step 1.
-   f. Replace the include directive with the included file's resolved content, surrounded by blank lines (`\n\n`) to ensure block-level separation.
-   g. Pop the resolved path from the include chain.
+   e. If the file contains invalid UTF-8 encoding (detected during step 1), emit diagnostic **MDPP017** and leave the include tag in place as a regular HTML comment.
+   f. Otherwise, push the resolved path onto the include chain and recursively process the included file starting from step 1.
+   g. Replace the include directive with the included file's resolved content, surrounded by blank lines (`\n\n`) to ensure block-level separation.
+   h. Pop the resolved path from the include chain.
 
 #### Path Resolution
 
@@ -434,7 +459,7 @@ A **fatal error** prevents the processor from producing a meaningful output tree
 
 | Classification | Behavior | Examples |
 |---------------|----------|----------|
-| **Fatal error** | Processor MUST report the error. Processing of the affected construct stops, but the processor SHOULD continue processing the remainder of the document. | Cross-file condition span (MDPP012), include cycle (MDPP013), max include depth exceeded (MDPP011) |
+| **Fatal error** | Processor MUST report the error. The affected construct's content MUST NOT be used for further pipeline processing, but the processor SHOULD continue processing the remainder of the document. A processor MAY implement an implementation-defined recovery strategy (e.g., encoding fallback for MDPP017), but MUST still emit the diagnostic regardless. | Invalid UTF-8 encoding (MDPP017), cross-file condition span (MDPP012), include cycle (MDPP013), max include depth exceeded (MDPP011) |
 | **Recoverable warning** | Processor MUST report the warning. Processing continues with a documented fallback behavior. | Missing include file (MDPP006), undefined variable (MDPP010), orphaned tag (MDPP009) |
 
 ### Diagnostic Collection
@@ -481,6 +506,7 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP014** | Duplicate link reference slug across files | Warning | Phase 2 | Two or more link reference definitions with the same slug originate from different source files in the assembled document. See [Cross-File Link Reference Resolution](cross-file-link-resolution.md). |
 | **MDPP015** | Document targets newer minor version than processor supports | Warning | Preamble | The `mdpp-version` minor version exceeds the processor's supported minor version within the same major series. See [Format Versioning](versioning.md). |
 | **MDPP016** | Document targets different major version than processor supports | Warning | Preamble | The `mdpp-version` major version differs from the processor's supported major version. See [Format Versioning](versioning.md). |
+| **MDPP017** | Invalid UTF-8 encoding | Error | Phase 1, Step 1 | The root document or an included file contains an invalid UTF-8 byte sequence when read during processing. See [Encoding Errors](#encoding-errors). |
 
 Implementations MAY define additional diagnostic codes beyond this registry for implementation-specific checks. Custom codes SHOULD use numbers MDPP100 and above to avoid conflicts with future specification-defined codes.
 
@@ -502,6 +528,7 @@ A conformant Markdown++ processor MUST implement all of the following:
 8. **Attachment rule enforcement** -- Block-level and inline attachment as specified in the [Attachment Rule](attachment-rule.md).
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
 10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
+11. **Encoding validation** -- UTF-8 encoding validation with BOM handling and MDPP017 emission, as specified in [Character Encoding](#character-encoding)
 
 ### Optional Features
 
