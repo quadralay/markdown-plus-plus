@@ -50,7 +50,7 @@ Before this solution, understanding Markdown++ semantics required fragmented app
 
 ## Solution
 
-Created `spec/processing-model.md` (513 lines) — a normative two-phase processing model specification covering 23 requirements (R1–R23), modeled after `spec/attachment-rule.md` conventions.
+Created `spec/processing-model.md` (550 lines) — a normative two-phase processing model specification covering 23 core requirements, modeled after `spec/attachment-rule.md` conventions. The spec has grown since initial creation as subsequent issues (UTF-8 encoding, format versioning, cross-file link resolution) added sections and diagnostic codes.
 
 **Phase 1, Step 1 — Include Expansion:**
 - Depth-first recursive algorithm with cycle detection (MDPP013)
@@ -79,27 +79,27 @@ Created `spec/processing-model.md` (513 lines) — a normative two-phase process
 - Combined command evaluation order: style > multiline > marker > alias
 - Orphaned tag handling
 
-**Additional sections:** Output model (abstract CommonMark tree + metadata annotations, determinism guarantee), error handling (fatal vs. recoverable, diagnostic collection, MDPP code registry MDPP000–013), and conformance (10 required features, 2 optional features).
+**Additional sections:** Output model (abstract CommonMark tree + metadata annotations, determinism guarantee), error handling (fatal vs. recoverable, diagnostic collection, MDPP code registry MDPP000–017), and conformance (11 required features, 3 optional features).
 
 **Review fix applied:** Added the fourth ordering implication — variable values can contain include syntax, but since includes have already been expanded, include directives in variable values are not processed.
 
 ## Why This Works
 
-The fundamental issue was that Markdown++ had an implicit processing model embedded in the ePublisher implementation but no explicit formalization. By reverse-engineering the actual two-phase pipeline from working code and formalizing it with RFC 2119 normative language, numbered requirements (R1–R23), error codes (MDPP000–013), explicit ordering implications, and edge case examples, the specification now serves as a reference standard. New implementors can build conformant processors without code inspection, and existing implementations can be validated against normative requirements.
+The fundamental issue was that Markdown++ had an implicit processing model embedded in the ePublisher implementation but no explicit formalization. By reverse-engineering the actual two-phase pipeline from working code and formalizing it with RFC 2119 normative language, numbered requirements, error codes (MDPP000–017), explicit ordering implications, and edge case examples, the specification now serves as a reference standard. New implementors can build conformant processors without code inspection, and existing implementations can be validated against normative requirements.
 
 ## Prevention
 
 - **Formalize implicit models early:** When designing a format with multiple interacting features, write the processing model alongside the syntax reference rather than waiting for implementations to discover it
 - **Use numbered conformance requirements:** Structure specs with traceable requirements (R1, R2, ...) tied to prose explanations, enabling checklist-based implementation validation
-- **Establish an error code registry early:** Classify every error condition as fatal or recoverable from the start (MDPP000–013) to prevent implementations from guessing at failure semantics
+- **Establish an error code registry early:** Classify every error condition as fatal or recoverable from the start (MDPP000–017) to prevent implementations from guessing at failure semantics
 - **Specify interaction order explicitly:** For any multi-phase system, document what information flows between phases and in what order, including what is NOT available in later phases
 - **Include edge case examples:** For every normative rule involving recursion, cycles, or ordering, provide concrete input/expected-output examples to catch ambiguities that prose alone misses
 
 ## Related Issues
 
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) — Define the processing model for Markdown++ extensions (this issue)
-- [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) — Write a formal Markdown++ specification (parent issue; processing model is foundational work)
-- [#22](https://github.com/quadralay/markdown-plus-plus/issues/22) — Define cross-file link reference resolution semantics (blocked by #8)
+- [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) — Write a formal Markdown++ specification (resolved; processing model is foundational work)
+- [#22](https://github.com/quadralay/markdown-plus-plus/issues/22) — Define cross-file link reference resolution semantics (resolved)
 - [#10](https://github.com/quadralay/markdown-plus-plus/issues/10) — Formalize the attachment rule (resolved; cross-referenced by processing model Phase 2)
 - [#16](https://github.com/quadralay/markdown-plus-plus/issues/16) — Define variable escaping mechanism (resolved; formalized in processing model Phase 1, Step 2)
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` — Related specification pattern
