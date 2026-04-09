@@ -26,7 +26,7 @@ This example demonstrates rich table content using the `<!-- multiline -->` dire
 |                | - Default: 100 req/min   | In Progress |
 |                | - Maximum: 1000 req/min  |             |
 
-Continuation rows (empty first cell) extend a logical row across multiple physical lines. Empty separator rows mark cell boundaries.
+Continuation rows (empty first cell) extend a logical row across multiple physical lines. Separator rows (pipes with whitespace-only cells) mark row boundaries. A completely blank line ends the table.
 
 ## Styled table with combined directives
 
@@ -44,3 +44,20 @@ Continuation rows (empty first cell) extend a logical row across multiple physic
 |            | - Git-friendly diffs         | - No schema validation      |
 
 Multiple directives (style, multiline, alias) compose on a single line, separated by semicolons.
+
+## Multiline header
+
+Headers can span multiple physical lines using continuation rows above the delimiter.
+
+<!-- style:DataTable ; multiline ; #multiline-header -->
+| Feature        | Description              |
+|                | and Requirements         |
+|----------------|--------------------------|
+| Authentication | OAuth 2.0 implementation |
+|                | - Authorization Code     |
+|                | - Client Credentials     |
+|                |                          |
+| Rate Limiting  | Per-endpoint limits      |
+|                | - Default: 100 req/min   |
+
+The header row `Feature | Description` is extended by a continuation row with an empty first cell and `and Requirements` in the second cell, before the delimiter row.

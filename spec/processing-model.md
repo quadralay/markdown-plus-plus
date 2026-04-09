@@ -524,7 +524,11 @@ A conformant Markdown++ processor MUST implement all of the following:
 4. **Style extraction** -- Extraction and attachment of `style:Name` commands to target elements.
 5. **Alias extraction** -- Extraction and attachment of `#name` commands to target elements.
 6. **Marker extraction** -- Extraction and attachment of `marker:Key="value"` and `markers:{json}` commands to target elements.
-7. **Multiline table processing** -- Recognition and processing of `multiline` commands on table elements.
+7. **Multiline table processing** -- Recognition and processing of `multiline` commands on table elements. A conformant processor MUST implement all of the following:
+   a. **Row separator recognition** -- A table row where every cell contains only whitespace (matching the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`) MUST be recognized as a row separator that delimits logical rows.
+   b. **Continuation row merging** -- A table row whose first cell is empty MUST be merged into the preceding logical row. The multiline algorithm applies to both header rows (above the delimiter) and body rows (below it).
+   c. **Blank-line termination** -- A completely blank line (no pipe characters) MUST end the table. A blank line does not separate rows.
+   d. **Cell content dedent** -- The processor MUST strip the minimum common leading whitespace from all lines of each cell's merged content. If all lines share N leading spaces, all N spaces are removed.
 8. **Attachment rule enforcement** -- Block-level and inline attachment as specified in the [Attachment Rule](attachment-rule.md).
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
 10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.

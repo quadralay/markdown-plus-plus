@@ -234,7 +234,7 @@ The `<!-- style:ProcedureList -->` directive tells the publishing tool how to re
 |                | - Maximum: 1000 req/min  |             |
 ```
 
-Multiline tables use continuation rows (empty first cell) to extend a logical row across multiple physical lines, with empty separator rows marking cell boundaries. Combined commands on a single directive -- style, multiline, and alias -- demonstrate how multiple extensions compose naturally.
+Multiline tables use continuation rows (empty first cell) to extend a logical row across multiple physical lines, with separator rows (pipes with whitespace-only cells) marking row boundaries. A completely blank line ends the table rather than separating rows. Combined commands on a single directive -- style, multiline, and alias -- demonstrate how multiple extensions compose naturally.
 
 In DITA, the same structures require `<note>` elements with typed attributes, `<steps>` and `<substeps>` elements with mandatory `<cmd>` children, and `<entry>` elements with nested XML block structures inside `<simpletable>` or `<table>`. The XML overhead is substantial, and the source is hard to read or review in a pull request. Markdown++ gets the same structural capability while keeping source files as plain text.
 
