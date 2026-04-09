@@ -58,6 +58,8 @@ The **$product_name;** application supports...
 **Valid:** `$product_name;`, `$version-2;`, `$my_var;`
 **Invalid:** `$product name;` (space), `$product` (no semicolon)
 
+**Variable values:** Values can contain Markdown syntax (`**bold**`, `[link](url)`) — it renders normally. Values cannot contain condition or include directives — those are resolved before variable substitution. See `spec/processing-model.md` for processing order.
+
 ### Custom Styles
 
 Styles override default formatting. Placement depends on element type.
@@ -125,6 +127,10 @@ Means: (!draft) OR (web AND production)
 
 **Inline:** `Contact us at <!--condition:web-->email<!--/condition--><!--condition:print-->the back cover<!--/condition-->.`
 
+**Per-file scoping:** Condition blocks must open and close within the same file — they cannot span across an include boundary (MDPP012). See `spec/processing-model.md`.
+
+**Tri-state model:** Each condition name is Visible, Hidden, or Unset. Unset conditions default to visible — content inside an undefined condition block is included in output, so documents render completely without requiring every build to define every condition.
+
 ### File Includes
 
 Insert content from other Markdown++ files.
@@ -172,6 +178,8 @@ Enable block content (lists, blockquotes, styled elements) inside table cells.
 ```
 
 Empty first cell continues previous row; a row with pipes and whitespace-only cells separates rows (a blank line ends the table). Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
+
+**Extensions in cells:** Variables, block/inline styles, markers, conditions (wrapping complete rows only — not partial rows), and combined commands work inside multiline table cells. Includes and nested multiline tables are not supported in cells. See `spec/multiline-cell-extensions.md`.
 
 ### Combined Commands
 
@@ -326,10 +334,15 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 - `references/error-codes.md` - Error code reference with detection logic, trigger examples, and fixes
 - `references/examples.md` - Real-world document examples
 - `references/best-practices.md` - Usage guidance, naming conventions, and common mistakes
-- `../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation
-- `../../../spec/graceful-degradation.md` - Graceful degradation behavior in standard CommonMark renderers
-- `../../../spec/cross-file-link-resolution.md` - Link reference scope and conflict rules across included files
-- `../../../spec/element-interactions.md` - Style types, default names, compound naming, heading alias auto-generation and collision resolution
+- `../../../../spec/specification.md` - Consolidated Markdown++ 1.0 specification
+- `../../../../spec/processing-model.md` - Two-phase pipeline, variable/condition scoping, and processing order
+- `../../../../spec/attachment-rule.md` - Formal tag-to-element binding rule, edge cases, and exempt tags
+- `../../../../spec/element-interactions.md` - Style types, default names, compound naming, heading alias auto-generation and collision resolution
+- `../../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation
+- `../../../../spec/cross-file-link-resolution.md` - Link reference scope and conflict rules across included files
+- `../../../../spec/versioning.md` - Format version declaration syntax (`mdpp-version`) and compatibility rules
+- `../../../../spec/multiline-cell-extensions.md` - Extension support and restrictions inside multiline table cells
+- `../../../../spec/graceful-degradation.md` - Graceful degradation behavior in standard CommonMark renderers
 
 </references>
 
