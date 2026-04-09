@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Tooling
 
+- Added standalone error code reference for MDPP000-MDPP009 ([#14](https://github.com/quadralay/markdown-plus-plus/issues/14))
+
 ### Project
 
 - Added CONTRIBUTING.md, CHANGELOG.md, and GOVERNANCE.md ([#26](https://github.com/quadralay/markdown-plus-plus/issues/26))

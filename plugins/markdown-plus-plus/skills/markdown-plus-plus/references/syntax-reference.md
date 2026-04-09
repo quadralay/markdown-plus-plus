@@ -995,11 +995,12 @@ Blockquotes create "content islands" - self-contained content blocks. See [SKILL
 
 ## Validation Checks
 
-The validation script checks for these issues:
+The validation script checks for these issues. See [Error Code Reference](error-codes.md) for full details including detection logic, trigger examples, and suggested fixes.
 
 | Code | Check | Severity |
 |------|-------|----------|
-| MDPP001 | Unclosed condition block | Error |
+| MDPP000 | File not found or not readable | Error |
+| MDPP001 | Unmatched condition block | Error |
 | MDPP002 | Invalid name (variable, style, alias, or marker key) | Error |
 | MDPP003 | Malformed marker JSON | Error |
 | MDPP004 | Invalid style placement (reserved, not yet implemented) | Warning |
