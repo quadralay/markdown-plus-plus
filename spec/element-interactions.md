@@ -308,6 +308,71 @@ If this is the second `## Setup` heading in the document, the heading has two va
 - `db-setup` -- the custom alias
 - `setup-2` -- the suffixed auto-generated alias
 
+#### Custom Alias Priority
+
+When a custom alias (`<!-- #name -->`) on one element produces the same identifier as an auto-generated heading alias on a different element, the custom alias takes priority. The auto-generated alias is displaced and MUST receive a counter suffix using the same algorithm as duplicate auto-generated alias resolution.
+
+Custom aliases are intentionally assigned by the author as stable, permanent anchors. Auto-generated aliases are derived from heading text and change when the heading text changes. When the two collide across elements, the intentional assignment wins.
+
+This resolution is **silent** -- a conformant processor MUST NOT emit a diagnostic for this collision. Unlike custom alias duplicates (which trigger [MDPP008](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-codes.md#mdpp008----duplicate-alias) as an error), a custom-vs-auto-generated collision is resolved by suffixing the auto-generated alias.
+
+##### Processing Order
+
+A conformant processor MUST resolve custom aliases before auto-generated heading aliases during Phase 2. This ensures that custom aliases claim their identifiers first, and auto-generated aliases that collide are displaced consistently regardless of document order.
+
+##### Example
+
+Given the following document:
+
+```markdown
+<!-- #setup -->
+## Installation
+
+Install the required packages.
+
+## Setup
+
+Configure the application.
+```
+
+The custom alias `<!-- #setup -->` assigns the identifier `setup` to the "Installation" heading. The "Setup" heading auto-generates the slug `setup`, which collides with the custom alias. The auto-generated alias is displaced and receives a counter suffix:
+
+| Heading | Anchors |
+|---------|---------|
+| `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
+| `## Setup` | `setup-2` (suffixed auto-generated) |
+
+The "Installation" heading has two valid anchors (`installation` and `setup`), consistent with the [alias supplement semantics](#relationship-to-custom-aliases). The "Setup" heading is addressable via `#setup-2`.
+
+##### Interaction with Duplicate Auto-Generated Resolution
+
+Custom alias priority composes with [duplicate auto-generated alias resolution](#duplicate-alias-resolution). When both collision types occur in the same document, custom aliases claim their identifiers first, then auto-generated aliases are deduplicated against all existing aliases (both custom and previously assigned auto-generated).
+
+Given the following document:
+
+```markdown
+<!-- #setup -->
+## Installation
+
+Install the required packages.
+
+## Setup
+
+Configure the application.
+
+## Setup
+
+Verify the installation.
+```
+
+A conformant processor produces the following aliases:
+
+| Heading | Anchors |
+|---------|---------|
+| `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
+| `## Setup` (first) | `setup-2` (suffixed -- displaced by custom alias) |
+| `## Setup` (second) | `setup-3` (suffixed -- next available counter) |
+
 ## Container Elements
 
 Container elements -- blockquotes and lists -- hold nested content. When a style tag is applied to a container, it affects both the container itself and the style names generated for nested content through **compound naming**.
