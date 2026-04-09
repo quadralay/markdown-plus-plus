@@ -133,6 +133,8 @@ Insert content from other Markdown++ files.
 
 **Rules:** Paths relative to containing file. Recursive includes supported; circular includes detected and prevented. Must be alone on its line. Can be wrapped in conditions.
 
+**Cross-file link resolution:** After include expansion, link reference definitions (`[slug]: url`) from all files share a single document-global scope. When multiple files define the same slug, first-definition-wins (per CommonMark 0.30) and include order determines priority. Cross-file duplicate slugs emit MDPP014 (warning). See `spec/cross-file-link-resolution.md` for full rules.
+
 ### Markers (Metadata)
 
 Attach metadata to document elements for search, processing, or custom behavior.
@@ -237,6 +239,7 @@ python scripts/validate-mdpp.py document.md
 - Circular file includes
 - Duplicate alias values within a file
 - Orphaned comment tags (tag not attached to element)
+- Duplicate link reference slugs across included files (MDPP014)
 
 ## Alias Generation
 
@@ -323,6 +326,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 - `references/best-practices.md` - Usage guidance, naming conventions, and common mistakes
 - `../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation
 - `../../../spec/graceful-degradation.md` - Graceful degradation behavior in standard CommonMark renderers
+- `../../../spec/cross-file-link-resolution.md` - Link reference scope and conflict rules across included files
 
 </references>
 

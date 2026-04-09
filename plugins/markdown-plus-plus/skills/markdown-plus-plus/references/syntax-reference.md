@@ -1029,6 +1029,7 @@ The validation script checks for these issues. See [Error Code Reference](error-
 | MDPP007 | Invalid condition syntax | Error |
 | MDPP008 | Duplicate alias within file | Error |
 | MDPP009 | Orphaned comment tag (not attached to element) | Warning |
+| MDPP014 | Duplicate link reference slug across files | Warning |
 
 ---
 
