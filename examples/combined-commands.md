@@ -4,7 +4,7 @@ date: 2026-04-08
 status: active
 ---
 
-<!-- style:Heading1; markers:{"Keywords": "combined commands, extensions, semicolons", "Description": "How multiple Markdown++ directives compose on a single line using semicolons"}; #400001 -->
+<!-- style:Heading1; markers:{"Description": "How multiple Markdown++ directives compose on a single line using semicolons", "Keywords": "combined commands, extensions, semicolons"}; #400001 -->
 # Combined commands
 
 [combined-commands]: #400001 "Combined commands"
@@ -30,9 +30,9 @@ This heading has a chapter style and a stable alias. Other documents link here u
 
 [style-with-markers]: #400004 "Style with markers"
 
-Add search keywords and a page description alongside a custom style. When a directive carries multiple markers (`Keywords` and `Description`), use JSON format (`markers:{...}`) instead of the single-key form.
+A custom style paired with an index marker.
 
-<!-- style:Important; markers:{"Keywords": "deployment, checklist, prerequisites", "Description": "Pre-deployment verification checklist"} -->
+<!-- style:Important; marker:IndexMarker="deployment:checklist" -->
 Before deploying, verify that all database migrations have been applied and environment variables are set.
 
 <!-- style:Heading2; #400005 -->
@@ -42,12 +42,12 @@ Before deploying, verify that all database migrations have been applied and envi
 
 All four directive types -- style, multiline, marker, and alias -- compose in one comment.
 
-<!-- style:SectionHeading; markers:{"Keywords": "migration, upgrade path", "Description": "Step-by-step guide for upgrading from version 1 to version 2"}; #400006 -->
+<!-- style:SectionHeading; marker:Author="Engineering Team"; #400006 -->
 ## Upgrade path from v1 to v2
 
 [upgrade-path]: #400006 "Upgrade path from v1 to v2"
 
-This heading carries a custom style, search keywords, a page description, and a stable alias. The `Description` marker provides a text summary that search engines display as the page snippet. The `Keywords` and `Description` markers are combined in a single JSON object because multiple markers on one element require JSON format. The order follows the priority convention: style first, then markers, then alias.
+This heading carries a custom style, search keywords, a page description, and a stable alias. The order follows the priority convention: style first, then markers, then alias.
 
 <!-- style:Heading2; #400007 -->
 ## Styled multiline table with alias
@@ -77,9 +77,9 @@ Tables benefit from combined commands when they need custom formatting, multilin
 
 [content-island-with-markers]: #400009 "Content island with markers"
 
-Styled blockquotes (content islands) can carry markers for search indexing.
+Styled blockquotes (content islands) can carry markers for metadata.
 
-<!-- style:BQ_Learn; markers:{"Keywords": "best practices, naming conventions", "Description": "Directive naming conventions for variables, conditions, styles, and aliases"} -->
+<!-- style:BQ_Learn; marker:Audience="developers" -->
 > ## Naming conventions
 >
 > Follow these patterns when naming Markdown++ directives:
