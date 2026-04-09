@@ -54,7 +54,7 @@ Created `spec/formal-grammar.md` (539 lines), a formal grammar specification con
 
 **W3C EBNF grammar**: Uses W3C EBNF notation (the same variant used by XML and CSS specifications). The top-level production `mdpp_extension ::= variable | escaped_variable | mdpp_comment` establishes that Markdown++ adds exactly two syntactic forms to CommonMark: inline variable tokens and HTML comment directives.
 
-**Two identifier productions**: `identifier ::= (letter | "_") (letter | digit | "-" | "_")*` for variables, styles, conditions, and marker keys, and `alias_name ::= (letter | digit | "_") (letter | digit | "-" | "_")*` for aliases. The alias exception allowing a leading digit supports numeric content identifiers (CMS record IDs like `#04499224`, `#316492`). These correspond to the validator's `STANDARD_NAME_RE` and `ALIAS_NAME_RE`.
+**Three identifier productions**: `identifier ::= (letter | "_") (letter | digit | "-" | "_")*` for variables and conditions, `alias_name ::= (letter | digit | "_") (letter | digit | "-" | "_")*` for aliases (digit-first supports CMS record IDs like `#04499224`), and `style_name ::= (letter | "_") (letter | digit | "-" | "_" | " ")*` for styles and markers (embedded spaces support compound names like `Blockquote Paragraph`). These correspond to the validator's `STANDARD_NAME_RE`, `ALIAS_NAME_RE`, and `STYLE_NAME_RE`. The third production was added by #52 to correct the original two-pattern system's overreach in forbidding spaces for styles and markers.
 
 **Condition expression sub-grammar with operator precedence**: Layered productions encode precedence structurally: `or_expr ::= and_expr (ws? "," ws? and_expr)*`, `and_expr ::= unary_expr (ws unary_expr)*`, `unary_expr ::= "!"? identifier`. This means NOT (prefix `!`) binds tightest, AND (space) is medium, OR (comma) is lowest. Example: `!draft,web production` parses as `(NOT "draft") OR ("web" AND "production")`.
 
@@ -86,6 +86,8 @@ The root cause was that syntax was defined through three different lenses (prose
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) -- Define the processing model (grammar explicitly excludes semantic processing)
 - [#23](https://github.com/quadralay/markdown-plus-plus/issues/23) -- Add UTF-8 character encoding requirement (may affect `letter` production)
 - [#27](https://github.com/quadralay/markdown-plus-plus/issues/27) -- Update ePublisher adapter regex patterns to enforce unified naming rule
+- [#52](https://github.com/quadralay/markdown-plus-plus/issues/52) -- Added `style_name` production for embedded spaces in style/marker names (extended two identifier forms to three)
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` -- Complementary: established the `STANDARD_NAME_RE` and `ALIAS_NAME_RE` regex patterns that the grammar formalizes as EBNF productions
+- `docs/solutions/logic-errors/embedded-spaces-in-style-marker-names-2026-04-08.md` -- Extended the naming system with `STYLE_NAME_RE` for styles and markers
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` -- Complementary: defines positional constraints referenced by the grammar's structural constraints table
 - `docs/solutions/documentation-gaps/variable-escaping-mechanism-2026-04-06.md` -- Complementary: documented escaping mechanisms that the grammar formalizes as the `escaped_variable` production
