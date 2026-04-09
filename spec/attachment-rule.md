@@ -14,7 +14,7 @@ A blank line between a tag and its intended target **breaks attachment silently*
 ## Formal Statement
 
 1. **Block-level tags** MUST appear on the line directly **above** the target element with no intervening blank line.
-2. **Inline tags** MUST appear immediately **before** the styled element on the same line, with no space between the closing `-->` and the element.
+2. **Inline tags** MUST appear immediately **before** the styled element on the same line, with no space between the closing `-->` and the element. **Exception:** For links, the style tag is placed *inside* the link text brackets (`[<!--style:Name-->text](url)`), not before the opening `[`. See the [Element Interactions specification](element-interactions.md#links) for the full link placement rule.
 3. A single blank line between a tag and its target breaks the attachment. Multiple blank lines have the same effect as one.
 4. Tags attach **downward only** -- a tag placed below content does not attach to the content above it.
 
