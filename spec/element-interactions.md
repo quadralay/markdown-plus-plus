@@ -27,7 +27,7 @@ Markdown++ defines four style types:
 
 | Style Type | Description | Applies To |
 |------------|-------------|------------|
-| **Paragraph** | Block-level text elements that occupy their own line or lines in the document flow. | Headings, titles, paragraphs, blockquotes, lists, code blocks, horizontal rules, block HTML |
+| **Paragraph** | Text elements that occupy their own line or lines in the document flow. | Headings, titles, paragraphs, blockquotes, lists, code blocks, horizontal rules, block HTML, inline HTML |
 | **Character** | Inline text elements that appear within a line of text, modifying a span of characters. | Bold, italic, strikethrough, code spans, links |
 | **Graphic** | Embedded media elements that represent non-text content. | Images |
 | **Table** | Tabular data elements with header and body cell structure. | Tables (standard and multiline) |
@@ -94,6 +94,8 @@ Chapter Overview
 ```
 
 Without a style tag, this setext heading receives the default style "Title 2" (Paragraph type).
+
+Setext headings also support alias auto-generation. See [Heading Alias Auto-Generation](#heading-alias-auto-generation) for the algorithm.
 
 ### ATX Headings
 
@@ -330,21 +332,21 @@ Each nesting level requires its own style tag. See [Nested List Style Non-Inheri
 
 ## Compound Style Naming
 
-When content is nested inside a styled container (blockquote or list), the style names for nested elements are **compound names** -- formed by combining the container's style name with the nested element's default name.
+When content is nested inside a styled container (blockquote or list), the style names for nested elements are **compound names** -- formed by combining the container's style name with the nested element's style name.
 
 ### Naming Rule
 
 A processor MUST generate compound style names using the following rule:
 
-> **Compound name = ContainerStyle + space + ElementDefault**
+> **Compound name = ContainerStyle + space + ElementStyle**
 
 Where:
 - **ContainerStyle** is the container's custom style name (or default name if no custom style is applied)
-- **ElementDefault** is the nested element's default style name
+- **ElementStyle** is the nested element's custom style name if a style tag is present, or the default style name if no custom style tag is applied
 
 The two components are joined by a single space character. This rule applies recursively at each container boundary.
 
-### Compound Names and the Naming Rule
+### Compound Names and Identifier Validation
 
 Compound style names contain spaces (e.g., `"Blockquote Heading 1"`) and therefore do not conform to `STANDARD_NAME_RE` (`[a-zA-Z_][a-zA-Z0-9_\-]*`). This is by design. Compound names are **structural compositions** of individual identifier names, not bare identifiers. Each component of a compound name MUST individually conform to the [Naming Rules](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#naming-rules) defined in the syntax reference, but the composed result is a space-separated sequence that falls outside the single-identifier naming rule.
 
