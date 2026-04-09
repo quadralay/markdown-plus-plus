@@ -74,6 +74,7 @@ PATTERNS = {
 
 STANDARD_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_-]*$')
 ALIAS_NAME_RE = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$')
+STYLE_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_ -]*$')
 
 
 def validate_variable_name(name: str) -> bool:
@@ -82,8 +83,11 @@ def validate_variable_name(name: str) -> bool:
 
 
 def validate_style_name(name: str) -> bool:
-    """Check if a style name is valid."""
-    return bool(STANDARD_NAME_RE.match(name))
+    """Check if a style name is valid (embedded spaces allowed)."""
+    trimmed = name.strip()
+    if not trimmed:
+        return False
+    return bool(STYLE_NAME_RE.match(trimmed))
 
 
 def validate_alias_name(name: str) -> bool:
@@ -92,8 +96,11 @@ def validate_alias_name(name: str) -> bool:
 
 
 def validate_marker_key(name: str) -> bool:
-    """Check if a marker key name is valid."""
-    return bool(STANDARD_NAME_RE.match(name))
+    """Check if a marker key name is valid (embedded spaces allowed)."""
+    trimmed = name.strip()
+    if not trimmed:
+        return False
+    return bool(STYLE_NAME_RE.match(trimmed))
 
 
 def validate_condition_expression(expr: str) -> tuple[bool, str | None]:
@@ -250,7 +257,7 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     file=filepath,
                     line=line_num,
                     context=line.strip()[:60],
-                    suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
+                    suggestion="Style names must start with a letter or underscore, followed by letters, digits, hyphens, underscores, or spaces (no leading/trailing spaces)"
                 ))
 
         # Check condition opens
@@ -314,7 +321,7 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                                 file=filepath,
                                 line=line_num,
                                 context=line.strip()[:60],
-                                suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
+                                suggestion="Marker key names must start with a letter or underscore, followed by letters, digits, hyphens, underscores, or spaces (no leading/trailing spaces)"
                             ))
 
         # Check simple marker key names
@@ -328,7 +335,7 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     file=filepath,
                     line=line_num,
                     context=line.strip()[:60],
-                    suggestion="Names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores"
+                    suggestion="Marker key names must start with a letter or underscore, followed by letters, digits, hyphens, underscores, or spaces (no leading/trailing spaces)"
                 ))
 
         # Check includes (warning if file doesn't exist)

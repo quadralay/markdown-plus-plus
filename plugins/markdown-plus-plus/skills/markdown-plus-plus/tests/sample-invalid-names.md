@@ -20,10 +20,20 @@ $123start;
 <!--style:123BadStyle-->
 ### Styled Heading Case 2
 
-### Case 3: Style with space in name -- EXPECT MDPP002
+### Case 3: Style with digit-first and space -- EXPECT MDPP002
 
-<!--style:Bad Style-->
+<!--style:1Bad Style-->
 ### Styled Heading Case 3
+
+### Case 3b: Marker key with digit-first and space -- EXPECT MDPP002
+
+<!--marker:1Bad Key="value"-->
+### Marker Heading Case 3b
+
+### Case 3c: Style with punctuation and space -- EXPECT MDPP002
+
+<!--style:Bad! Style-->
+### Styled Heading Case 3c
 
 ### Case 4: Alias starting with hyphen -- EXPECT MDPP002
 
@@ -98,3 +108,28 @@ This content is conditioned.
 
 <!--#_private_anchor-->
 ### Aliased Heading Case 15
+
+### Case 18: Style with embedded space -- EXPECT no error
+
+<!--style:Code Block-->
+### Styled Heading Case 18
+
+### Case 19: Style with multiple embedded spaces -- EXPECT no error
+
+<!--style:Table Cell Head-->
+### Styled Heading Case 19
+
+### Case 20: Marker with embedded space -- EXPECT no error
+
+<!--marker:Index Entry="setup"-->
+### Marker Heading Case 20
+
+### Case 21: JSON marker with embedded space in key -- EXPECT no error
+
+<!--markers:{"Index Entry": "setup", "See Also": "related"}-->
+### Marker Heading Case 21
+
+### Case 22: Style with compound name -- EXPECT no error
+
+<!--style:Blockquote Paragraph-->
+### Styled Heading Case 22

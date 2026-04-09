@@ -79,17 +79,25 @@ These three forms are the complete set of Markdown++ syntactic extensions to Com
 
 ### Identifiers
 
-Markdown++ defines two identifier forms. The **standard identifier** is used for variables, styles, conditions, and marker keys. The **alias name** additionally permits a leading digit, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`).
+Markdown++ defines three identifier forms:
+
+- The **standard identifier** is used for variables and conditions.
+- The **alias name** additionally permits a leading digit, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`).
+- The **style name** additionally permits embedded spaces, since styles and markers use compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems use space-embedded style names.
 
 ```ebnf
 identifier         ::= (letter | "_") (letter | digit | "-" | "_")*
 
 alias_name         ::= (letter | digit | "_") (letter | digit | "-" | "_")*
+
+style_name         ::= (letter | "_") (letter | digit | "-" | "_" | " ")*
+                       /* Leading and trailing spaces are stripped before matching.
+                          The trimmed result must not be empty. */
 ```
 
-The standard identifier corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\-]*`. The alias name corresponds to the regex `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`.
+The standard identifier corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\-]*`. The alias name corresponds to the regex `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`. The style name corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\- ]*` applied after trimming.
 
-**Rationale for two forms:** The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs), and requiring a letter prefix would force unnatural naming. All other entity types -- variables, styles, conditions, marker keys -- use the standard identifier to avoid ambiguity with numeric literals (e.g., `$100;` is not a variable reference).
+**Rationale for three forms:** The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs), and requiring a letter prefix would force unnatural naming. The style name exception allows embedded spaces for processor-defined compound names and legacy compatibility. Variables and conditions use the standard identifier to avoid ambiguity with numeric literals (e.g., `$100;` is not a variable reference).
 
 ### Variables
 
@@ -163,13 +171,13 @@ unrecognized_text  ::= [^;]+
 
 #### Style Command
 
-Applies a custom style to the attached content element. The style name follows the standard identifier rule.
+Applies a custom style to the attached content element. The style name follows the style name rule, which permits embedded spaces.
 
 ```ebnf
-style_cmd          ::= "style:" identifier
+style_cmd          ::= "style:" style_name
 ```
 
-**Examples:** `style:CustomHeading`, `style:NoteBlock`, `style:BQ_Warning`
+**Examples:** `style:CustomHeading`, `style:NoteBlock`, `style:BQ_Warning`, `style:Code Block`
 
 #### Alias Command
 
@@ -221,7 +229,7 @@ file_path          ::= [^>]+
 Attaches a single key-value metadata pair to the attached content element.
 
 ```ebnf
-marker_cmd         ::= "marker:" identifier '="' marker_value '"'
+marker_cmd         ::= "marker:" style_name '="' marker_value '"'
 
 marker_value       ::= [^"]*
                        /* Any sequence of characters except double quote.
@@ -229,7 +237,7 @@ marker_value       ::= [^"]*
                           not supported. An empty value ("") is permitted. */
 ```
 
-**Examples:** `marker:Keywords="api, documentation"`, `marker:IndexMarker="setup:initial"`, `marker:Passthrough="<a id='legacy-anchor'></a>"`
+**Examples:** `marker:Keywords="api, documentation"`, `marker:IndexMarker="setup:initial"`, `marker:Passthrough="<a id='legacy-anchor'></a>"`, `marker:Index Entry="setup"`
 
 #### JSON Markers Command
 
@@ -411,14 +419,16 @@ close_delim        <- ws? '-->'
 # Identifiers
 identifier         <- [a-zA-Z_] [a-zA-Z0-9_-]*
 alias_name         <- [a-zA-Z0-9_] [a-zA-Z0-9_-]*
+style_name         <- [a-zA-Z_] [a-zA-Z0-9_ -]*
+                      # Leading/trailing spaces stripped before matching
 
 # Individual commands
-style_cmd          <- 'style:' identifier
+style_cmd          <- 'style:' style_name
 alias_cmd          <- '#' alias_name
 condition_open_cmd <- 'condition:' condition_expr
 condition_close_cmd <- '/condition'
 include_cmd        <- 'include:' file_path
-marker_cmd         <- 'marker:' identifier '="' marker_value '"'
+marker_cmd         <- 'marker:' style_name '="' marker_value '"'
 markers_cmd        <- 'markers:' json_object
 multiline_cmd      <- 'multiline'
 

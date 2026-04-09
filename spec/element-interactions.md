@@ -415,7 +415,7 @@ The two components are joined by a single space character. This rule applies rec
 
 ### Compound Names and Identifier Validation
 
-Compound style names contain spaces (e.g., `"Blockquote Heading 1"`) and therefore do not conform to `STANDARD_NAME_RE` (`[a-zA-Z_][a-zA-Z0-9_\-]*`). This is by design. Compound names are **structural compositions** of individual identifier names, not bare identifiers. Each component of a compound name MUST individually conform to the [Naming Rules](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#naming-rules) defined in the syntax reference, but the composed result is a space-separated sequence that falls outside the single-identifier naming rule.
+Compound style names contain embedded spaces (e.g., `"Blockquote Heading 1"`) and conform to the **style/marker name** pattern (`[a-zA-Z_][a-zA-Z0-9_\- ]*`, trimmed). This pattern was introduced specifically to support processor-defined compound names and legacy systems with space-embedded style names. Each component of a compound name MUST individually conform to the standard identifier rule defined in the [Naming Rules](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#naming-rules), and the composed result is validated as a style/marker name with embedded spaces.
 
 ### Examples
 

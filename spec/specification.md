@@ -155,14 +155,15 @@ Grammar productions referenced in this document use the names defined in the for
 
 ### 4.2 Naming Rules
 
-Markdown++ defines two identifier forms used across all named entities:
+Markdown++ defines three identifier forms used across all named entities:
 
-| Form | Pattern | Used By |
-|------|---------|---------|
-| **Standard identifier** | `[a-zA-Z_][a-zA-Z0-9_-]*` | Variables, styles, conditions, marker keys |
-| **Alias name** | `[a-zA-Z0-9_][a-zA-Z0-9_-]*` | Aliases (digit-first permitted) |
+| Form | Pattern | Used By | Spaces |
+|------|---------|---------|--------|
+| **Standard identifier** | `[a-zA-Z_][a-zA-Z0-9_-]*` | Variables, conditions | No |
+| **Alias name** | `[a-zA-Z0-9_][a-zA-Z0-9_-]*` | Aliases (digit-first permitted) | No |
+| **Style/marker name** | `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed | Styles, markers (embedded spaces permitted) | Yes, embedded |
 
-The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs like `#04499224`), and requiring a letter prefix would force unnatural naming. All other entity types use the standard identifier to avoid ambiguity with numeric literals.
+The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs like `#04499224`), and requiring a letter prefix would force unnatural naming. The style/marker name exception allows embedded spaces to support processor-defined compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems with space-embedded style names. Leading and trailing spaces are stripped before validation. Variables and conditions use the standard identifier to avoid ambiguity with numeric literals.
 
 Names are case-sensitive. `$Product;` and `$product;` are distinct variable references. `style:Note` and `style:note` are distinct style names.
 
@@ -381,7 +382,7 @@ Custom styles associate a named style with a block-level or inline content eleme
 <!-- style:StyleName -->
 ```
 
-The style name MUST match the standard identifier pattern: `[a-zA-Z_][a-zA-Z0-9_-]*`. Style names are conventionally PascalCase (e.g., `CustomHeading`, `NoteBlock`, `BQ_Warning`).
+The style name MUST match the style/marker name pattern: `[a-zA-Z_][a-zA-Z0-9_ -]*` (trimmed, no leading or trailing spaces). Embedded spaces are permitted to support compound names and legacy systems. Style names are conventionally PascalCase (e.g., `CustomHeading`, `NoteBlock`, `BQ_Warning`, `Code Block`).
 
 ### 9.3 Semantics
 
@@ -742,7 +743,7 @@ For a single key-value pair:
 <!-- marker:Key="value" -->
 ```
 
-The key MUST match the standard identifier pattern. The value is enclosed in double quotes. Empty values (`""`) are permitted. Escaped double quotes within values are not supported.
+The key MUST match the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Embedded spaces are permitted in marker keys. The value is enclosed in double quotes. Empty values (`""`) are permitted. Escaped double quotes within values are not supported.
 
 #### JSON Markers
 
@@ -797,7 +798,7 @@ Marker commands require block-level attachment. The marker tag MUST appear on th
 
 | Code | Description | Severity |
 |------|-------------|----------|
-| **MDPP002** | Marker key does not match the standard identifier pattern | Error |
+| **MDPP002** | Marker key does not match the style/marker name pattern | Error |
 | **MDPP003** | Malformed JSON in `markers:` command | Error |
 | **MDPP009** | Orphaned marker tag (not attached to an element) | Warning |
 
@@ -1157,7 +1158,7 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 |------|------|----------|-------|-------------|---------------------|
 | **MDPP000** | File not found or cannot be read | Error | Pre-processing | The input file does not exist or cannot be read | Root document path is invalid or inaccessible |
 | **MDPP001** | Unclosed condition block | Error | Pre-processing | A condition block is missing its closing tag, or a closing tag has no matching opening tag | `<!-- condition:expr -->` without `<!-- /condition -->`, or vice versa |
-| **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard) or `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias) |
+| **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard), `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias), or `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed (style/marker) |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 | The JSON content in a `markers:` command is not valid JSON | `markers:{invalid}` |
 | **MDPP004** | Invalid style placement | Warning | Phase 2 | A style command appears in a position where it cannot be applied | Style in unsupported context |
 | **MDPP005** | Circular include (static) | Error | Pre-processing | Static analysis detects a circular include chain | File A includes B which includes A |
