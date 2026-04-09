@@ -5,7 +5,7 @@ status: active
 
 # Markdown++ Best Practices
 
-Guidelines for effective use of Markdown++ extensions in documentation projects.
+Guidelines for effective use of Markdown++ extensions in documentation projects. Examples here are minimal do/don't snippets that illustrate rules -- not full patterns. For complete scenario patterns, see [`examples.md`](examples.md). For standalone specimen documents you can open and preview, see the [`examples/`](../../../../../examples/) directory.
 
 ## Start with Markdown, extend where needed
 
@@ -564,3 +564,10 @@ The reference in `troubleshooting.md` resolves to the definition in `installatio
 - Makes AI-generated content more difficult
 - Requires authors to look in multiple places
 - Harder to validate link integrity
+
+---
+
+## See Also
+
+- **[`examples/`](../../../../../examples/)** -- Standalone specimen documents with real Markdown++ directives. Open, preview, and validate these files directly.
+- **[`examples.md`](examples.md)** -- Scenario-oriented patterns in fenced code blocks, curated for AI skill context.

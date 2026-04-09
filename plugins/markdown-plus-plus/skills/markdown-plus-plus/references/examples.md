@@ -5,6 +5,8 @@ status: active
 
 # Markdown++ Examples
 
+> **Purpose:** This file is curated scenario context for the Claude Code AI skill. Each example shows a realistic document type combining multiple Markdown++ extensions in fenced code blocks. For standalone specimen documents with real directives that you can open, preview, and validate, see the [`examples/`](../../../../../examples/) directory. For prescriptive do/don't guidance, see [`best-practices.md`](best-practices.md).
+
 Real-world examples demonstrating common patterns and use cases.
 
 ## Example 1: Product Documentation
@@ -642,17 +644,17 @@ This section has a custom style, marker metadata, and a stable alias for linking
 ## Styled Multiline Table with Alias
 
 <!-- style:DataTable ; multiline ; #comparison-table -->
-| Feature        | Description              | Status      |
+| Module         | Capabilities             | Status      |
 |----------------|--------------------------|-------------|
-| Authentication | OAuth 2.0 implementation |             |
+| Notifications  | Multi-channel delivery   |             |
 |                | Supports:                | Complete    |
-|                | - Authorization Code     |             |
-|                | - Client Credentials     |             |
-|                | - Refresh tokens         |             |
+|                | - Email digest           |             |
+|                | - Webhook push           |             |
+|                | - In-app alerts          |             |
 |                |                          |             |
-| Rate Limiting  | Per-endpoint limits      |             |
-|                | - Default: 100 req/min   | In Progress |
-|                | - Maximum: 1000 req/min  |             |
+| Audit Log      | Compliance tracking      |             |
+|                | - Event capture          | In Progress |
+|                | - Retention policies     |             |
 
 ## Styled Content Island with Metadata
 
@@ -677,3 +679,10 @@ This section has a custom style, marker metadata, and a stable alias for linking
 7. **Use content islands** - Blockquotes for rich callout boxes
 8. **Use combined commands** - Multiple extensions in one comment
 9. **Follow order priority** - style, multiline, marker(s), #alias
+
+---
+
+## See Also
+
+- **[`examples/`](../../../../../examples/)** -- Standalone specimen documents with real Markdown++ directives. Open, preview, and validate these files directly.
+- **[`best-practices.md`](best-practices.md)** -- Prescriptive style guide with do/don't snippets illustrating rules.

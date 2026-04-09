@@ -91,6 +91,23 @@ The script updates both `plugin.json` and `marketplace.json` to keep versions sy
 Cross-repo resource locations are defined in `.claude/external-sources.conf`.
 Paths reference environment variables from the operator's ~/.claude/settings.json.
 
+## Example locations
+
+Markdown++ examples live in three places with distinct roles:
+
+| Location | Role | Form | Audience |
+|----------|------|------|----------|
+| `examples/` | Standalone specimen documents | Real Markdown++ directives (not code blocks) | Humans and tools -- open, preview, validate |
+| `plugins/.../references/examples.md` | Scenario pattern library | Fenced code blocks showing syntax | Claude Code AI skill context |
+| `plugins/.../references/best-practices.md` | Prescriptive style guide | Minimal do/don't snippets | Authors learning conventions |
+
+**Where to add new examples:**
+- A new standalone, feature-focused specimen document: `examples/`
+- A new realistic scenario combining multiple extensions: `references/examples.md`
+- A new rule illustration or anti-pattern: `references/best-practices.md`
+
+Avoid duplicating identical table data or scenarios across locations.
+
 ## Ecosystem context
 
 Markdown++ is an open documentation format. WebWorks ePublisher is one tool that processes it, but the format is not tied to any single vendor or product.
