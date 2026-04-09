@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="brand/logo.svg" alt="Markdown++ logo" width="128" height="128">
+</p>
+
 # Markdown++
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

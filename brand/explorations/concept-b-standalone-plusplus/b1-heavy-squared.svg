@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Standalone ++ Glyph — Variation 1: Heavy weight, no container, squared terminals -->
+  <!-- Two + signs in rising-step layout: second elevated and offset right -->
+  <!-- Conveys increment/progression — "take what exists and advance it" -->
+  <g fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linecap="butt">
+    <!-- Plus 1 (lower-left, center at 30,57) -->
+    <line x1="30" y1="37" x2="30" y2="77"/>
+    <line x1="10" y1="57" x2="50" y2="57"/>
+    <!-- Plus 2 (upper-right, elevated, center at 70,43) -->
+    <line x1="70" y1="23" x2="70" y2="63"/>
+    <line x1="50" y1="43" x2="90" y2="43"/>
+  </g>
+</svg>
