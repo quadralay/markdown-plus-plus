@@ -241,6 +241,73 @@ A processor MUST NOT replace the auto-generated alias with a custom alias, and M
 
 Heading alias auto-generation applies to both ATX headings (`#` through `######`) and setext headings (`===` and `---` underlines). The algorithm is identical for both heading types.
 
+### Duplicate Alias Resolution
+
+When two or more headings in the assembled document produce the same auto-generated alias after the 6-step algorithm, a conformant processor MUST disambiguate by appending a counter suffix to subsequent occurrences:
+
+1. The **first** heading in document order claims the bare alias (no suffix).
+2. The **second** heading with the same alias receives the suffix `-2`.
+3. The **third** receives `-3`, and so on for each subsequent duplicate.
+
+The resulting suffixed alias MUST be unique across all aliases -- both auto-generated and custom -- already assigned in the document. If a candidate suffix collides with an existing alias, the processor MUST continue incrementing the counter until a unique alias is produced.
+
+Document order is determined by the assembled document after Phase 1 processing (include expansion, condition evaluation, and variable substitution). For multi-file documents, this follows the depth-first recursive include expansion order defined in the [Processing Model](processing-model.md).
+
+This resolution is **silent** -- a conformant processor MUST NOT emit a diagnostic for auto-generated alias collisions. Unlike custom alias duplicates (which trigger [MDPP008](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-codes.md#mdpp008----duplicate-alias) as an error), auto-generated collisions are expected in documents that reuse heading text across sections.
+
+#### Example
+
+Given the following document:
+
+```markdown
+# Installation Guide
+
+## Setup
+
+Install the required packages.
+
+## Configuration
+
+Configure the application.
+
+## Setup
+
+Configure the database connection.
+
+## Setup
+
+Verify the installation.
+```
+
+A conformant processor produces the following auto-generated aliases:
+
+| Heading | Auto-Generated Alias |
+|---------|---------------------|
+| `# Installation Guide` | `installation-guide` |
+| `## Setup` (first) | `setup` |
+| `## Configuration` | `configuration` |
+| `## Setup` (second) | `setup-2` |
+| `## Setup` (third) | `setup-3` |
+
+All three Setup headings are independently addressable via their respective aliases: `#setup`, `#setup-2`, and `#setup-3`.
+
+#### Interaction with Custom Aliases
+
+Duplicate alias resolution applies only to auto-generated aliases. Custom aliases remain governed by MDPP008 -- duplicate custom aliases within a file are an error regardless of whether the auto-generated aliases would collide.
+
+When a heading with a collision-suffixed auto-generated alias also has a custom alias, both are valid anchors. The custom alias supplements the suffixed auto-generated alias, consistent with the [alias supplement semantics](#relationship-to-custom-aliases):
+
+```markdown
+<!-- #db-setup -->
+## Setup
+
+Configure the database connection.
+```
+
+If this is the second `## Setup` heading in the document, the heading has two valid anchors:
+- `db-setup` -- the custom alias
+- `setup-2` -- the suffixed auto-generated alias
+
 ## Container Elements
 
 Container elements -- blockquotes and lists -- hold nested content. When a style tag is applied to a container, it affects both the container itself and the style names generated for nested content through **compound naming**.

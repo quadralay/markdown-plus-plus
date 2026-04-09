@@ -441,6 +441,8 @@ Standard Markdown auto-generates IDs from headings. Custom aliases:
 - Allow multiple aliases per element
 - Work on non-heading block elements (paragraphs, tables, lists, etc.)
 
+When duplicate headings produce the same auto-generated alias, the processor disambiguates with a counter suffix: the first heading keeps the bare alias, subsequent headings receive `-2`, `-3`, etc. See [Duplicate Alias Resolution](../../../../../spec/element-interactions.md#duplicate-alias-resolution) for the normative rules.
+
 ---
 
 ## Conditions
