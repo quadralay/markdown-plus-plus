@@ -28,16 +28,16 @@ The Markdown++ specification defined collision behavior for auto-generated headi
 
 ## Symptoms
 
-- A custom alias `<!-- #setup -->` on a heading and an auto-generated alias `setup` from a different `## Setup` heading would both claim the same identifier.
-- Different processors could resolve the collision differently -- some might let the auto-generated alias win (document order), others might give priority to the custom alias.
+- A custom alias `<!-- #setup -->` on a heading and an auto-generated alias `setup` from a different `## Setup` heading would both produce the same identifier string.
+- Different processors could resolve a link to `#setup` differently -- some might resolve to the auto-generated alias target (document order), others might give priority to the custom alias target.
 - Cross-references using `#setup` would be non-deterministic across implementations.
-- The existing global uniqueness check in duplicate alias resolution mentioned custom aliases but did not define the priority when a bare (unsuffixed) auto-generated alias collides with a custom alias.
+- The existing duplicate alias resolution mentioned custom aliases but did not define the resolution priority when an auto-generated alias and a custom alias share the same identifier string.
 
 ## What Didn't Work
 
 This was a spec-writing exercise extending the collision framework from #53. No failed debugging approaches were needed. The gap existed because #53 focused on auto-vs-auto collisions and deferred the custom-vs-auto case.
 
-The alternative of "document order wins" was considered and rejected. Document order is appropriate for auto-vs-auto collisions (where both aliases are equally fragile), but inappropriate for custom-vs-auto collisions because the custom alias is an intentional authorial choice that should not be displaced by an incidental heading slug.
+The alternative of "document order wins" was considered and rejected. Document order is appropriate for auto-vs-auto collisions (where both aliases are equally fragile), but inappropriate for custom-vs-auto overlap because the custom alias is an intentional authorial choice that should always take resolution priority over an incidental heading slug.
 
 ## Solution
 
@@ -45,28 +45,28 @@ Added a normative **Custom Alias Priority** subsection to `spec/element-interact
 
 **Core normative rule:**
 
-When a custom alias and an auto-generated heading alias produce the same identifier, the custom alias takes priority. The auto-generated alias is displaced and receives a counter suffix using the same algorithm as duplicate auto-generated alias resolution.
+Custom aliases and auto-generated heading aliases occupy separate namespaces. When both produce the same identifier string, both exist independently -- the auto-generated alias is NOT displaced or suffixed. At link resolution time, the custom alias takes priority: a link to `#setup` resolves to the custom alias target, not the auto-generated alias target.
 
-**Processing order requirement:**
+**Resolution order requirement:**
 
-A conformant processor MUST resolve custom aliases before auto-generated heading aliases during Phase 2. This ensures custom aliases claim their identifiers first, regardless of document order.
+A conformant processor MUST check custom aliases before auto-generated heading aliases when resolving a link target. This ensures custom aliases always win resolution priority regardless of document order. Auto-generated aliases are still generated normally for all headings -- the processor does not modify auto-generation based on custom alias values.
 
-**Silent resolution:** Conformant processors MUST NOT emit a diagnostic for this collision. The custom alias is an intentional authorial choice; the auto-generated one adjusts around it.
+**Silent resolution:** Conformant processors MUST NOT emit a diagnostic when a custom alias and an auto-generated alias share the same identifier string. The custom alias is an intentional authorial choice that wins at resolution time.
 
-**Worked example** -- custom alias colliding with auto-generated alias:
-
-| Heading | Anchors |
-|---------|---------|
-| `## Installation` (with `<!-- #setup -->`) | `installation` (auto-generated), `setup` (custom alias) |
-| `## Setup` | `setup-2` (suffixed auto-generated) |
-
-**Composition with duplicate resolution** -- both collision types in one document:
+**Worked example** -- custom alias overlapping with auto-generated alias:
 
 | Heading | Anchors |
 |---------|---------|
 | `## Installation` (with `<!-- #setup -->`) | `installation` (auto-generated), `setup` (custom alias) |
-| `## Setup` (first) | `setup-2` (suffixed -- displaced by custom alias) |
-| `## Setup` (second) | `setup-3` (suffixed -- next available counter) |
+| `## Setup` | `setup` (auto-generated, de-prioritized by custom alias) |
+
+**Composition with duplicate resolution** -- both overlap types in one document:
+
+| Heading | Anchors |
+|---------|---------|
+| `## Installation` (with `<!-- #setup -->`) | `installation` (auto-generated), `setup` (custom alias) |
+| `## Setup` (first) | `setup` (auto-generated, de-prioritized by custom alias) |
+| `## Setup` (second) | `setup-2` (suffixed -- duplicate auto-generated resolution) |
 
 **Supporting cross-references updated in:** syntax-reference.md (collision summary paragraph), error-codes.md (MDPP008 scope note).
 
@@ -74,10 +74,10 @@ A conformant processor MUST resolve custom aliases before auto-generated heading
 
 The priority rule is the natural consequence of the design intent behind custom aliases:
 
-1. **Intentional vs. incidental** -- Custom aliases are deliberately assigned by the author to be stable, permanent anchors. Auto-generated aliases are derived from heading text and change when the heading text changes. The intentional assignment should always win.
-2. **Consistent with supplement semantics** -- When there is no collision, custom and auto-generated aliases coexist (supplement). When there is a collision, the custom alias claims the name and the auto-generated alias adjusts. The supplement model is preserved -- the heading still has both an auto-generated alias (suffixed) and the custom alias.
-3. **Composable with existing rules** -- The same counter-suffix algorithm from #53 handles the displaced auto-generated alias. No new resolution mechanism is needed.
-4. **Deterministic** -- Processing custom aliases first ensures every conformant processor produces the same result regardless of document order.
+1. **Intentional vs. incidental** -- Custom aliases are deliberately assigned by the author to be stable, permanent anchors. Auto-generated aliases are derived from heading text and change when the heading text changes. The intentional assignment should always win at resolution time.
+2. **Separate namespaces preserve both aliases** -- Custom aliases and auto-generated aliases coexist in separate namespaces. Neither displaces the other. The auto-generated alias still exists and is still valid -- it is simply de-prioritized when a custom alias shares the same identifier.
+3. **Composable with existing rules** -- Duplicate auto-generated alias resolution (#53) operates entirely within the auto-generated namespace and is unaffected by custom alias values. Custom alias priority is a separate concern applied only at link resolution time.
+4. **Deterministic** -- Checking custom aliases first during resolution ensures every conformant processor produces the same result regardless of document order.
 
 ## Prevention
 

@@ -310,15 +310,17 @@ If this is the second `## Setup` heading in the document, the heading has two va
 
 #### Custom Alias Priority
 
-When a custom alias (`<!-- #name -->`) on one element produces the same identifier as an auto-generated heading alias on a different element, the custom alias takes priority. The auto-generated alias is displaced and MUST receive a counter suffix using the same algorithm as duplicate auto-generated alias resolution.
+Custom aliases and auto-generated heading aliases occupy **separate namespaces**. When a custom alias (`<!-- #name -->`) on one element produces the same identifier string as an auto-generated heading alias on a different element, there is no collision -- both aliases exist independently. The auto-generated alias is NOT displaced or suffixed.
 
-Custom aliases are intentionally assigned by the author as stable, permanent anchors. Auto-generated aliases are derived from heading text and change when the heading text changes. When the two collide across elements, the intentional assignment wins.
+The distinction matters at **resolution time**: when a link references an ambiguous identifier (e.g., `[link](#setup)` where both a custom alias and an auto-generated alias resolve to `setup`), a conformant processor MUST resolve to the custom alias target. Custom aliases are intentionally assigned by the author as stable, permanent anchors. Auto-generated aliases are derived from heading text and change when the heading text changes. The intentional assignment wins at resolution time.
 
-This resolution is **silent** -- a conformant processor MUST NOT emit a diagnostic for this collision. Unlike custom alias duplicates (which trigger [MDPP008](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-codes.md#mdpp008----duplicate-alias) as an error), a custom-vs-auto-generated collision is resolved by suffixing the auto-generated alias.
+This resolution is **silent** -- a conformant processor MUST NOT emit a diagnostic when a custom alias and an auto-generated alias share the same identifier string. Unlike custom alias duplicates (which trigger [MDPP008](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-codes.md#mdpp008----duplicate-alias) as an error), custom-vs-auto-generated overlap is resolved by priority, not by suffixing.
 
-##### Processing Order
+##### Resolution Order
 
-A conformant processor MUST resolve custom aliases before auto-generated heading aliases during Phase 2. This ensures that custom aliases claim their identifiers first, and auto-generated aliases that collide are displaced consistently regardless of document order.
+A conformant processor MUST check custom aliases before auto-generated heading aliases when resolving a link target. This ensures that custom aliases always win resolution priority regardless of document order.
+
+Note: auto-generated aliases are still generated normally for all headings. The processor does not skip or modify auto-generation based on custom alias values. Priority applies only at the point of link resolution.
 
 ##### Example
 
@@ -335,18 +337,18 @@ Install the required packages.
 Configure the application.
 ```
 
-The custom alias `<!-- #setup -->` assigns the identifier `setup` to the "Installation" heading. The "Setup" heading auto-generates the slug `setup`, which collides with the custom alias. The auto-generated alias is displaced and receives a counter suffix:
+The custom alias `<!-- #setup -->` assigns the identifier `setup` to the "Installation" heading. The "Setup" heading auto-generates the slug `setup` independently. Both aliases exist:
 
 | Heading | Anchors |
 |---------|---------|
 | `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
-| `## Setup` | `setup-2` (suffixed auto-generated) |
+| `## Setup` | `setup` (auto-generated) |
 
-The "Installation" heading has two valid anchors (`installation` and `setup`), consistent with the [alias supplement semantics](#relationship-to-custom-aliases). The "Setup" heading is addressable via `#setup-2`.
+A link `[see setup](#setup)` resolves to the "Installation" heading because custom aliases take priority over auto-generated aliases. The "Setup" heading remains addressable by its auto-generated alias when no custom alias competes for the same identifier in a given resolution context, or by any other custom alias explicitly assigned to it.
 
 ##### Reverse Document Order
 
-Custom alias priority applies regardless of document order. Even when the heading with the colliding auto-generated alias appears first, the custom alias still wins:
+Custom alias priority applies regardless of document order. Even when the heading with the overlapping auto-generated alias appears first, the custom alias still wins at resolution time:
 
 ```markdown
 ## Setup
@@ -359,18 +361,18 @@ Configure the application.
 Install the required packages.
 ```
 
-The custom alias `<!-- #setup -->` claims `setup` for the "Installation" heading. The "Setup" heading's auto-generated alias is displaced despite appearing first in the document:
+Both headings have an alias resolving to `setup`, but the custom alias takes priority:
 
 | Heading | Anchors |
 |---------|---------|
-| `## Setup` | `setup-2` (suffixed auto-generated, displaced by custom alias) |
+| `## Setup` | `setup` (auto-generated, de-prioritized by custom alias) |
 | `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
 
-This demonstrates why the [processing order requirement](#processing-order) matters -- resolving custom aliases first ensures the same result regardless of where headings appear in the document.
+A link `[see setup](#setup)` resolves to the "Installation" heading regardless of document order.
 
 ##### Interaction with Duplicate Auto-Generated Resolution
 
-Custom alias priority composes with [duplicate auto-generated alias resolution](#duplicate-alias-resolution). When both collision types occur in the same document, custom aliases claim their identifiers first, then auto-generated aliases are deduplicated against all existing aliases (both custom and previously assigned auto-generated).
+Custom alias priority composes with [duplicate auto-generated alias resolution](#duplicate-alias-resolution). Duplicate auto-generated aliases within the auto-generated namespace still receive counter suffixes as normal. Custom alias priority then applies separately at resolution time.
 
 Given the following document:
 
@@ -394,8 +396,10 @@ A conformant processor produces the following aliases:
 | Heading | Anchors |
 |---------|---------|
 | `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
-| `## Setup` (first) | `setup-2` (suffixed -- displaced by custom alias) |
-| `## Setup` (second) | `setup-3` (suffixed -- next available counter) |
+| `## Setup` (first) | `setup` (auto-generated, de-prioritized by custom alias) |
+| `## Setup` (second) | `setup-2` (suffixed -- duplicate auto-generated resolution) |
+
+The first `## Setup` heading keeps its bare auto-generated alias `setup` because it is the first heading to produce that slug. The second `## Setup` heading receives `setup-2` per the normal [duplicate alias resolution](#duplicate-alias-resolution) algorithm. The custom alias `setup` on "Installation" does not affect auto-generation -- it only wins at resolution time when a link targets `#setup`.
 
 ## Container Elements
 
