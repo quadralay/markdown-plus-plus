@@ -12,6 +12,7 @@ symptoms:
 root_cause: inadequate_documentation
 resolution_type: documentation_update
 severity: medium
+last_updated: 2026-04-08
 tags:
   - heading-alias
   - custom-alias
@@ -35,9 +36,15 @@ The Markdown++ specification defined collision behavior for auto-generated headi
 
 ## What Didn't Work
 
-This was a spec-writing exercise extending the collision framework from #53. No failed debugging approaches were needed. The gap existed because #53 focused on auto-vs-auto collisions and deferred the custom-vs-auto case.
+**Suffix/displacement semantics (shared namespace model).** The initial implementation borrowed the collision-resolution pattern from duplicate auto-generated aliases (#53) and applied it to the custom-vs-auto case. Under this model, custom and auto-generated aliases occupied a single shared namespace. When a custom alias `<!-- #setup -->` existed and another heading auto-generated the slug `setup`, the auto-generated alias would be displaced and given a counter suffix (e.g., `setup` becomes `setup-1`).
 
-The alternative of "document order wins" was considered and rejected. Document order is appropriate for auto-vs-auto collisions (where both aliases are equally fragile), but inappropriate for custom-vs-auto overlap because the custom alias is an intentional authorial choice that should always take resolution priority over an incidental heading slug.
+This approach was fundamentally wrong for three reasons:
+
+1. **It mutated the auto-generated alias value.** Renaming `setup` to `setup-1` would break any existing links that correctly pointed at the heading via its auto-generated slug. The displacement imposed a cost on authors who had done nothing wrong.
+2. **It conflated two different systems.** Custom aliases are intentional, author-specified identifiers. Auto-generated aliases are incidental byproducts of heading text slugification. Treating them as peers in a shared namespace erased this semantic distinction.
+3. **It resolved the collision at the wrong layer.** The real conflict is not at alias generation time (both aliases can coexist without contradiction) but at link resolution time (a `#setup` link must choose one target). Suffix/displacement "solved" a problem at the wrong layer.
+
+The alternative of "document order wins" was also considered and rejected. Document order is appropriate for auto-vs-auto collisions (where both aliases are equally fragile), but inappropriate for custom-vs-auto overlap because the custom alias is an intentional authorial choice that should always take resolution priority over an incidental heading slug.
 
 ## Solution
 
@@ -82,7 +89,11 @@ The priority rule is the natural consequence of the design intent behind custom 
 ## Prevention
 
 - **Collision matrix completeness:** When defining collision behavior for identifiers, enumerate all pairwise combinations (auto-auto, custom-custom, custom-auto) and specify each. Issue #53 covered auto-auto, MDPP008 covers custom-custom, and this change covers custom-auto.
-- **Priority principle documentation:** When two identifier sources can collide, always document which source has priority and why. The principle "intentional assignments beat derived identifiers" applies broadly.
+- **Distinguish namespaces before designing collision rules.** When two features can produce the same identifier, ask: "Are these the same namespace or different namespaces?" If they have different provenance, semantics, or levels of author intent, they are likely separate namespaces and should not share displacement/suffix mechanics.
+- **Locate the collision at the right layer.** Ask: "Where does the ambiguity actually matter?" If two aliases can coexist without contradiction until something tries to choose between them, the collision belongs at the resolution layer, not at the generation layer.
+- **Apply the principle of least mutation.** A spec rule that modifies an existing value (renaming `setup` to `setup-1`) has a higher burden of proof than one that leaves all values intact and applies priority at lookup time.
+- **Test the analogy before reusing a pattern.** The suffix/displacement approach was borrowed from duplicate auto-generated alias handling (#53). That pattern works when both colliding aliases have the same provenance. It does not transfer to cross-provenance collisions. Before reusing a collision-resolution pattern, verify that the new context shares the same structural properties.
+- **Use "what breaks?" as a design smell test.** The suffix/displacement approach would have broken existing links to the auto-generated alias. Any spec rule that silently invalidates previously-correct links should be treated as a strong signal that the design is wrong.
 
 ## Related Issues
 
