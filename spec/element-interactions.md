@@ -344,6 +344,30 @@ The custom alias `<!-- #setup -->` assigns the identifier `setup` to the "Instal
 
 The "Installation" heading has two valid anchors (`installation` and `setup`), consistent with the [alias supplement semantics](#relationship-to-custom-aliases). The "Setup" heading is addressable via `#setup-2`.
 
+##### Reverse Document Order
+
+Custom alias priority applies regardless of document order. Even when the heading with the colliding auto-generated alias appears first, the custom alias still wins:
+
+```markdown
+## Setup
+
+Configure the application.
+
+<!-- #setup -->
+## Installation
+
+Install the required packages.
+```
+
+The custom alias `<!-- #setup -->` claims `setup` for the "Installation" heading. The "Setup" heading's auto-generated alias is displaced despite appearing first in the document:
+
+| Heading | Anchors |
+|---------|---------|
+| `## Setup` | `setup-2` (suffixed auto-generated, displaced by custom alias) |
+| `## Installation` | `installation` (auto-generated), `setup` (custom alias) |
+
+This demonstrates why the [processing order requirement](#processing-order) matters -- resolving custom aliases first ensures the same result regardless of where headings appear in the document.
+
 ##### Interaction with Duplicate Auto-Generated Resolution
 
 Custom alias priority composes with [duplicate auto-generated alias resolution](#duplicate-alias-resolution). When both collision types occur in the same document, custom aliases claim their identifiers first, then auto-generated aliases are deduplicated against all existing aliases (both custom and previously assigned auto-generated).
