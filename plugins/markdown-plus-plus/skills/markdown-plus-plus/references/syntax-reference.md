@@ -170,9 +170,9 @@ The `Passthrough` marker key (`<!-- marker:Passthrough="content" -->`) is a reco
 
 ## Naming Rules
 
-All named entities in Markdown++ (variables, styles, aliases, conditions, and marker keys) follow a shared naming grammar.
+All named entities in Markdown++ (variables, styles, aliases, conditions, and marker keys) follow a shared naming grammar with three patterns.
 
-### Standard Rule
+### Standard Name
 
 **Regex:** `[a-zA-Z_][a-zA-Z0-9_\-]*`
 
@@ -181,11 +181,28 @@ All named entities in Markdown++ (variables, styles, aliases, conditions, and ma
 - Minimum length is 1 character
 - No whitespace or punctuation
 
-### Alias Exception
+**Applies to:** Variables, conditions
+
+### Alias Name
 
 Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `#04499224`).
 
 **Regex:** `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`
+
+**Applies to:** Aliases
+
+### Style/Marker Name
+
+Style and marker names allow embedded spaces to support processor-defined compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems with space-embedded style names. Leading and trailing spaces are not permitted; the name is trimmed before validation.
+
+**Regex:** `[a-zA-Z_][a-zA-Z0-9_\- ]*` (trimmed, no leading/trailing spaces)
+
+- First character must be a letter (`a-z`, `A-Z`) or underscore (`_`)
+- Subsequent characters may be letters, digits (`0-9`), hyphens (`-`), underscores (`_`), or spaces
+- Embedded spaces are allowed; leading and trailing spaces are stripped
+- No punctuation
+
+**Applies to:** Styles, markers
 
 ### Valid Name Examples
 
@@ -196,10 +213,13 @@ Alias names may also begin with a digit, since aliases often map to numeric iden
 | `_internal` | Variable | Underscore-first |
 | `CustomHeading` | Style | PascalCase |
 | `BQ_Warning` | Style | Mixed with underscore |
+| `Code Block` | Style | Embedded space (style/marker name) |
+| `Table Cell Head` | Style | Multiple embedded spaces |
 | `introduction` | Alias | Lowercase alpha |
 | `316492` | Alias | Digit-first (alias exception) |
 | `web` | Condition | Single word |
 | `Keywords` | Marker key | PascalCase |
+| `Index Entry` | Marker key | Embedded space (style/marker name) |
 
 ### Invalid Name Examples
 
@@ -207,7 +227,9 @@ Alias names may also begin with a digit, since aliases often map to numeric iden
 |------|-------------|
 | `123start` | Digit-first (not an alias) |
 | `-hyphen-first` | Starts with hyphen |
-| `has space` | Contains whitespace |
+| `has space` | Contains whitespace (variable/condition) |
+| ` Leading Space` | Leading space (style/marker) |
+| `Trailing Space ` | Trailing space (style/marker) |
 | `special!char` | Contains punctuation |
 
 ### Non-English Content
@@ -383,8 +405,8 @@ This is <!--style: Emphasis--> **bold text**.
 
 | Rule | Description |
 |------|-------------|
-| Name | Must follow [Naming Rules](#naming-rules) |
-| Spaces | Not allowed in style names |
+| Name | Must follow [Naming Rules](#naming-rules) (style/marker name pattern) |
+| Spaces | Embedded spaces allowed; no leading or trailing spaces |
 | Case | Typically PascalCase by convention |
 
 ---
@@ -611,7 +633,7 @@ Use `marker:key="value"` for single markers, JSON format for multiple.
 
 ### Simple Format Rules
 
-- Key names must follow [Naming Rules](#naming-rules)
+- Key names must follow [Naming Rules](#naming-rules) (style/marker name pattern)
 - Key followed by `=` and quoted value
 - Value in double quotes
 - No spaces around `=`

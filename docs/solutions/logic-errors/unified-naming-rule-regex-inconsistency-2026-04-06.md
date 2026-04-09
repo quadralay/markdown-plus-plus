@@ -50,8 +50,9 @@ The Markdown++ specification and validator defined naming rules independently pe
 
 Added a shared `## Naming Rules` section (placed after Attachment Rules) with a single authoritative regex:
 
-- **Standard names:** `[a-zA-Z_][a-zA-Z0-9_\-]*` — letter or underscore first, then letters/digits/hyphens/underscores
+- **Standard names:** `[a-zA-Z_][a-zA-Z0-9_\-]*` — letter or underscore first, then letters/digits/hyphens/underscores (variables, conditions)
 - **Alias exception:** `[a-zA-Z0-9_][a-zA-Z0-9_\-]*` — digit-first permitted for numeric identifiers like `#04499224`
+- **Style/marker names:** `[a-zA-Z_][a-zA-Z0-9_\- ]*` trimmed — embedded spaces allowed for compound names like `Blockquote Paragraph` (added by #52)
 
 Each extension section (Variables, Styles, Aliases, Conditions, Markers) was updated to cross-reference the shared rule rather than define its own. MDPP002 description was updated from "Invalid variable name" to "Invalid name (variable, style, alias, or marker key)".
 
@@ -63,13 +64,14 @@ Before (per-type, ad hoc):
 style_match = re.match(r'<!--\s*style\s+([^->]+?)\s*-->', line)  # truncates at hyphens
 ```
 
-After (unified):
+After (unified, later extended by #52 to three patterns):
 ```python
 STANDARD_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_\-]*$')
 ALIAS_NAME_RE    = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$')
+STYLE_NAME_RE    = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_ -]*$')  # added by #52
 
 def validate_style_name(name, line_num, errors):
-    if not STANDARD_NAME_RE.match(name):
+    if not STYLE_NAME_RE.match(name.strip()):  # uses STYLE_NAME_RE, not STANDARD_NAME_RE
         errors.append((line_num, 'MDPP002', f'Invalid style name: {name!r}'))
 
 def validate_alias_name(name, line_num, errors):
@@ -77,7 +79,7 @@ def validate_alias_name(name, line_num, errors):
         errors.append((line_num, 'MDPP002', f'Invalid alias name: {name!r}'))
 
 def validate_marker_key(key, line_num, errors):
-    if not STANDARD_NAME_RE.match(key):
+    if not STYLE_NAME_RE.match(key.strip()):  # uses STYLE_NAME_RE, not STANDARD_NAME_RE
         errors.append((line_num, 'MDPP002', f'Invalid marker key: {key!r}'))
 
 # Fixed capture regex — [^>]+? instead of [^->]+?
@@ -100,7 +102,7 @@ Unifying the grammar in one spec section, compiling shared regex constants in th
 
 1. **Single source of truth for naming grammar.** The `## Naming Rules` section in the spec is now authoritative. Any future extension type must reference it rather than define its own pattern. Code review should flag any new per-type name regex as a policy violation.
 
-2. **Shared compiled constants in the validator.** `STANDARD_NAME_RE` and `ALIAS_NAME_RE` are defined once at module level. Adding a new extension type means calling an existing `validate_*_name()` helper, not writing a new regex.
+2. **Shared compiled constants in the validator.** `STANDARD_NAME_RE`, `ALIAS_NAME_RE`, and `STYLE_NAME_RE` are defined once at module level. Adding a new extension type means calling an existing `validate_*_name()` helper, not writing a new regex.
 
 3. **Capture regex review checklist.** When writing `[^...]` character classes in capture groups, verify that each excluded character is intentional. In particular, `-` inside `[^...]` should almost never appear in a name-capture regex — it indicates the regex is doing double duty (capturing and boundary-detecting) and should be split.
 
@@ -114,3 +116,5 @@ Unifying the grammar in one spec section, compiling shared regex constants in th
 - [#14](https://github.com/quadralay/markdown-plus-plus/issues/14) — Error code reference (MDPP002 scope expanded by this work)
 - [#11](https://github.com/quadralay/markdown-plus-plus/issues/11) — Formal grammar (defines `identifier` production backed by this rule)
 - [#27](https://github.com/quadralay/markdown-plus-plus/issues/27) — ePublisher adapter regex updates (downstream, separate repo)
+- [#52](https://github.com/quadralay/markdown-plus-plus/issues/52) — Extended the two-pattern system to three patterns, adding `STYLE_NAME_RE` for styles and markers with embedded spaces
+- `docs/solutions/logic-errors/embedded-spaces-in-style-marker-names-2026-04-08.md` — Follow-up learning documenting the #52 correction
