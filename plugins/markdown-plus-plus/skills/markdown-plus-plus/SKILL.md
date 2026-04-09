@@ -101,6 +101,8 @@ See [Getting Started](#getting-started) for an introduction.
 - Keep alias values unique within each file
 - Must be attached to an element (no blank line between alias and element) -- same rule as styles
 
+**Auto-generated alias collisions:** When multiple headings produce the same auto-generated alias, the first heading keeps the bare alias and subsequent headings receive `-2`, `-3`, etc. (e.g., `setup`, `setup-2`, `setup-3`). This is silent — no diagnostic is emitted. Custom alias duplicates remain an error (MDPP008). See `spec/element-interactions.md` for the full algorithm.
+
 Use `scripts/add-aliases.py` to auto-generate aliases for headings.
 
 ### Conditions
