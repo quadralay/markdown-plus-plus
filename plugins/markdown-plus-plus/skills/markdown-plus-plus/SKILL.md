@@ -101,7 +101,7 @@ See [Getting Started](#getting-started) for an introduction.
 - Keep alias values unique within each file
 - Must be attached to an element (no blank line between alias and element) -- same rule as styles
 
-**Auto-generated alias collisions:** When multiple headings produce the same auto-generated alias, the first heading keeps the bare alias and subsequent headings receive `-2`, `-3`, etc. (e.g., `setup`, `setup-2`, `setup-3`). This is silent -- no diagnostic is emitted. Custom alias duplicates remain an error (MDPP008). When a heading with a suffixed auto-generated alias also has a custom alias, both are valid anchors (e.g., `#db-setup` and `#setup-2`). See `spec/element-interactions.md` for the full algorithm.
+**Auto-generated alias collisions:** When multiple headings produce the same auto-generated alias, the first heading keeps the bare alias and subsequent headings receive `-2`, `-3`, etc. (e.g., `setup`, `setup-2`, `setup-3`). Custom aliases and auto-generated aliases occupy separate namespaces -- when a custom alias and an auto-generated alias share the same identifier, both exist independently, but the custom alias wins at link resolution time (no suffixing or displacement of the auto-generated alias). Both overlap types are resolved silently -- no diagnostic is emitted. Custom alias duplicates remain an error (MDPP008). When a heading with a suffixed auto-generated alias also has a custom alias, both are valid anchors (e.g., `#db-setup` and `#setup-2`). See `spec/element-interactions.md` for the full algorithm.
 
 Use `scripts/add-aliases.py` to auto-generate aliases for headings.
 
@@ -329,6 +329,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 - `../../../spec/formal-grammar.md` - Formal EBNF/PEG grammar for parser implementation
 - `../../../spec/graceful-degradation.md` - Graceful degradation behavior in standard CommonMark renderers
 - `../../../spec/cross-file-link-resolution.md` - Link reference scope and conflict rules across included files
+- `../../../spec/element-interactions.md` - Style types, default names, compound naming, heading alias auto-generation and collision resolution
 
 </references>
 

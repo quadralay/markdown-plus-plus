@@ -255,7 +255,7 @@ $my variable;
 
 **Suggested fix:** Use a unique alias name for each element. The error message includes the line number of the first definition.
 
-**Note:** MDPP008 applies only to custom aliases (`<!-- #name -->`). Auto-generated heading aliases that collide are silently disambiguated with a counter suffix (`-2`, `-3`, etc.) rather than triggering an error. See [Duplicate Alias Resolution](../../../../../spec/element-interactions.md#duplicate-alias-resolution).
+**Note:** MDPP008 applies only to custom aliases (`<!-- #name -->`). Auto-generated heading aliases that collide with each other are silently disambiguated with a counter suffix (`-2`, `-3`, etc.) rather than triggering an error. When a custom alias and an auto-generated alias share the same identifier, both exist independently in separate namespaces -- the custom alias takes resolution priority (no suffix is applied to the auto-generated alias). See [Duplicate Alias Resolution](../../../../../spec/element-interactions.md#duplicate-alias-resolution) and [Custom Alias Priority](../../../../../spec/element-interactions.md#custom-alias-priority).
 
 ---
 
