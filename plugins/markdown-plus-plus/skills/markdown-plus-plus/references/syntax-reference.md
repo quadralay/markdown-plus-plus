@@ -390,11 +390,20 @@ The style comment tag must be indented to match the nested list item.
 
 ### Inline Placement
 
+For most inline elements, place the style tag immediately before the element with no space:
+
 ```markdown
 This is <!--style:Emphasis-->**bold text**.
 Use <!--style:Code-->`inline code` here.
-Click <!--style:Link-->[here](url) to continue.
 ```
+
+**Links are the exception** -- place the style tag inside the link text brackets:
+
+```markdown
+Click [<!--style:CustomLink-->here](url) to continue.
+```
+
+See [Inline Styles for Images and Links](#inline-styles-for-images-and-links) for link and image examples, and the [Element Interactions specification](../../../../../spec/element-interactions.md#links) for the full placement rule.
 
 **Wrong - space breaks the association:**
 ```markdown

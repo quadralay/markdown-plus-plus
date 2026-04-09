@@ -413,6 +413,46 @@ Where:
 
 The two components are joined by a single space character. This rule applies recursively at each container boundary.
 
+### List Item Naming Sub-Rule
+
+List items are a special case of compound naming. When a style tag is applied to a list (ordered or unordered), the list items receive a name formed by appending the fixed suffix **"Item"** to the list's style name:
+
+> **List item name = ListStyle + space + "Item"**
+
+Where **ListStyle** is the custom style name if a style tag is present, or the default name ("OList" or "UList") if no custom style is applied.
+
+A processor MUST generate list item names using this sub-rule:
+
+| List Type | Style Tag | Container Name | Item Name |
+|-----------|-----------|----------------|-----------|
+| Ordered | *(none)* | OList | OList Item |
+| Unordered | *(none)* | UList | UList Item |
+| Ordered | `<!-- style:StepList -->` | StepList | StepList Item |
+| Unordered | `<!-- style:FeatureList -->` | FeatureList | FeatureList Item |
+
+The "Item" suffix is a fixed structural component -- it is not a style name that authors can independently customize. There is no mechanism to apply a separate style tag to individual list items to change the "Item" portion of the name. The item name is always derived from the list container's style.
+
+This sub-rule is distinct from the general compound naming rule, which governs content nested *within* list items (paragraphs, headings, code blocks, etc.). Both rules can apply simultaneously. For example, given a styled ordered list that contains a paragraph within a list item:
+
+```markdown
+<!-- style:StepList -->
+1. First step
+
+   This paragraph provides additional detail.
+
+2. Second step
+```
+
+The names produced are:
+
+| Element | Name | Rule Applied |
+|---------|------|--------------|
+| List container | StepList | Custom style tag |
+| List items | StepList Item | List item naming sub-rule |
+| Nested paragraph | StepList Paragraph | General compound naming rule |
+
+The list item naming sub-rule applies identically to ordered and unordered lists. The only difference is the default container name ("OList" vs. "UList") when no custom style tag is present.
+
 ### Compound Names and Identifier Validation
 
 Compound style names contain embedded spaces (e.g., `"Blockquote Heading 1"`) and conform to the **style/marker name** pattern (`[a-zA-Z_][a-zA-Z0-9_\- ]*`, trimmed). This pattern was introduced specifically to support processor-defined compound names and legacy systems with space-embedded style names. Each component of a compound name MUST individually conform to the standard identifier rule defined in the [Naming Rules](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#naming-rules), and the composed result is validated as a style/marker name with embedded spaces.
@@ -526,6 +566,8 @@ A processor MUST NOT propagate a container's custom style to nested containers. 
 
 Inline elements appear within a line of text. Inline style tags MUST appear immediately before the styled element on the same line, with no space between the closing `-->` and the element, as defined by the [Attachment Rule](attachment-rule.md).
 
+**Link exception:** Links are an exception to this general placement rule. For links, the style tag is placed *inside* the link text brackets (`[...]`), not immediately before the opening bracket. See [Links](#links) for the full rule and rationale.
+
 ### Bold, Italic, Strikethrough, and Code Spans
 
 **Style type:** Character
@@ -555,9 +597,24 @@ This text has <!--style:Removed-->~~deprecated content~~ in it.
 **Style type:** Character
 **Default name:** "Link"
 
-Links accept inline style tags. The style is placed inside the link text brackets, before the formatted text content. Links produce Character style type.
+Links accept inline style tags. Links produce Character style type.
 
 A processor MUST assign "Link" as the default style name and Character as the style type for links.
+
+#### Placement Exception
+
+Links are the **one exception** to the general inline placement rule. For all other inline elements (bold, italic, strikethrough, code spans, images), the style tag appears immediately *before* the element's opening delimiter. For links, the style tag MUST be placed **inside the link text brackets**, before the link text content:
+
+```
+General inline rule:  <!--style:Name-->**element**
+Link exception:       [<!--style:Name-->link text](url)
+```
+
+The tag appears after the opening `[` and before the link text. This placement is required because the style applies to the *text content* of the link, not to the link as a structural element. Placing the tag before the opening `[` is not valid for link styling.
+
+A processor MUST recognize style tags inside link text brackets. A processor MUST NOT require style tags to appear before the opening `[` of a link.
+
+#### Examples
 
 ```markdown
 See the [<!--style:APILink-->**API Reference**](api.md#auth) for details.
@@ -567,6 +624,17 @@ Read the [<!--style:ExternalLink-->documentation](https://example.com).
 
 - The first link receives "APILink" (Character type) instead of the default "Link"
 - The second link receives "ExternalLink" (Character type) instead of the default "Link"
+
+#### Comparison with Other Inline Elements
+
+| Element | Style Tag Placement | Example |
+|---------|-------------------|---------|
+| Bold | Before element | `<!--style:Name-->**text**` |
+| Italic | Before element | `<!--style:Name-->*text*` |
+| Strikethrough | Before element | `<!--style:Name-->~~text~~` |
+| Code span | Before element | `` <!--style:Name-->`text` `` |
+| Image | Before element | `<!--style:Name-->![alt](src)` |
+| **Link** | **Inside brackets** | `[<!--style:Name-->text](url)` |
 
 #### Cross-Document Alias Linking
 
