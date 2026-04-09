@@ -1,7 +1,7 @@
 ---
 title: "docs: Define custom alias priority over auto-generated heading aliases"
 type: docs
-status: active
+status: completed
 date: 2026-04-08
 origin: docs/brainstorms/2026-04-08-custom-alias-priority-requirements.md
 ---
@@ -66,7 +66,7 @@ Issue #53 resolved auto-generated vs. auto-generated heading alias collisions wi
 
 ## Implementation Units
 
-- [ ] **Unit 1: Add Custom Alias Priority subsection to spec**
+- [x] **Unit 1: Add Custom Alias Priority subsection to spec**
 
 **Goal:** Define normative custom-vs-auto collision priority rules in `spec/element-interactions.md`
 
@@ -102,7 +102,7 @@ Issue #53 resolved auto-generated vs. auto-generated heading alias collisions wi
 - Custom alias interaction example is consistent with the Relationship to Custom Aliases section
 - Processing order requirement ensures deterministic results regardless of document order
 
-- [ ] **Unit 2: Update supporting references**
+- [x] **Unit 2: Update supporting references**
 
 **Goal:** Cross-reference the new spec section from syntax-reference.md and error-codes.md
 
@@ -126,7 +126,7 @@ Issue #53 resolved auto-generated vs. auto-generated heading alias collisions wi
 - Both files link back to the Custom Alias Priority section in the spec
 - MDPP008 note clearly distinguishes custom alias errors (MDPP008) from silent custom-vs-auto resolution
 
-- [ ] **Unit 3: Document solution**
+- [x] **Unit 3: Document solution**
 
 **Goal:** Record the custom alias priority resolution as an institutional learning
 
@@ -149,7 +149,7 @@ Issue #53 resolved auto-generated vs. auto-generated heading alias collisions wi
 - Solution document captures the "intentional vs. incidental" design rationale
 - Prevention section documents the collision matrix completeness principle
 
-- [ ] **Unit 4: Version bump**
+- [x] **Unit 4: Version bump**
 
 **Goal:** Bump patch version for the documentation update
 
