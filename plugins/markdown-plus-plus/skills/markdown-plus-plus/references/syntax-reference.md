@@ -295,6 +295,8 @@ Variables can appear:
 
 Variables remain as literals in the source and are resolved during publishing by a processing tool.
 
+**CommonMark rendering:** Variable tokens are visible as literal text (e.g., `$product_name;` appears as-is). This is the most visible artifact of any Markdown++ extension in standard renderers.
+
 ---
 
 ## Custom Styles
@@ -362,6 +364,8 @@ For nested lists, use proper indentation to match the list level:
 
 The style comment tag must be indented to match the nested list item.
 
+**CommonMark rendering:** Style directives are hidden (HTML comments are invisible). The styled element renders with default formatting.
+
 ### Inline Placement
 
 ```markdown
@@ -427,6 +431,8 @@ See [API Auth](api-reference.md#authentication) for auth info.
 ```
 
 **Note:** Reference-style links (`[text][ref]` with `[ref]: url`) are supported but generally not recommended for simple use cases. See the **Advanced Patterns** section in [best-practices.md](best-practices.md#link-references) for guidance on when to use them. In multi-file assemblies, link reference definitions from all included files are visible throughout the assembled document — this is the foundation of the semantic cross-reference pattern. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the normative resolution rules.
+
+**CommonMark rendering:** Alias directives are hidden (HTML comments are invisible). Standard heading IDs still work for in-page navigation.
 
 ### Alias vs. Heading IDs
 
@@ -517,6 +523,8 @@ This appears in web AND production.
 | Typo in closing | `<!--condition-->` instead of `<!--/condition-->` |
 | Mismatched nesting | Overlapping conditions |
 
+**CommonMark rendering:** Opening and closing condition tags are hidden, but all conditional branches are visible simultaneously. Readers see content for every condition regardless of audience or output format.
+
 ---
 
 ## File Includes
@@ -568,6 +576,8 @@ Included content:
 |-----------|----------|
 | File not found | Warning; include tag passes through as HTML comment |
 | Circular include | Error; include is skipped with warning |
+
+**CommonMark rendering:** Include directives are hidden (HTML comments are invisible), but included content is entirely missing. Book assembly files that consist only of include directives render as blank pages. Individual content files render normally when viewed directly.
 
 ---
 
@@ -670,6 +680,8 @@ The `Passthrough` marker injects literal content into published output without M
 ```
 
 **Note:** The `Passthrough` marker is a recognized Markdown++ directive (it matches the `marker:Key="value"` pattern). It is distinct from the general behavior where unrecognized HTML comments are ignored -- see [Comment Disambiguation](#comment-disambiguation).
+
+**CommonMark rendering:** Marker directives are hidden (HTML comments are invisible). Metadata is simply absent from the rendered view.
 
 ### Index Markers
 
@@ -861,6 +873,8 @@ Standard Markdown alignment syntax works:
 | Auth    | OAuth 2.0 support.       |
 ```
 
+**CommonMark rendering:** The multiline directive is hidden. The table renders as standard GFM, but continuation rows (empty first cell) appear as separate rows. Content is readable but the intended row grouping is lost.
+
 ---
 
 ## Combined Commands
@@ -946,6 +960,8 @@ The segments `style:CustomHeading` and `#alias-here` match known command pattern
 > Important information here.
 ```
 
+**CommonMark rendering:** Combined command directives are hidden (HTML comments are invisible). Behaves identically to the individual commands -- all comment-based directives are invisible in standard renderers.
+
 ---
 
 ## Inline Styles for Images and Links
@@ -976,6 +992,8 @@ Read the [<!--style:ExternalLink-->documentation](https://example.com).
 
 The style applies to the formatted text within the link.
 
+**CommonMark rendering:** Inline style directives are hidden. The formatted element (bold, italic, link, image) renders normally with default formatting.
+
 ---
 
 ## Content Islands (Blockquotes)
@@ -990,6 +1008,8 @@ Blockquotes create "content islands" - self-contained content blocks. See [SKILL
 - Other Markdown++ extensions (variables, conditions, inline styles)
 
 **Styling:** Place `<!--style:StyleName-->` on the line above the blockquote to apply a custom style.
+
+**CommonMark rendering:** Style directives are hidden. Blockquotes render with default formatting. There is no visual distinction between Warning, Tip, Note, or other styled blockquote types -- all appear as standard blockquotes.
 
 ---
 
