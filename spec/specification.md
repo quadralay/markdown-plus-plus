@@ -450,7 +450,6 @@ Inline placement applies only to `style:` commands; all other commands that requ
 | Code | Description | Severity |
 |------|-------------|----------|
 | **MDPP002** | Style name does not match the standard identifier pattern | Error |
-| **MDPP004** | Invalid style placement | Warning |
 | **MDPP009** | Orphaned style tag (not attached to an element) | Warning |
 
 ### 9.7 Examples
@@ -1173,7 +1172,7 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 | **MDPP001** | Unclosed condition block | Error | Pre-processing | A condition block is missing its closing tag, or a closing tag has no matching opening tag | `<!-- condition:expr -->` without `<!-- /condition -->`, or vice versa |
 | **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard), `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias), or `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed (style/marker) |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 | The JSON content in a `markers:` command is not valid JSON | `markers:{invalid}` |
-| **MDPP004** | Invalid style placement | Warning | Phase 2 | A style command appears in a position where it cannot be applied | Style in unsupported context |
+| **MDPP004** | *(Reserved)* | Warning | — | Formerly "Invalid style placement" — covered by MDPP009 | — |
 | **MDPP005** | Circular include (static) | Error | Pre-processing | Static analysis detects a circular include chain | File A includes B which includes A |
 | **MDPP006** | Missing include file | Warning | Phase 1, Step 1 | An included file does not exist or cannot be read | `<!-- include:nonexistent.md -->` |
 | **MDPP007** | Invalid condition syntax | Error | Phase 1, Step 1 | A condition expression cannot be parsed | `<!-- condition: -->` (empty) or malformed expression |

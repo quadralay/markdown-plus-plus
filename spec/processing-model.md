@@ -500,7 +500,7 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP001** | Unclosed or unmatched condition block | Error | Pre-processing |
 | **MDPP002** | Invalid name (variable, style, alias, or marker key) | Error | Any |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 |
-| **MDPP004** | Invalid style placement | Warning | Phase 2 |
+| **MDPP004** | *(Reserved)* | Warning | — |
 | **MDPP005** | Circular include detected (static analysis) | Error | Pre-processing |
 | **MDPP006** | Missing include file | Warning | Phase 1, Step 1 |
 | **MDPP007** | Invalid condition syntax | Error | Phase 1, Step 1 |
