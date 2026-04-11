@@ -496,7 +496,7 @@ Each condition name has one of three states:
 | **Hidden** | Content inside the block is removed from output. |
 | **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
 
-When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block passes through as-is, allowing the implementation to surface or resolve undefined conditional content downstream.
+When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is, allowing the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
 ### Condition Expressions
 

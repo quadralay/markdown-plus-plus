@@ -626,7 +626,7 @@ Contact us at <!--condition:web-->[email](mailto:x@x.com)<!--/condition--><!--co
 
 Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it. Content within an Unset (pass-through) condition block is preserved along with the condition tags -- embedded extension directives within the block survive into Phase 2 as regular HTML comments.
 
-**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
+**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
 
 **Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed. If the condition is Unset, the entire block -- including the include directive -- passes through as-is; the include is not processed.
 
