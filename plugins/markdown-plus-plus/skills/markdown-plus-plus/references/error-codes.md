@@ -28,21 +28,42 @@ All line-based checks skip lines inside fenced code blocks. A fenced code block 
 
 ## Naming Rule
 
-Most named entities share a standard naming grammar. MDPP002 validates this rule across variable names, condition names, style names, and marker key names.
+Markdown++ defines three naming patterns. The pattern applied depends on the entity type:
 
-**Standard rule regex:** `^[a-zA-Z_][a-zA-Z0-9_\-]*$`
+| Form | Regex | Used by | Spaces |
+|------|-------|---------|--------|
+| **Standard identifier** | `^[a-zA-Z_][a-zA-Z0-9_\-]*$` | Variables, conditions | No |
+| **Alias name** | `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` | Aliases (digit-first permitted) | No |
+| **Style/marker name** | `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` (trimmed) | Styles, marker keys (embedded spaces permitted) | Yes, embedded |
+
+### Standard Identifier
+
+**Regex:** `^[a-zA-Z_][a-zA-Z0-9_\-]*$`
 
 - First character must be a letter (`a-z`, `A-Z`) or underscore (`_`)
 - Subsequent characters may be letters, digits (`0-9`), hyphens (`-`), or underscores (`_`)
 - Minimum length is 1 character
 - No whitespace or punctuation characters
-- Hyphens are explicitly allowed
+- Used by: variable names (`$name;`), condition names
 
 ### Alias Exception
 
 Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`).
 
-**Alias rule regex:** `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$`
+**Regex:** `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$`
+
+Used by: alias names (`<!--#name-->`).
+
+### Style/Marker Name Exception
+
+Style names and marker key names permit embedded spaces to support compound names (e.g., `Code Block`, `Blockquote Paragraph`) and legacy style systems.
+
+**Regex:** `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` applied after trimming leading/trailing spaces.
+
+- First character must be a letter or underscore (same as standard)
+- Subsequent characters may include embedded spaces in addition to letters, digits, hyphens, and underscores
+- Leading and trailing spaces are stripped before validation
+- Used by: style names (`<!--style:name-->`), marker key names (`<!--markers:{...}-->`, `<!--marker:key="value"-->`)
 
 For non-English content, the same structural rules apply using the language's UTF-8 letter values in place of `a-zA-Z`.
 
@@ -113,13 +134,13 @@ Nested content — not permitted.
 
 **Description:** A named entity (variable, condition name, style, marker key, or alias) contains characters that violate the naming rule.
 
-**Detection logic:** Each name is tested against the appropriate naming rule regex. The check applies to:
+**Detection logic:** Each name is tested against the naming rule regex for its entity type. The check applies to:
 
-- **Variables:** The name portion of `$name;` references (standard rule)
-- **Style names:** The name in `<!--style:name-->` (standard rule)
-- **Alias names:** The name in `<!--#name-->` (alias rule -- digit-first allowed)
-- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (standard rule)
-- **Condition names:** Individual names within condition expressions (standard rule; see also MDPP007)
+- **Variables:** The name portion of `$name;` references (standard identifier rule)
+- **Condition names:** Individual names within condition expressions (standard identifier rule; see also MDPP007)
+- **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed)
+- **Style names:** The name in `<!--style:name-->` (style/marker rule — embedded spaces allowed)
+- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (style/marker rule — embedded spaces allowed)
 
 **Trigger examples:**
 
@@ -127,17 +148,25 @@ Nested content — not permitted.
 <!-- ERROR: variable name starts with digit -->
 $1foo;
 
-<!-- ERROR: variable name contains space -->
+<!-- ERROR: variable name contains space (variables use standard identifier rule) -->
 $my variable;
 
-<!-- ERROR: style name with punctuation -->
+<!-- ERROR: style name with punctuation (periods not in style/marker rule) -->
 <!--style:My.Style-->
 
-<!-- ERROR: marker key with space -->
-<!--markers:{"invalid key": "value"}-->
+<!-- ERROR: marker key starts with digit (style/marker rule still requires letter/underscore first) -->
+<!--markers:{"1key": "value"}-->
+
+<!-- NOTE: embedded spaces in style/marker names are valid -->
+<!--style:Code Block-->
+<!--markers:{"Table Cell Head": "value"}-->
 ```
 
-**Suggested fix:** Rename the entity to start with a letter or underscore, using only letters, digits, hyphens, and underscores for subsequent characters. Alias names may also start with a digit.
+**Suggested fix:** The required characters depend on the entity type:
+
+- **Variables and conditions (standard identifier rule):** Start with a letter or underscore; subsequent characters may be letters, digits, hyphens, or underscores. No spaces.
+- **Aliases (alias rule):** Same as standard, but may also start with a digit.
+- **Style names and marker keys (style/marker rule):** Start with a letter or underscore; subsequent characters may include embedded spaces as well as letters, digits, hyphens, and underscores. Leading/trailing spaces are stripped.
 
 ---
 
