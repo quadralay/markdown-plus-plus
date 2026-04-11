@@ -1074,8 +1074,8 @@ The validation script checks for these issues. See [Error Code Reference](error-
 | MDPP001 | Unmatched condition block | Error |
 | MDPP002 | Invalid name (variable, style, alias, or marker key) | Error |
 | MDPP003 | Malformed marker JSON | Error |
-| MDPP004 | Invalid style placement (reserved, not yet implemented) | Warning |
-| MDPP005 | Circular include (reserved, not yet implemented) | Error |
+| MDPP004 | Invalid style placement | Warning |
+| MDPP005 | Circular include detected (static analysis) | Error |
 | MDPP006 | Missing include file | Warning |
 | MDPP007 | Invalid condition syntax | Error |
 | MDPP008 | Duplicate alias within file | Error |
