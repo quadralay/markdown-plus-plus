@@ -59,7 +59,7 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 
 - Quick-reference summary table with code, name, severity, and description for all ten codes
 - General rules section documenting that all checks skip fenced code blocks
-- Naming rule section defining the shared grammar (`^[a-zA-Z_][a-zA-Z0-9_-]*$`) used by MDPP002 and MDPP007
+- Naming rule section defining the shared grammar (`^[a-zA-Z_][a-zA-Z0-9_-]*$`) used by MDPP002 and MDPP007 — **note:** originally documented as a single-regex grammar; expanded to a three-pattern table (standard identifier, alias name, style/marker name) in follow-up correction below
 - Per-code sections (`## MDPPnnn -- Name`) with severity, description, detection logic, trigger examples, and suggested fixes
 - Reserved codes (MDPP004, MDPP005) documented with intended detection logic and reserved status — **note:** this was later found to be incorrect; see "Follow-up Correction" below
 
@@ -71,7 +71,7 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 
 **Review-phase refinements:**
 
-- MDPP002 section enhanced with alias naming exception (`^[a-zA-Z0-9_][a-zA-Z0-9_-]*$` for aliases, allowing digit-first)
+- MDPP002 section enhanced with alias naming exception (`^[a-zA-Z0-9_][a-zA-Z0-9_-]*$` for aliases, allowing digit-first) — **note:** MDPP002 was later revised to reference per-entity-type rules rather than one regex for all entity types; see follow-up correction below
 - MDPP001 wording unified to "Unmatched" across all documents (was inconsistently "Unclosed" in some files)
 
 ### Follow-up Correction (2026-04-11): MDPP004 and MDPP005 promoted, then MDPP004 re-reserved and MDPP013 removed
@@ -90,6 +90,27 @@ After the initial error-codes.md was created, a subsequent review ([#67](https:/
 - MDPP013 marked as reserved in `spec/processing-model.md` and `spec/specification.md` diagnostic registries; all normative references changed to MDPP005
 - Plugin version bumped 1.1.13 → 1.1.14 (patch)
 - Test fixture added: `tests/sample-circular-includes.md` for MDPP005
+
+### Follow-up Correction (2026-04-11): Three-pattern naming system
+
+After the initial error-codes.md was created and the alias exception added during review, a subsequent audit ([#65](https://github.com/quadralay/markdown-plus-plus/issues/65)) found that the naming rule section still omitted the style/marker name pattern defined in `specification.md` §4.2. This caused MDPP002 to describe a single regex for all entity types — which would incorrectly reject valid style names and marker keys that contain embedded spaces (e.g., `<!--style:Code Block-->`).
+
+**What was corrected:**
+
+- `error-codes.md` naming rule section: expanded from two subsections ("Standard Identifier," "Alias Exception") to a three-pattern intro table plus three subsections ("Standard Identifier," "Alias Name," "Style/Marker Name")
+- MDPP002 description: changed from a single implicit regex to "naming rule **for its entity type**" with the three patterns distinguished
+- MDPP007 step 4: changed from ambiguous "naming rule regex" to "standard identifier regex (`^[a-zA-Z_][a-zA-Z0-9_\-]*$`)"
+- MDPP003 cross-reference: changed from "the naming rule" to "style/marker name rule"
+- Subsection headings renamed: "Alias Exception" → "Alias Name," "Style/Marker Name Exception" → "Style/Marker Name" (first-class patterns, not edge cases)
+- Table header "Used by" normalized to "Used By" for capitalization consistency with the spec
+
+**Three-pattern table (current state):**
+
+| Form | Regex | Used By | Spaces |
+|------|-------|---------|--------|
+| **Standard identifier** | `^[a-zA-Z_][a-zA-Z0-9_\-]*$` | Variables, conditions | No |
+| **Alias name** | `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` | Aliases (digit-first permitted) | No |
+| **Style/marker name** | `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` (trimmed) | Styles, marker keys | Yes, embedded |
 
 ## Why This Works
 
@@ -113,8 +134,9 @@ This also fulfills the principle established in the attachment rule solution doc
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) -- Define processing model (resolved; established diagnostic code registry)
 - [#10](https://github.com/quadralay/markdown-plus-plus/issues/10) -- Formalize attachment rule (resolved; MDPP009 semantics cross-referenced)
 - [#67](https://github.com/quadralay/markdown-plus-plus/issues/67) -- Remove "reserved" annotations from MDPP004 and MDPP005 (follow-up correction to this solution; MDPP004/005 promoted to active, v1.1.14)
-- [#65](https://github.com/quadralay/markdown-plus-plus/issues/65) -- Align error-codes.md naming rules with three-pattern system (open; same reference file)
+- [#65](https://github.com/quadralay/markdown-plus-plus/issues/65) -- Align error-codes.md naming rules with three-pattern system (resolved 2026-04-11; three-pattern naming table added)
 - [#66](https://github.com/quadralay/markdown-plus-plus/issues/66) -- Add MDPP010-MDPP017 to error-codes.md and syntax-reference.md (open; extends coverage beyond MDPP009)
+- `docs/solutions/documentation-gaps/error-codes-naming-rule-three-pattern-gap-2026-04-11.md` -- Detailed solution doc for the #65 three-pattern correction
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` -- MDPP002 scope expansion
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` -- Prevention principle fulfilled
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` -- Diagnostic code registry
