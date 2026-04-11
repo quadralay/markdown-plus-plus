@@ -134,7 +134,7 @@ mdpp_comment       ::= "<!--" ws? command_list ws? "-->"
 
 ### Command List (Combined Commands)
 
-A command list contains one or more segments separated by semicolons. Each segment is either a recognized command or unrecognized text. Unrecognized segments are silently discarded, functioning as inline comments within the directive.
+A command list contains one or more segments separated by semicolons. Each segment is either a recognized command or unrecognized text. Unrecognized segments are collected and injected as **PassThrough markers** attached to the target element. The rendering of PassThrough marker content from unrecognized segments is implementation-defined.
 
 ```ebnf
 command_list       ::= segment (ws? ";" ws? segment)*
@@ -165,7 +165,7 @@ unrecognized_text  ::= [^;]+
 |-------|---------|
 | `style:A;#b;marker:C="d"` | Three recognized commands |
 | `style:A ; #b ; marker:C="d"` | Three recognized commands (preferred style) |
-| `style:X ; TODO: add markers ; #alias` | Two commands + one discarded inline comment |
+| `style:X ; TODO: add markers ; #alias` | Two commands + one PassThrough marker injection |
 
 ### Individual Commands
 
@@ -412,7 +412,7 @@ command            <- style_cmd / alias_cmd / condition_open_cmd
                     / condition_close_cmd / include_cmd
                     / markers_cmd / marker_cmd / multiline_cmd
 
-# Unrecognized text (catch-all for inline comments)
+# Unrecognized text (catch-all for PassThrough marker injection)
 unrecognized_text  <- (!';' !close_delim .)+
 close_delim        <- ws? '-->'
 
@@ -534,7 +534,7 @@ All constructs in the five example files (`examples/*.md`) parse correctly under
 
 1. **Whitespace flexibility:** The grammar permits optional whitespace (`ws?`) after `<!--` and before `-->`, and around semicolons in combined commands. Both `<!--style:X-->` and `<!-- style:X -->` are valid.
 
-2. **Combined command with unrecognized segment:** `<!-- style:CustomHeading ; #alias ; TODO: add markers -->` parses as two recognized commands (`style_cmd`, `alias_cmd`) plus one discarded segment (`TODO: add markers`).
+2. **Combined command with unrecognized segment:** `<!-- style:CustomHeading ; #alias ; TODO: add markers -->` parses as two recognized commands (`style_cmd`, `alias_cmd`) plus one unrecognized segment (`TODO: add markers`) injected as a PassThrough marker.
 
 3. **JSON markers in combined commands:** `<!-- markers:{"Key": "val;ue"} ; #alias -->` -- the JSON object is parsed greedily (matching balanced braces), so a semicolon within a JSON string value does not split the segment.
 
