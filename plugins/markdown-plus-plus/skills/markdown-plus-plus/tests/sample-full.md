@@ -272,6 +272,16 @@ This section has an associated marker.
 |        | - Item 1                 |
 |        | - Item 2                 |
 
+### Unrecognized Segment (implementation-defined disposition)
+
+<!-- style:ReviewNote ; marker:Priority="high" ; TODO: verify before release -->
+## Section Pending Review
+
+### All-Unrecognized Segments (treated as regular HTML comment)
+
+<!-- TODO: this comment has no recognized commands ; review before release -->
+Regular paragraph — the comment above is a regular HTML comment, not a combined command.
+
 ### Style + Marker
 
 <!-- style:ImportantSection ; marker:Priority="high" -->

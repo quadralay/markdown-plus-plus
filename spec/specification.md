@@ -213,6 +213,8 @@ Multiple commands MAY be joined in a single comment using semicolons as separato
 
 Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives. See [section 16](#16-combined-commands) for the complete definition.
 
+**Edge case:** A comment containing semicolons where no segment matches any recognized command pattern is treated as a regular HTML comment under section 5.2 — it is not a combined command, is not subject to the attachment rule, and produces no diagnostics. The combined command path is only entered when at least one segment matches a recognized command pattern.
+
 ### 5.4 Whitespace
 
 Whitespace (spaces and horizontal tabs) between the comment delimiters and the command content is optional. Both `<!--style:Name-->` and `<!-- style:Name -->` are valid. Whitespace around semicolons in combined commands is optional but recommended for readability.
@@ -779,7 +781,7 @@ The `Passthrough` marker key has special semantics. Its value is emitted as-is i
 ## Migration Guide
 ```
 
-The Passthrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the automatic PassThrough marker injection for unrecognized segments in combined commands (section 16.4), and from the general behavior where standalone unrecognized HTML comments are ignored (section 5.2).
+The Passthrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the general behavior where standalone unrecognized HTML comments are ignored (section 5.2) and from unrecognized segments in combined commands (section 16.4), whose disposition is implementation-defined.
 
 #### Index Markers
 

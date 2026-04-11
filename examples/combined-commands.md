@@ -89,6 +89,20 @@ Styled blockquotes (content islands) can carry markers for metadata.
 > - **Styles:** type-based PascalCase (`WarningBox`, `DataTable`)
 > - **Aliases:** numeric IDs for stability (`#400001`)
 
+<!-- style:Heading2; #400010 -->
+## Unrecognized segments
+
+[unrecognized-segments]: #400010 "Unrecognized segments"
+
+A combined command may include segments that do not match any recognized command pattern. These unrecognized segments MUST NOT affect content processing. Their disposition is implementation-defined — an implementation may pass them through as HTML comments (invisible to readers, visible to QA tools), inject them as markers, or discard them.
+
+<!-- style:NoteBox; marker:Status="draft" ; #400011 ; TODO: verify examples before publish -->
+## Draft section pending review
+
+[draft-section-pending-review]: #400011 "Draft section pending review"
+
+The directive above includes three recognized segments (`style:NoteBox`, `marker:Status="draft"`, `#400011`) and one unrecognized segment (`TODO: verify examples before publish`). All three recognized commands apply normally to this heading.
+
 ## Summary
 
-Combined commands reduce visual clutter by merging multiple directives into a single comment. The semicolon separator and consistent ordering make documents easier to scan and maintain.
+Combined commands reduce visual clutter by merging multiple directives into a single comment. The semicolon separator and consistent ordering make documents easier to scan and maintain. Unrecognized segments may also appear in combined commands to carry authoring notes or QA flags alongside recognized directives.
