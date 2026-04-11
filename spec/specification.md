@@ -1032,7 +1032,7 @@ The segments `style:CustomHeading` and `#alias-here` are recognized and applied.
 
 ### 16.5 Conformance Note
 
-Combined commands are classified as an OPTIONAL feature in the [Processing Model conformance section](processing-model.md#optional-features). A processor that supports combined commands MUST evaluate them in the order specified above.
+Combined commands are classified as a REQUIRED feature in the [Processing Model conformance section](processing-model.md#required-features). A conformant processor MUST support combined commands and MUST evaluate them in the order specified above.
 
 ### 16.6 Examples
 

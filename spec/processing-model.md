@@ -533,14 +533,14 @@ A conformant Markdown++ processor MUST implement all of the following:
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
 10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
 11. **Encoding validation** -- UTF-8 encoding validation with BOM handling and MDPP017 emission, as specified in [Character Encoding](#character-encoding)
+12. **Combined commands** -- Semicolon-separated commands in a single comment tag. A conformant processor MUST evaluate them in the order specified in [Combined Command Evaluation Order](#combined-command-evaluation-order).
 
 ### Optional Features
 
 The following features are OPTIONAL. A conformant processor MAY implement them but is not required to:
 
-1. **Combined commands** -- Semicolon-separated commands in a single comment tag. A processor that supports combined commands MUST evaluate them in the order specified in [Combined Command Evaluation Order](#combined-command-evaluation-order).
-2. **Maximum include depth enforcement** -- A processor MAY impose a maximum include depth. If it does, it SHOULD use a default of 10 and MUST emit **MDPP011** when the limit is exceeded.
-3. **Version checking** -- A processor MAY implement the version check preamble described in [Format Versioning](versioning.md). If it does, it MUST emit **MDPP015** and **MDPP016** at their specified severities and follow the compatibility rules defined in that specification.
+1. **Maximum include depth enforcement** -- A processor MAY impose a maximum include depth. If it does, it SHOULD use a default of 10 and MUST emit **MDPP011** when the limit is exceeded.
+2. **Version checking** -- A processor MAY implement the version check preamble described in [Format Versioning](versioning.md). If it does, it MUST emit **MDPP015** and **MDPP016** at their specified severities and follow the compatibility rules defined in that specification.
 
 ### Conformance Statement
 
