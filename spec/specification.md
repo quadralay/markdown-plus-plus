@@ -551,15 +551,19 @@ Condition evaluation occurs during Phase 1, Step 1 of the processing pipeline, o
 
 #### Condition State Model
 
-Each condition name has one of three states. Visible and Hidden are **assigned states** — explicitly set in the condition set provided at build time. Unset is **not an assigned state**; it represents the absence of a definition. This distinction is normative: whenever any operand in an expression is Unset, the processor MUST NOT evaluate the expression, regardless of the other operands' assigned states.
+Each condition name has one of three states. Visible and Hidden are **assigned states** — explicitly set in the condition set provided at build time. Unset is **not an assigned state**; it represents the absence of a definition.
 
 | State | Meaning |
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without condition evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content. |
+| **Unset** | The condition name is not defined in the condition set. |
 
-When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
+##### Unset Pre-Evaluation Check
+
+Before evaluating a condition expression, a processor MUST check whether all condition names in the expression are defined in the condition set. If any name is Unset, the processor MUST NOT evaluate the expression -- the entire condition block passes through as-is (opening tag, content, and closing tag are preserved in the output). As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content.
+
+This allows implementations to surface or resolve undefined conditional content downstream rather than silently including it. The check applies once per expression, before any operator logic runs.
 
 For example, given the condition set `{web: Visible}` and input:
 
@@ -583,37 +587,19 @@ Mobile content here.
 <!--/condition-->
 ```
 
-The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
-
-##### Compound Expression with Mixed Assigned/Unset Operands
-
-The most counter-intuitive case: a compound expression passes through even when one of its operands has an assigned state. Given the condition set `{web: Visible}` and input:
-
-```markdown
-<!--condition:web mobile-->
-This content requires both web and mobile.
-<!--/condition-->
-```
-
-The output is:
-
-```markdown
-<!--condition:web mobile-->
-This content requires both web and mobile.
-<!--/condition-->
-```
-
-Although `web` is Visible, the processor MUST NOT evaluate the AND expression because `mobile` is Unset. The entire block passes through unchanged. Presence of any Unset operand in an expression forces pass-through of the whole block.
+The `web` block is evaluated normally (Visible = true, so content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
 
 #### Expression Operators
+
+Once all condition names pass the Unset pre-check (all names are defined), the processor evaluates the expression using standard boolean logic (Visible = true, Hidden = false).
 
 Condition expressions support three operators with explicit precedence:
 
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
-| NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
-| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both `a` and `b` are Visible. If any operand is Unset, the block passes through. |
-| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. If any operand is Unset, the block passes through. |
+| NOT | `!` (prefix) | 1 (highest) | Inverts the value. `!name` is true when `name` is Hidden, false when Visible. |
+| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both `a` and `b` are Visible. |
+| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!draft,web production` MUST be parsed as `(!draft) OR (web AND production)`.
 

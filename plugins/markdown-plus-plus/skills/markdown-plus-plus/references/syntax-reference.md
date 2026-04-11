@@ -494,32 +494,32 @@ Each condition name has one of three states:
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content. |
+| **Unset** | The condition name is not defined in the condition set. |
 
-When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
+**Unset pre-evaluation check:** Before evaluating a condition expression, the processor checks whether all condition names are defined. If any name is Unset, the entire block passes through as-is (opening tag, content, closing tag preserved). As-is refers to condition evaluation only; variable substitution still applies. The check fires once per expression, before any operator logic runs.
 
 ### Condition Expressions
 
+Once all names pass the Unset pre-check, operators use standard boolean logic (Visible = true, Hidden = false):
+
 | Operator | Symbol | Meaning | Precedence |
 |----------|--------|---------|------------|
-| NOT | `!` | Negate condition. If operand is Unset, block passes through. | Highest (1) |
-| AND | space | All must be visible. If any operand is Unset, block passes through. | Medium (2) |
-| OR | `,` | Any can be visible. If any operand is Unset, block passes through. | Lowest (3) |
+| NOT | `!` | Inverts the value. True when operand is Hidden. | Highest (1) |
+| AND | space | All must be true (Visible). | Medium (2) |
+| OR | `,` | Any can be true (Visible). | Lowest (3) |
 
 ### Expression Examples
 
 | Expression | Interpretation |
 |------------|----------------|
-| `web` | Show when "web" is visible |
-| `!web` | Show when "web" is hidden |
-| `web print` | Show when "web" AND "print" are visible |
-| `web,print` | Show when "web" OR "print" is visible |
-| `!internal,web` | Show when "internal" is hidden OR "web" is visible |
+| `web` | Show when "web" is Visible |
+| `!web` | Show when "web" is Hidden |
+| `web print` | Show when "web" AND "print" are both Visible |
+| `web,print` | Show when "web" OR "print" is Visible |
+| `!internal,web` | Show when "internal" is Hidden OR "web" is Visible |
 | `!draft,web production` | `(!draft) OR (web AND production)` |
-| `mobile` | **Pass through** — "mobile" is Unset (not defined in condition set) |
-| `!mobile` | **Pass through** — NOT applied to an Unset operand still forces pass-through; the expression is not evaluated |
-| `web mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the AND expression is not evaluated |
-| `web,mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the OR expression is not evaluated |
+| `mobile` | **Pass through** — "mobile" is Unset; pre-check prevents evaluation |
+| `web mobile` | **Pass through** — "mobile" is Unset; pre-check prevents evaluation even though "web" is defined |
 
 ### Condition Name Rules
 
