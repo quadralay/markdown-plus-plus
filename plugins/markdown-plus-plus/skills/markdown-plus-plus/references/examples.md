@@ -668,6 +668,62 @@ This section has a custom style, marker metadata, and a stable alias for linking
 
 ---
 
+## Example 12: Unset Condition Pass-Through
+
+Unset conditions pass through with their tags intact, allowing downstream tools or build stages to process them. This example shows a document built with condition set `{web: Visible, print: Visible}` — the `mobile` and `tablet` conditions are not defined and therefore Unset.
+
+```markdown
+<!--markers:{"Keywords": "installation, setup", "Description": "Installation guide for all platforms"} ; #installation-guide-->
+# Installation Guide
+
+## Download
+
+<!--condition:web-->
+Download the installer from [$product_name; Downloads]($download_url;).
+<!--/condition-->
+
+<!--condition:print-->
+See the Quick Start card included in the product box.
+<!--/condition-->
+
+<!--condition:mobile-->
+Tap the **Download** button in the app store listing.
+<!--/condition-->
+
+<!--condition:tablet-->
+Open the App Store or Google Play Store and search for $product_name;.
+<!--/condition-->
+
+## Platform-Specific Instructions
+
+<!--condition:web production-->
+These instructions apply to the production web environment.
+<!--/condition-->
+
+<!--condition:web mobile-->
+These instructions apply when both web and mobile are active.
+<!--/condition-->
+
+## Version Note
+
+<!--condition:mobile-->
+Mobile version: $version;
+<!--/condition-->
+```
+
+Given condition set `{web: Visible, print: Visible}` and variable map `{product_name: "Acme Docs", version: "2.1", download_url: "https://acme.example.com/downloads"}`:
+
+- The `web` block renders its content (tags removed).
+- The `print` block renders its content (tags removed).
+- The `mobile` block (standalone) passes through as-is — tags and content preserved. Note: `$version;` IS resolved to `2.1` even though the condition block passes through.
+- The `tablet` block passes through as-is.
+- The `web production` block passes through as-is — `production` is Unset, so the AND expression is not evaluated even though `web` is Visible.
+- The `web mobile` block passes through as-is — same reason.
+
+The resulting output contains the Unset blocks verbatim, with `$version;` already substituted, ready for a mobile-aware downstream processor to evaluate.
+
+---
+
 ## Tips for Writing Markdown++
 
 1. **Use variables for repeated content** - Product names, versions, URLs

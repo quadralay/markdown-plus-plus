@@ -129,7 +129,9 @@ Means: (!draft) OR (web AND production)
 
 **Per-file scoping:** Condition blocks must open and close within the same file — they cannot span across an include boundary (MDPP012). See `spec/processing-model.md`.
 
-**Tri-state model:** Each condition name is either Visible or Hidden; a name not defined in the condition set is Unset (undefined). Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditional content downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
+**Condition state model:** Each condition name is either Visible or Hidden (assigned states); a name not defined in the condition set is Unset — not an assigned state, but the absence of one. Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditional content downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
+
+**Variable substitution inside Unset blocks:** "Passes through as-is" refers to condition evaluation only. Variable substitution (Phase 1, Step 2) still resolves `$variable;` tokens inside Unset blocks because the content survives into that processing step. Include directives inside Unset blocks are NOT processed — the include tag passes through as literal text.
 
 ### File Includes
 

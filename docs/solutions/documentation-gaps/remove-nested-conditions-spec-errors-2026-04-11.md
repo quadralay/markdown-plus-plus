@@ -117,4 +117,4 @@ Advanced web content.
 - GitHub issue #71 — Remove nested condition support from spec (this fix)
 - `docs/solutions/documentation-gaps/combined-commands-conformance-classification-2026-04-10.md` — Precedent for cross-file RFC 2119 specification corrections; recommended the grep-sweep approach used here
 - `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — Documents the condition expression grammar (AND/OR/NOT operator precedence); may still reference the old grammar production permitting nesting
-- `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Documents condition evaluation model (tri-state: Set/Unset/Absent); may still reference the removed "Nested Conditions" subsection
+- `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Documents condition evaluation model (Condition State Model: Visible/Hidden/Unset)

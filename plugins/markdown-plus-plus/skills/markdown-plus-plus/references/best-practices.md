@@ -167,6 +167,27 @@ Click <!--condition:windows10-->Start<!--/condition--><!--condition:windows11-->
 <!--/condition-->
 ```
 
+**Undefined condition names (Unset) — authoring guidance:**
+
+A condition name that is not included in the condition set at build time is **Unset**. Unset condition blocks pass through the processor with their opening tags, content, and closing tags intact. This is intentional: it lets you author content for multiple output targets in a single source file, even if only some targets are active in a given build.
+
+- **Define all active conditions explicitly.** An omitted name is not "off" — it is undefined. If you intend a block to be removed, set the condition to Hidden. If you leave it undefined, the block passes through to the output, which may not be what you want.
+- **Unset is useful for staged or multi-pass builds.** A `mobile` condition block that passes through in a web build can be processed by a separate mobile pipeline in a later stage.
+- **Variables inside Unset blocks are still resolved.** Even when the condition block passes through, `$variable;` tokens inside the block are substituted during Phase 1. Do not rely on pass-through to preserve unresolved variable references.
+- **Compound expressions with any Unset operand always pass through.** `<!--condition:web mobile-->` passes through even if `web` is Visible, because `mobile` is Unset. Add all required condition names to the condition set before build if you need a compound block to be evaluated.
+
+```markdown
+<!-- Pass-through: mobile is Unset — block preserved with variable resolved -->
+<!--condition:mobile-->
+Download version $version; for mobile.
+<!--/condition-->
+
+<!-- Pass-through: tablet is Unset — even though print is Visible, OR is not evaluated -->
+<!--condition:print,tablet-->
+Available in print and tablet editions.
+<!--/condition-->
+```
+
 ### File Includes
 
 **Use includes for:**

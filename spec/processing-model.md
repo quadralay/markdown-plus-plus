@@ -29,7 +29,7 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 |-------|---------|
 | **Visible** | The condition is active. Content inside the condition block is included in output. |
 | **Hidden** | The condition is suppressed. Content inside the condition block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
+| **Unset** | The condition name is not defined in the condition set. See [Unset Pre-Evaluation Check](#unset-pre-evaluation-check) for how Unset names affect expression evaluation. |
 
 **Attachment** -- The relationship between a Markdown++ comment tag and the content element it modifies. See the [Attachment Rule](attachment-rule.md) for the complete definition.
 
@@ -166,15 +166,19 @@ Condition evaluation occurs per-file during include expansion. Each file's condi
 2. If a processor detects an unclosed condition block at the end of a file, it MUST emit diagnostic **MDPP001**. If a processor detects a closing `<!-- /condition -->` tag without a matching opening tag, it MUST emit diagnostic **MDPP001**.
 3. If a processor detects a condition block that spans an include boundary (opening in one file, closing in another), it MUST emit diagnostic **MDPP012**.
 
-##### Tri-State Condition Model
+##### Condition State Model
 
-Each condition name has one of three states:
+Each condition name has one of three states. Visible and Hidden are **assigned states** -- they are explicitly set in the condition set provided at build time. Unset is **not an assigned state**; it represents the absence of a definition.
 
 - **Visible**: The condition evaluates to true. Content inside the block is **included** in the output.
 - **Hidden**: The condition evaluates to false. Content inside the block is **removed** from the output.
-- **Unset**: The condition name is not defined in the condition set. The condition block **passes through** without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output.
+- **Unset**: The condition name is not defined in the condition set.
 
-When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
+##### Unset Pre-Evaluation Check
+
+Before evaluating a condition expression, a processor MUST check whether all condition names in the expression are defined in the condition set. If any name is Unset, the processor MUST NOT evaluate the expression -- the entire condition block passes through as-is (opening tag, content, and closing tag are preserved in the output). As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content.
+
+This allows implementations to surface or resolve undefined conditional content downstream rather than silently including it. The check applies once per expression, before any operator logic runs.
 
 For example, given the condition set `{web: Visible}` and input:
 
@@ -198,21 +202,23 @@ Mobile content here.
 <!--/condition-->
 ```
 
-The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
+The `web` block is evaluated normally (Visible = true, so content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set -- the pre-evaluation check prevents evaluation.
+
+For compound expressions, the same pre-check applies: `<!--condition:web mobile-->` with `web=Visible` and `mobile=Unset` passes through because `mobile` is not defined. The pre-check fires before the AND operator is evaluated.
 
 ##### Condition Expression Operators
+
+Once all condition names pass the Unset pre-check (all names are defined), the processor evaluates the expression using standard boolean logic (Visible = true, Hidden = false).
 
 Condition expressions support three operators with the following precedence (highest to lowest):
 
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
-| NOT | `!` | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
-| AND | ` ` (space) | 2 | All operands must be true. `a b` is true when both `a` and `b` are Visible. If any operand is Unset, the block passes through. |
-| OR | `,` | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. If any operand is Unset, the block passes through. |
+| NOT | `!` | 1 (highest) | Inverts the value. `!name` is true when `name` is Hidden, false when Visible. |
+| AND | ` ` (space) | 2 | All operands must be true. `a b` is true when both `a` and `b` are Visible. |
+| OR | `,` | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!a b,c` MUST be parsed as `((!a) AND b) OR c`.
-
-NOT applies to a single condition name. It inverts the evaluation: `!name` is true when the condition is Hidden, and false when the condition is Visible. If the condition is Unset, the block passes through without evaluation.
 
 ##### Nesting
 
@@ -390,6 +396,8 @@ Before processing a comment tag, the processor MUST determine whether it is a re
 
 Regular HTML comments (such as `<!-- TODO: fix this -->` or `<!-- Author's note -->`) MUST be ignored by the processor. They are not directives, are not subject to the attachment rule, and produce no diagnostics.
 
+**Unset condition blocks in Phase 2:** A conformant processor MUST treat condition opening tags (`<!--condition:expr-->`), condition closing tags (`<!--/condition-->`), and include directives (`<!--include:path-->`) that passed through Phase 1 as part of an Unset condition block as unrecognized HTML comments. These tags do not match any Phase 2 recognized command pattern, and MUST be ignored by Phase 2 -- they are not directives, are not subject to the attachment rule, and produce no diagnostics.
+
 See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#comment-disambiguation) section of the syntax reference for the complete recognition rules.
 
 #### Extension Extraction
@@ -531,7 +539,7 @@ This section defines what constitutes a conformant Markdown++ processor.
 A conformant Markdown++ processor MUST implement all of the following:
 
 1. **Include expansion** -- Recursive depth-first expansion with cycle detection and per-file condition evaluation, as specified in [Phase 1, Step 1](#phase-1-step-1-include-expansion).
-2. **Condition evaluation** -- Tri-state condition model with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation).
+2. **Condition evaluation** -- Condition state model (two assigned states plus Unset) with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation).
 3. **Variable substitution** -- Token replacement from a variable map with both escaping mechanisms, as specified in [Phase 1, Step 2](#phase-1-step-2-variable-substitution).
 4. **Style extraction** -- Extraction and attachment of `style:Name` commands to target elements.
 5. **Alias extraction** -- Extraction and attachment of `#name` commands to target elements.
