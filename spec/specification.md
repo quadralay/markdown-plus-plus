@@ -92,7 +92,7 @@ Any standard CommonMark renderer that does not modify HTML comments satisfies pa
 A **fully conformant processor** is a tool that evaluates all Markdown++ extensions as defined in this specification and its normative references. A fully conformant processor MUST implement all required features defined in the [Processing Model conformance section](processing-model.md#conformance), including:
 
 1. Include expansion with cycle detection and per-file condition evaluation.
-2. Condition evaluation with the tri-state model and three-operator precedence.
+2. Condition evaluation with the condition state model (two assigned states plus Unset) and three-operator precedence.
 3. Variable substitution with both escaping mechanisms.
 4. Style, alias, marker, and multiline extraction and attachment.
 5. Attachment rule enforcement for block-level and inline tags.
@@ -549,15 +549,15 @@ A condition block consists of an opening tag with a condition expression and a c
 
 Condition evaluation occurs during Phase 1, Step 1 of the processing pipeline, on a per-file basis during include expansion. The complete evaluation rules are specified in the [Processing Model](processing-model.md#per-file-condition-evaluation).
 
-#### Tri-State Model
+#### Condition State Model
 
-Each condition name has one of three states:
+Each condition name has one of three states. Visible and Hidden are **assigned states** — explicitly set in the condition set provided at build time. Unset is **not an assigned state**; it represents the absence of a definition. This distinction is normative: whenever any operand in an expression is Unset, the processor MUST NOT evaluate the expression, regardless of the other operands' assigned states.
 
 | State | Meaning |
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without condition evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content. |
 
 When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
@@ -584,6 +584,26 @@ Mobile content here.
 ```
 
 The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
+
+##### Compound Expression with Mixed Assigned/Unset Operands
+
+The most counter-intuitive case: a compound expression passes through even when one of its operands has an assigned state. Given the condition set `{web: Visible}` and input:
+
+```markdown
+<!--condition:web mobile-->
+This content requires both web and mobile.
+<!--/condition-->
+```
+
+The output is:
+
+```markdown
+<!--condition:web mobile-->
+This content requires both web and mobile.
+<!--/condition-->
+```
+
+Although `web` is Visible, the processor MUST NOT evaluate the AND expression because `mobile` is Unset. The entire block passes through unchanged. Presence of any Unset operand in an expression forces pass-through of the whole block.
 
 #### Expression Operators
 
@@ -613,7 +633,7 @@ Contact us at <!--condition:web-->[email](mailto:x@x.com)<!--/condition--><!--co
 
 ### 11.4 Interaction with Other Extensions
 
-Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it. Content within an Unset (pass-through) condition block is preserved along with the condition tags -- embedded extension directives within the block survive into Phase 2 as regular HTML comments.
+Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it. Content within an Unset (pass-through) condition block is preserved along with the condition tags -- embedded extension directives within the block survive into Phase 2 as HTML comments that Phase 2 does not act on. (Phase 2 recognizes only `style:`, `#alias`, `marker:`, `markers:`, `multiline`, and combined commands; condition and include tags from pass-through blocks are treated as unrecognized HTML comments and ignored.)
 
 **Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
 
@@ -639,21 +659,65 @@ Condition tags are **exempt** from the attachment rule. Conditions wrap content 
 
 ### 11.7 Examples
 
+**Example 1 — Simple Visible condition** (condition set: `{web: Visible}`):
+
 ```markdown
 <!-- condition:web -->
 ## Web-Only Section
 
 This section only appears in web output.
 <!-- /condition -->
+```
 
+Output: the tags are removed and the heading and body text are included.
+
+**Example 2 — Complex expression** (condition set: `{web: Visible, production: Visible, draft: Hidden}`):
+
+```markdown
 <!-- condition:!draft,web production -->
 This appears when draft is Hidden, OR when both web and production are Visible.
 <!-- /condition -->
+```
 
+Output: the content is included (both the `!draft` operand and the `web production` operand evaluate to true).
+
+**Example 3 — Conditional include** (condition set: `{advanced: Hidden}`):
+
+```markdown
 <!-- condition:advanced -->
 <!-- include:appendix.md -->
 <!-- /condition -->
 ```
+
+Output: the entire block including the include directive is removed. `appendix.md` is never read.
+
+**Example 4 — Unset pass-through** (condition set: `{web: Visible}` — `mobile` is not defined):
+
+Input:
+
+```markdown
+<!-- condition:mobile -->
+Download our mobile app for the best experience.
+<!-- /condition -->
+
+<!-- condition:web mobile -->
+Available on all platforms: web and mobile.
+<!-- /condition -->
+```
+
+Output:
+
+```markdown
+<!-- condition:mobile -->
+Download our mobile app for the best experience.
+<!-- /condition -->
+
+<!-- condition:web mobile -->
+Available on all platforms: web and mobile.
+<!-- /condition -->
+```
+
+Both blocks pass through with their opening tags, content, and closing tags intact. The first block uses the undefined name `mobile` directly; the second uses a compound AND expression where `mobile` is Unset — even though `web` is Visible, the presence of an Unset operand forces the entire block to pass through. Neither block is evaluated; neither block is removed.
 
 ---
 

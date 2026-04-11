@@ -516,6 +516,9 @@ When a condition expression references an undefined (Unset) name, the processor 
 | `web,print` | Show when "web" OR "print" is visible |
 | `!internal,web` | Show when "internal" is hidden OR "web" is visible |
 | `!draft,web production` | `(!draft) OR (web AND production)` |
+| `mobile` | **Pass through** — "mobile" is Unset (not defined in condition set) |
+| `web mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the AND expression is not evaluated |
+| `web,mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the OR expression is not evaluated |
 
 ### Condition Name Rules
 
@@ -575,6 +578,37 @@ This appears when draft is Hidden.
 | Nested conditions | Condition blocks inside other condition blocks (use logical expressions instead) |
 
 **CommonMark rendering:** Opening and closing condition tags are hidden, but all conditional branches are visible simultaneously. Readers see content for every condition regardless of audience or output format.
+
+### Interaction with Other Extensions for Unset Blocks
+
+When a condition block passes through (Unset), its content and tags interact with other extensions as follows:
+
+| Extension | Behavior inside an Unset condition block |
+|-----------|------------------------------------------|
+| **Variables** | Variable substitution (`$name;`) IS applied. Phase 1, Step 2 resolves `$variable;` tokens inside Unset blocks because the content survives into that step. "Pass-through" means the condition is not evaluated — not that the content is frozen at Phase 1 input. |
+| **Includes** | Include directives (`<!--include:path-->`) inside an Unset block are NOT processed. The include tag passes through as literal text in the output along with the condition tags. The referenced file is never read. |
+| **Styles / Aliases / Markers** | Tags inside Unset blocks survive into Phase 2 output as HTML comments that Phase 2 does not act on. They do not attach to elements and do not produce diagnostics. |
+| **Phase 2 recognition** | Condition opening/closing tags that pass through Phase 1 are NOT recognized as Markdown++ directives in Phase 2. Phase 2 treats them as regular HTML comments and ignores them. |
+
+**Variable inside an Unset block — example:**
+
+Given condition set `{web: Visible}` and variable map `{version: "2.0"}`:
+
+```markdown
+<!--condition:mobile-->
+Download version $version; for mobile.
+<!--/condition-->
+```
+
+Output:
+
+```markdown
+<!--condition:mobile-->
+Download version 2.0 for mobile.
+<!--/condition-->
+```
+
+The `mobile` condition is Unset so the block passes through, but `$version;` is still resolved to `2.0` by variable substitution.
 
 ---
 

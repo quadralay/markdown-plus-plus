@@ -29,7 +29,7 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 |-------|---------|
 | **Visible** | The condition is active. Content inside the condition block is included in output. |
 | **Hidden** | The condition is suppressed. Content inside the condition block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without condition evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. **As-is refers to condition evaluation only**: variable substitution (Phase 1, Step 2) still applies to the block's content. |
 
 **Attachment** -- The relationship between a Markdown++ comment tag and the content element it modifies. See the [Attachment Rule](attachment-rule.md) for the complete definition.
 
@@ -166,13 +166,13 @@ Condition evaluation occurs per-file during include expansion. Each file's condi
 2. If a processor detects an unclosed condition block at the end of a file, it MUST emit diagnostic **MDPP001**. If a processor detects a closing `<!-- /condition -->` tag without a matching opening tag, it MUST emit diagnostic **MDPP001**.
 3. If a processor detects a condition block that spans an include boundary (opening in one file, closing in another), it MUST emit diagnostic **MDPP012**.
 
-##### Tri-State Condition Model
+##### Condition State Model
 
-Each condition name has one of three states:
+Each condition name has one of three states. Visible and Hidden are **assigned states** -- they are explicitly set in the condition set provided at build time. Unset is **not an assigned state**; it represents the absence of a definition. This distinction is normative: whenever any operand in an expression is Unset, the processor MUST NOT evaluate the expression, regardless of the other operands' assigned states.
 
 - **Visible**: The condition evaluates to true. Content inside the block is **included** in the output.
 - **Hidden**: The condition evaluates to false. Content inside the block is **removed** from the output.
-- **Unset**: The condition name is not defined in the condition set. The condition block **passes through** without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output.
+- **Unset**: The condition name is not defined in the condition set. The condition block **passes through** without condition evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content.
 
 When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
@@ -199,6 +199,26 @@ Mobile content here.
 ```
 
 The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
+
+###### Compound Expression with Mixed Assigned/Unset Operands
+
+This example illustrates the most counter-intuitive aspect of Unset semantics: a compound expression passes through even when one of its operands is assigned. Given the condition set `{web: Visible}` and input:
+
+```markdown
+<!--condition:web mobile-->
+This content requires both web and mobile.
+<!--/condition-->
+```
+
+The output is:
+
+```markdown
+<!--condition:web mobile-->
+This content requires both web and mobile.
+<!--/condition-->
+```
+
+Even though `web` is Visible, the processor MUST NOT evaluate the expression because `mobile` is Unset. The entire block -- opening tag, content, and closing tag -- passes through unchanged. The result is the same as if both names were Unset: presence of any Unset operand forces pass-through of the entire block.
 
 ##### Condition Expression Operators
 
@@ -389,6 +409,8 @@ A conformant processor MUST parse the input as [CommonMark 0.30](https://spec.co
 Before processing a comment tag, the processor MUST determine whether it is a recognized Markdown++ directive or a regular HTML comment. A comment is recognized as a Markdown++ directive only if its content matches at least one known command pattern: `style:`, `#alias`, `marker:`, `markers:`, `multiline`, or a combined command using `;` separators.
 
 Regular HTML comments (such as `<!-- TODO: fix this -->` or `<!-- Author's note -->`) MUST be ignored by the processor. They are not directives, are not subject to the attachment rule, and produce no diagnostics.
+
+**Unset condition blocks in Phase 2:** A conformant processor MUST treat condition opening tags (`<!--condition:expr-->`), condition closing tags (`<!--/condition-->`), and include directives (`<!--include:path-->`) that passed through Phase 1 as part of an Unset condition block as unrecognized HTML comments. These tags do not match any Phase 2 recognized command pattern, and MUST be ignored by Phase 2 -- they are not directives, are not subject to the attachment rule, and produce no diagnostics.
 
 See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#comment-disambiguation) section of the syntax reference for the complete recognition rules.
 
