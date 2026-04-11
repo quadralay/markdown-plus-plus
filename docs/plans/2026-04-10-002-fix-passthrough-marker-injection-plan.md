@@ -1,7 +1,7 @@
 ---
 title: "fix: Replace silent discard language with PassThrough marker injection for unrecognized combined command segments"
 type: fix
-status: active
+status: completed
 date: 2026-04-10
 origin: docs/brainstorms/2026-04-10-passthrough-marker-injection-requirements.md
 ---
@@ -50,7 +50,7 @@ This is a spec-vs-implementation divergence. The PassThrough marker injection be
 
 ## Implementation Units
 
-- [ ] **Unit 1: Update specification.md (2 locations)**
+- [x] **Unit 1: Update specification.md (2 locations)**
 
 **Goal:** Replace incorrect "silently discarded" / "inline comments" language in specification.md with PassThrough marker injection semantics
 
@@ -73,7 +73,7 @@ This is a spec-vs-implementation divergence. The PassThrough marker injection be
 - No instance of "silently discarded" or "inline comments" in reference to unrecognized combined command segments
 - Language is consistent with existing Passthrough marker terminology in section 11.3
 
-- [ ] **Unit 2: Update formal-grammar.md (4 locations)**
+- [x] **Unit 2: Update formal-grammar.md (4 locations)**
 
 **Goal:** Replace incorrect "silently discarded" / "inline comments" language in formal-grammar.md with PassThrough marker injection semantics
 
