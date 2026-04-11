@@ -435,7 +435,7 @@ When styling a nested list item, the tag MUST be indented to match the nesting l
 
 **Styles and Content Islands:** A style above a blockquote creates a content island -- a styled, self-contained content block. See [section 15](#15-content-islands).
 
-**Styles and Conditions:** Style tags within a Hidden condition block are removed along with the rest of the block's content.
+**Styles and Conditions:** Style tags within a Hidden condition block are removed along with the rest of the block's content. Style tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 ### 9.5 Attachment Requirements
 
@@ -497,7 +497,7 @@ An alias supplements the auto-generated heading ID -- both the alias and the hea
 
 **Aliases and Combined Commands:** An alias MAY be combined with styles and markers using combined command syntax. In the recommended evaluation order, the alias is evaluated last. See [section 16](#16-combined-commands).
 
-**Aliases and Conditions:** Alias tags within a Hidden condition block are removed along with the rest of the block's content.
+**Aliases and Conditions:** Alias tags within a Hidden condition block are removed along with the rest of the block's content. Alias tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 ### 10.5 Attachment Requirements
 
@@ -810,7 +810,7 @@ The `IndexMarker` key creates entries in generated indexes. Index entries use co
 
 **Markers and Combined Commands:** Markers MAY be combined with styles and aliases using combined command syntax. In the recommended evaluation order, markers are evaluated third (after style and multiline, before alias). See [section 16](#16-combined-commands).
 
-**Markers and Conditions:** Marker tags within a Hidden condition block are removed along with the rest of the block's content.
+**Markers and Conditions:** Marker tags within a Hidden condition block are removed along with the rest of the block's content. Marker tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 **Markers and Aliases:** Markers and aliases are frequently combined on the same element via combined commands, particularly for headings in the semantic cross-reference pattern.
 
@@ -901,7 +901,7 @@ Standard Markdown alignment syntax (`:---`, `:---:`, `---:`) works in multiline 
 
 **Multiline Tables and Variables:** Variable tokens within multiline table cells are substituted during Phase 1, before table parsing in Phase 2.
 
-**Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. The condition content is evaluated during Phase 1.
+**Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
 
 **Multiline Tables and Combined Commands:** In the recommended evaluation order, the `multiline` indicator is second (after style, before markers and alias). See [section 16](#16-combined-commands).
 
