@@ -326,7 +326,7 @@ Variable names MUST match the naming rule `[a-zA-Z_][a-zA-Z0-9_\-]*`. Variable r
 
 Variable substitution MUST run after include expansion and condition evaluation are complete. This ordering has four critical implications that processors MUST observe:
 
-1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned. However, variables inside Unset (pass-through) condition blocks ARE resolved, because the block's content is preserved during condition evaluation and is present when variable substitution scans the text.
+1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned. However, variables inside Unset (pass-through) condition blocks are resolved, because the block's content is preserved during condition evaluation and is present when variable substitution scans the text.
 
 2. **Variable values cannot contain condition syntax.** Because defined conditions are already evaluated before variable substitution, a variable value containing `<!--condition:name-->` will not be evaluated as a condition directive. It will pass through as literal text into Phase 2.
 
