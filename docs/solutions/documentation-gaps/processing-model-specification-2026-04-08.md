@@ -76,10 +76,10 @@ Created `spec/processing-model.md` (550 lines) — a normative two-phase process
 **Phase 2 — Markdown Parsing with Extension Extraction:**
 - Extension extraction from HTML comments with disambiguation rules
 - Attachment rule cross-reference to `spec/attachment-rule.md`
-- Combined command evaluation order: style > multiline > marker > alias
+- Combined command evaluation order (RECOMMENDED, not required): style > multiline > marker > alias
 - Orphaned tag handling
 
-**Additional sections:** Output model (abstract CommonMark tree + metadata annotations, determinism guarantee), error handling (fatal vs. recoverable, diagnostic collection, MDPP code registry MDPP000–017), and conformance (11 required features, 3 optional features).
+**Additional sections:** Output model (abstract CommonMark tree + metadata annotations, determinism guarantee), error handling (fatal vs. recoverable, diagnostic collection, MDPP code registry MDPP000–017), and conformance (12 required features, 2 optional features).
 
 **Review fix applied:** Added the fourth ordering implication — variable values can contain include syntax, but since includes have already been expanded, include directives in variable values are not processed.
 
@@ -104,3 +104,4 @@ The fundamental issue was that Markdown++ had an implicit processing model embed
 - [#16](https://github.com/quadralay/markdown-plus-plus/issues/16) — Define variable escaping mechanism (resolved; formalized in processing model Phase 1, Step 2)
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` — Related specification pattern
 - `docs/solutions/documentation-gaps/variable-escaping-mechanism-2026-04-06.md` — Variable escaping formalized in processing model
+- `docs/solutions/documentation-gaps/combined-commands-conformance-classification-2026-04-10.md` — Combined commands promoted from OPTIONAL to REQUIRED (conformance counts updated from 11/3 to 12/2)
