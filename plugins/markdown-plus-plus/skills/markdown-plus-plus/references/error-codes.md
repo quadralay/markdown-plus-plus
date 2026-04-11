@@ -30,7 +30,7 @@ All line-based checks skip lines inside fenced code blocks. A fenced code block 
 
 Markdown++ defines three naming patterns. The pattern applied depends on the entity type:
 
-| Form | Regex | Used by | Spaces |
+| Form | Regex | Used By | Spaces |
 |------|-------|---------|--------|
 | **Standard identifier** | `^[a-zA-Z_][a-zA-Z0-9_\-]*$` | Variables, conditions | No |
 | **Alias name** | `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` | Aliases (digit-first permitted) | No |
@@ -46,7 +46,7 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 - No whitespace or punctuation characters
 - Used by: variable names (`$name;`), condition names
 
-### Alias Exception
+### Alias Name
 
 Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`).
 
@@ -54,7 +54,7 @@ Alias names may also begin with a digit, since aliases often map to numeric iden
 
 Used by: alias names (`<!--#name-->`).
 
-### Style/Marker Name Exception
+### Style/Marker Name
 
 Style names and marker key names permit embedded spaces to support compound names (e.g., `Code Block`, `Blockquote Paragraph`) and legacy style systems.
 
@@ -132,7 +132,7 @@ Nested content — not permitted.
 
 **Severity:** Error
 
-**Description:** A named entity (variable, condition name, style, marker key, or alias) contains characters that violate the naming rule.
+**Description:** A named entity (variable, condition name, style, marker key, or alias) contains characters that violate the naming rule for its entity type.
 
 **Detection logic:** Each name is tested against the naming rule regex for its entity type. The check applies to:
 
@@ -157,6 +157,12 @@ $my variable;
 <!-- ERROR: marker key starts with digit (style/marker rule still requires letter/underscore first) -->
 <!--markers:{"1key": "value"}-->
 
+<!-- ERROR: alias name contains invalid character (period not allowed) -->
+<!--#my.section-->
+
+<!-- NOTE: alias may start with a digit — digit-first is valid for aliases -->
+<!--#04499224-->
+
 <!-- NOTE: embedded spaces in style/marker names are valid -->
 <!--style:Code Block-->
 <!--markers:{"Table Cell Head": "value"}-->
@@ -176,7 +182,7 @@ $my variable;
 
 **Description:** The JSON payload inside a `<!--markers:{...}-->` directive fails to parse.
 
-**Detection logic:** The JSON substring (the `{...}` portion) is extracted and passed to a JSON parser. If parsing fails, the decode error is emitted. If parsing succeeds, individual key names are further validated against the naming rule (see MDPP002).
+**Detection logic:** The JSON substring (the `{...}` portion) is extracted and passed to a JSON parser. If parsing fails, the decode error is emitted. If parsing succeeds, individual key names are further validated against the style/marker name rule (see MDPP002).
 
 **Trigger examples:**
 
@@ -246,7 +252,7 @@ $my variable;
 1. If the expression is empty after trimming, emit "Empty condition expression"
 2. If a part starts with `!` (NOT operator), the `!` is removed before checking
 3. If a part is empty after removing the NOT operator, emit "Empty condition after NOT operator"
-4. Each part (after NOT removal) is validated against the naming rule regex
+4. Each part (after NOT removal) is validated against the standard identifier regex (`^[a-zA-Z_][a-zA-Z0-9_\-]*$`)
 
 **Trigger examples:**
 
