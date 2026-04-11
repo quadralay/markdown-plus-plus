@@ -113,7 +113,7 @@ Given the same input document, variable map, and condition set, a fully conforma
 
 The following terms are used normatively throughout this specification.
 
-**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, conditions are evaluated, and variables are substituted. This is the input to Phase 2.
+**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, defined conditions are evaluated (Unset condition blocks pass through as-is), and variables are substituted. This is the input to Phase 2.
 
 **Attachment** -- The positional relationship between a Markdown++ comment tag and the content element it modifies. A tag is attached when it appears on the line immediately above (block-level) or immediately before (inline) its target element with no intervening blank line or space. See [section 6](#6-the-attachment-rule).
 
@@ -121,7 +121,7 @@ The following terms are used normatively throughout this specification.
 
 **Combined command** -- A single HTML comment containing multiple Markdown++ commands separated by semicolons. See [section 16](#16-combined-commands).
 
-**Condition set** -- A collection of condition names, each assigned one of three states: Visible, Hidden, or Unset. Provided to the processor at build time.
+**Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not defined in the condition set is **Unset** (undefined). Provided to the processor at build time.
 
 **Content island** -- A blockquote element styled with a Markdown++ custom style, creating a self-contained content block. See [section 15](#15-content-islands).
 
@@ -271,9 +271,9 @@ The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is co
 
 The sequential ordering of the pipeline has critical implications:
 
-1. Conditions are evaluated before variable substitution. Variables inside Hidden condition blocks are never resolved.
+1. Conditions are evaluated before variable substitution. Variables inside Hidden condition blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution.
 2. Includes are expanded before variable substitution. Variable values cannot contain include syntax.
-3. Variable values cannot contain condition syntax (conditions are already resolved).
+3. Variable values cannot contain condition syntax (defined conditions are already evaluated).
 4. Variable values CAN contain Markdown syntax (variable substitution runs before Markdown parsing).
 
 ### 7.3 Error Model
@@ -336,7 +336,7 @@ Variables MAY appear in paragraphs, headings, list items, link text, link URLs, 
 
 ### 8.4 Interaction with Other Extensions
 
-**Variables and Conditions:** Variable substitution runs after condition evaluation (Phase 1, Step 2 follows Step 1). Variables inside Hidden condition blocks are never resolved -- the content is removed before variable scanning occurs. Variable values cannot contain condition syntax; such content passes through as literal text into Phase 2.
+**Variables and Conditions:** Variable substitution runs after condition evaluation (Phase 1, Step 2 follows Step 1). Variables inside Hidden condition blocks are never resolved -- the content is removed before variable scanning occurs. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax; such content passes through as literal text into Phase 2.
 
 **Variables and Includes:** The variable map is document-global. All files in an include tree share the same variable map. Variable substitution runs after all includes are expanded. Variable values cannot contain include syntax; such content passes through as literal text into Phase 2.
 
@@ -435,7 +435,7 @@ When styling a nested list item, the tag MUST be indented to match the nesting l
 
 **Styles and Content Islands:** A style above a blockquote creates a content island -- a styled, self-contained content block. See [section 15](#15-content-islands).
 
-**Styles and Conditions:** Style tags within a Hidden condition block are removed along with the rest of the block's content.
+**Styles and Conditions:** Style tags within a Hidden condition block are removed along with the rest of the block's content. Style tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 ### 9.5 Attachment Requirements
 
@@ -497,7 +497,7 @@ An alias supplements the auto-generated heading ID -- both the alias and the hea
 
 **Aliases and Combined Commands:** An alias MAY be combined with styles and markers using combined command syntax. In the recommended evaluation order, the alias is evaluated last. See [section 16](#16-combined-commands).
 
-**Aliases and Conditions:** Alias tags within a Hidden condition block are removed along with the rest of the block's content.
+**Aliases and Conditions:** Alias tags within a Hidden condition block are removed along with the rest of the block's content. Alias tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 ### 10.5 Attachment Requirements
 
@@ -531,7 +531,7 @@ See [Introduction](#introduction) for details.
 
 ### 11.1 Purpose
 
-Conditions control content visibility. A condition block wraps content that is included or excluded based on the condition set provided at build time. Conditions enable single-source authoring for multiple output formats, audiences, or platforms.
+Conditions control content visibility. A condition block wraps content that is included, excluded, or passed through based on the condition set provided at build time. Conditions enable single-source authoring for multiple output formats, audiences, or platforms.
 
 ### 11.2 Syntax
 
@@ -555,9 +555,33 @@ Each condition name has one of three states:
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | Content inside the block is included in output (document-default behavior). |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
 
-The Unset state ensures that documents render completely by default when no condition set is provided.
+When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
+
+For example, given the condition set `{web: Visible}` and input:
+
+```markdown
+<!--condition:web-->
+Web content here.
+<!--/condition-->
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The output is:
+
+```markdown
+Web content here.
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
 
 #### Expression Operators
 
@@ -565,9 +589,9 @@ Condition expressions support three operators with explicit precedence:
 
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
-| NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden. |
-| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both are Visible or Unset. |
-| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either is Visible or Unset. |
+| NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
+| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both `a` and `b` are Visible. If any operand is Unset, the block passes through. |
+| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. If any operand is Unset, the block passes through. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!draft,web production` MUST be parsed as `(!draft) OR (web AND production)`.
 
@@ -588,7 +612,7 @@ Advanced web content.
 <!-- /condition -->
 ```
 
-If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed.
+If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed. If `web` is Unset, the entire outer block passes through without evaluation -- including the nested `advanced` block and its condition tags. Inner conditions within an Unset outer block are not evaluated.
 
 #### Block and Inline Usage
 
@@ -600,17 +624,17 @@ Contact us at <!--condition:web-->[email](mailto:x@x.com)<!--/condition--><!--co
 
 ### 11.4 Interaction with Other Extensions
 
-Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it.
+Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it. Content within an Unset (pass-through) condition block is preserved along with the condition tags -- embedded extension directives within the block survive into Phase 2 as regular HTML comments.
 
-**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
+**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
 
-**Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed.
+**Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed. If the condition is Unset, the entire block -- including the include directive -- passes through as-is; the include is not processed.
 
-**Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules.
+**Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules. Tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
-**Conditions and Multiline Tables:** Conditions MAY appear within multiline table cells. The condition content is evaluated during Phase 1 before table parsing in Phase 2.
+**Conditions and Multiline Tables:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
 
-**Conditions and Content Islands:** Conditions MAY wrap or appear within content islands (styled blockquotes).
+**Conditions and Content Islands:** Conditions MAY wrap or appear within content islands (styled blockquotes). If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
 
 ### 11.5 Attachment Requirements
 
@@ -690,7 +714,7 @@ When an included file does not exist or cannot be read, the processor MUST emit 
 
 ### 12.4 Interaction with Other Extensions
 
-**Includes and Conditions:** Condition evaluation is per-file during include expansion. Each file's condition blocks are evaluated before its content is spliced into the parent. A condition block MAY wrap an include directive -- if the condition is Hidden, the include is not processed. Cross-file condition spans (opening in one file, closing in another) are a fatal error (MDPP012).
+**Includes and Conditions:** Condition evaluation is per-file during include expansion. Each file's condition blocks are evaluated before its content is spliced into the parent. A condition block MAY wrap an include directive -- if the condition is Hidden, the include is not processed; if the condition is Unset, the entire block (including the include directive) passes through as-is and the include is not processed. Cross-file condition spans (opening in one file, closing in another) are a fatal error (MDPP012).
 
 **Includes and Variables:** Included files inherit the variable map from the parent document. All files in an include tree share the same variable map. Variable substitution runs after all includes are expanded.
 
@@ -786,7 +810,7 @@ The `IndexMarker` key creates entries in generated indexes. Index entries use co
 
 **Markers and Combined Commands:** Markers MAY be combined with styles and aliases using combined command syntax. In the recommended evaluation order, markers are evaluated third (after style and multiline, before alias). See [section 16](#16-combined-commands).
 
-**Markers and Conditions:** Marker tags within a Hidden condition block are removed along with the rest of the block's content.
+**Markers and Conditions:** Marker tags within a Hidden condition block are removed along with the rest of the block's content. Marker tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 **Markers and Aliases:** Markers and aliases are frequently combined on the same element via combined commands, particularly for headings in the semantic cross-reference pattern.
 
@@ -877,7 +901,7 @@ Standard Markdown alignment syntax (`:---`, `:---:`, `---:`) works in multiline 
 
 **Multiline Tables and Variables:** Variable tokens within multiline table cells are substituted during Phase 1, before table parsing in Phase 2.
 
-**Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. The condition content is evaluated during Phase 1.
+**Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
 
 **Multiline Tables and Combined Commands:** In the recommended evaluation order, the `multiline` indicator is second (after style, before markers and alias). See [section 16](#16-combined-commands).
 
@@ -952,7 +976,7 @@ Blockquotes in CommonMark support rich nested content. Within a content island, 
 
 **Content Islands and Variables:** Variable tokens within the blockquote are substituted during Phase 1.
 
-**Content Islands and Conditions:** Conditions MAY wrap or appear within content islands.
+**Content Islands and Conditions:** Conditions MAY wrap or appear within content islands (styled blockquotes). If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
 
 ### 15.5 Attachment Requirements
 

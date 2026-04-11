@@ -486,13 +486,25 @@ content
 <!--/condition-->
 ```
 
+### Condition States
+
+Each condition name has one of three states:
+
+| State | Meaning |
+|-------|---------|
+| **Visible** | Content inside the block is included in output. |
+| **Hidden** | Content inside the block is removed from output. |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
+
+When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
+
 ### Condition Expressions
 
 | Operator | Symbol | Meaning | Precedence |
 |----------|--------|---------|------------|
-| NOT | `!` | Negate condition | Highest (1) |
-| AND | space | All must be visible | Medium (2) |
-| OR | `,` | Any can be visible | Lowest (3) |
+| NOT | `!` | Negate condition. If operand is Unset, block passes through. | Highest (1) |
+| AND | space | All must be visible. If any operand is Unset, block passes through. | Medium (2) |
+| OR | `,` | Any can be visible. If any operand is Unset, block passes through. | Lowest (3) |
 
 ### Expression Examples
 
@@ -547,6 +559,8 @@ This appears in web AND production.
 
 <!--/condition-->
 ```
+
+If the outer condition is Unset, the entire outer block (including nested condition blocks and their tags) passes through without evaluation.
 
 ### Common Errors
 

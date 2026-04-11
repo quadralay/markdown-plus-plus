@@ -251,7 +251,7 @@ When two or more headings in the assembled document produce the same auto-genera
 
 The resulting suffixed alias MUST be unique across all aliases -- both auto-generated and custom -- already assigned in the document. If a candidate suffix collides with an existing alias, the processor MUST continue incrementing the counter until a unique alias is produced.
 
-Document order is determined by the assembled document after Phase 1 processing (include expansion, condition evaluation, and variable substitution). For multi-file documents, this follows the depth-first recursive include expansion order defined in the [Processing Model](processing-model.md).
+Document order is determined by the assembled document after Phase 1 processing (all includes are expanded, defined conditions are evaluated (Unset condition blocks pass through as-is), and variables are substituted). For multi-file documents, this follows the depth-first recursive include expansion order defined in the [Processing Model](processing-model.md).
 
 This resolution is **silent** -- a conformant processor MUST NOT emit a diagnostic for auto-generated alias collisions. Unlike custom alias duplicates (which trigger [MDPP008](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-codes.md#mdpp008----duplicate-alias) as an error), auto-generated collisions are expected in documents that reuse heading text across sections.
 
