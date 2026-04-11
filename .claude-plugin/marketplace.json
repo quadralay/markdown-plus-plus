@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "markdown-plus-plus",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Claude Code skill for Markdown++ authoring: syntax reference, validation, alias generation, and best practices for the open documentation format",
   "icon": "brand/logo.svg",
   "owner": {

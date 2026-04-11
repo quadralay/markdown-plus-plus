@@ -1,7 +1,7 @@
 ---
 title: "fix: Resolve contradictory link style examples in specification"
 type: fix
-status: active
+status: completed
 date: 2026-04-10
 ---
 
