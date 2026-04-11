@@ -412,7 +412,7 @@ An inline style tag MUST appear immediately before the styled inline element on 
 ```markdown
 This is <!--style:Emphasis-->**bold text** in a paragraph.
 Use <!--style:Code-->`inline code` here.
-Click [<!--style:Link-->here](url) to continue.
+Click [<!--style:Link-->*here*](url) to continue.
 ```
 
 #### Nested List Styling
