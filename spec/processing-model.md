@@ -390,7 +390,7 @@ For each recognized Markdown++ comment tag, the processor extracts one or more c
 
 #### Combined Command Evaluation Order
 
-When a single comment contains multiple commands separated by semicolons (`;`), the processor MUST evaluate them in the following fixed order, regardless of the order in which they appear in the comment:
+When a single comment contains multiple commands separated by semicolons (`;`), the processor SHOULD evaluate them in the following order for readability and consistency, regardless of the order in which they appear in the comment. Processors MAY evaluate segments in any order.
 
 | Order | Command | Effect |
 |:-----:|---------|--------|
@@ -407,7 +407,7 @@ When a single comment contains multiple commands separated by semicolons (`;`), 
 |---------|-------|----------|
 ```
 
-The processor evaluates: style `DataTable` first, then `multiline`, then marker `Keywords="specs"`, then alias `comparison`. All four directives attach to the table.
+Following the recommended order, the processor evaluates: style `DataTable` first, then `multiline`, then marker `Keywords="specs"`, then alias `comparison`. All four directives attach to the table.
 
 #### Orphaned Tag Handling
 
@@ -533,14 +533,14 @@ A conformant Markdown++ processor MUST implement all of the following:
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
 10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
 11. **Encoding validation** -- UTF-8 encoding validation with BOM handling and MDPP017 emission, as specified in [Character Encoding](#character-encoding)
+12. **Combined commands** -- Semicolon-separated commands in a single comment tag. The evaluation order listed in [Combined Command Evaluation Order](#combined-command-evaluation-order) is RECOMMENDED for readability but not required; processors MAY evaluate segments in any order.
 
 ### Optional Features
 
 The following features are OPTIONAL. A conformant processor MAY implement them but is not required to:
 
-1. **Combined commands** -- Semicolon-separated commands in a single comment tag. A processor that supports combined commands MUST evaluate them in the order specified in [Combined Command Evaluation Order](#combined-command-evaluation-order).
-2. **Maximum include depth enforcement** -- A processor MAY impose a maximum include depth. If it does, it SHOULD use a default of 10 and MUST emit **MDPP011** when the limit is exceeded.
-3. **Version checking** -- A processor MAY implement the version check preamble described in [Format Versioning](versioning.md). If it does, it MUST emit **MDPP015** and **MDPP016** at their specified severities and follow the compatibility rules defined in that specification.
+1. **Maximum include depth enforcement** -- A processor MAY impose a maximum include depth. If it does, it SHOULD use a default of 10 and MUST emit **MDPP011** when the limit is exceeded.
+2. **Version checking** -- A processor MAY implement the version check preamble described in [Format Versioning](versioning.md). If it does, it MUST emit **MDPP015** and **MDPP016** at their specified severities and follow the compatibility rules defined in that specification.
 
 ### Conformance Statement
 

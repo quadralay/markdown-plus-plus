@@ -265,7 +265,7 @@ Authors requiring tabular content within a table cell MUST use alternative appro
 
 ### Combined Commands
 
-Combined commands within cells follow the same evaluation order as outside cells. The [Processing Model](processing-model.md) defines the fixed evaluation order: style (1), multiline (2), marker (3), alias (4). A combined command on a continuation row within a cell is valid and MUST be evaluated in this same order.
+Combined commands within cells follow the same evaluation order as outside cells. The [Processing Model](processing-model.md) defines the recommended evaluation order: style (1), multiline (2), marker (3), alias (4). A combined command on a continuation row within a cell is valid and SHOULD be evaluated in this same order for readability and consistency. Processors MAY evaluate segments in any order.
 
 **Example -- combined command in a cell:**
 
