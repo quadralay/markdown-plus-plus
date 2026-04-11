@@ -58,7 +58,7 @@ Created `spec/processing-model.md` (550 lines) — a normative two-phase process
 - Path resolution relative to containing file's directory
 - Configurable depth limits (default 10, MDPP011)
 - Per-file condition evaluation during include processing
-- Tri-state condition model (Visible/Hidden/Unset)
+- Condition state model (two assigned states: Visible/Hidden; Unset = absence of definition, not an assigned state)
 - Operator precedence: NOT > AND (space) > OR (comma)
 - Cross-file condition span detection (MDPP012)
 - Four edge cases with code examples
