@@ -21,7 +21,7 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 
 **Variable map** -- A key-value collection where each key is a variable name (matching the naming rule `[a-zA-Z_][a-zA-Z0-9_\-]*`) and each value is a string. The variable map is provided to the processor at build time. This specification does not prescribe how the map is populated -- environment variables, configuration files, CLI flags, and API parameters are all valid sources.
 
-**Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not present in the set is **Unset** (undefined). The condition set is provided to the processor at build time. This specification does not prescribe how the set is populated.
+**Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not defined in the condition set is **Unset** (undefined). The condition set is provided to the processor at build time. This specification does not prescribe how the set is populated.
 
 **Condition state** -- One of three values:
 
