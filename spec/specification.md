@@ -121,7 +121,7 @@ The following terms are used normatively throughout this specification.
 
 **Combined command** -- A single HTML comment containing multiple Markdown++ commands separated by semicolons. See [section 16](#16-combined-commands).
 
-**Condition set** -- A collection of condition names, each assigned one of three states: Visible, Hidden, or Unset. Provided to the processor at build time.
+**Condition set** -- A collection of condition names, each assigned a state of Visible or Hidden. A condition name not present in the set is Unset (undefined). Provided to the processor at build time.
 
 **Content island** -- A blockquote element styled with a Markdown++ custom style, creating a self-contained content block. See [section 15](#15-content-islands).
 
@@ -555,9 +555,9 @@ Each condition name has one of three states:
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | Content inside the block is included in output (document-default behavior). |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
 
-The Unset state ensures that documents render completely by default when no condition set is provided.
+When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
 #### Expression Operators
 
@@ -565,9 +565,9 @@ Condition expressions support three operators with explicit precedence:
 
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
-| NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden. |
-| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both are Visible or Unset. |
-| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either is Visible or Unset. |
+| NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
+| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both are Visible. If any operand is Unset, the block passes through. |
+| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either is Visible. If any operand is Unset, the block passes through. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!draft,web production` MUST be parsed as `(!draft) OR (web AND production)`.
 

@@ -21,7 +21,7 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 
 **Variable map** -- A key-value collection where each key is a variable name (matching the naming rule `[a-zA-Z_][a-zA-Z0-9_\-]*`) and each value is a string. The variable map is provided to the processor at build time. This specification does not prescribe how the map is populated -- environment variables, configuration files, CLI flags, and API parameters are all valid sources.
 
-**Condition set** -- A collection of condition names, each assigned one of three states: **Visible**, **Hidden**, or **Unset**. The condition set is provided to the processor at build time. This specification does not prescribe how the set is populated.
+**Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not present in the set is **Unset** (undefined). The condition set is provided to the processor at build time. This specification does not prescribe how the set is populated.
 
 **Condition state** -- One of three values:
 
@@ -29,7 +29,7 @@ The processing model formalizes the two-phase pipeline that the ePublisher Markd
 |-------|---------|
 | **Visible** | The condition is active. Content inside the condition block is included in output. |
 | **Hidden** | The condition is suppressed. Content inside the condition block is removed from output. |
-| **Unset** | The condition has no assigned state. Content inside the condition block is included in output (document-default behavior). |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
 
 **Attachment** -- The relationship between a Markdown++ comment tag and the content element it modifies. See the [Attachment Rule](attachment-rule.md) for the complete definition.
 
@@ -172,9 +172,9 @@ Each condition name in the condition set has one of three states:
 
 - **Visible**: The condition evaluates to true. Content inside the block is **included** in the output.
 - **Hidden**: The condition evaluates to false. Content inside the block is **removed** from the output.
-- **Unset**: The condition has no assigned state. Content inside the block is **included** in the output (document-default behavior).
+- **Unset**: The condition name is not defined in the condition set. The condition block **passes through** without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output.
 
-The Unset state ensures that documents render completely by default when no condition set is provided. Authors can write conditional content without requiring every build to define every condition name.
+When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
 ##### Condition Expression Operators
 
@@ -182,13 +182,13 @@ Condition expressions support three operators with the following precedence (hig
 
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
-| NOT | `!` | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden. |
-| AND | ` ` (space) | 2 | All operands must be true. `a b` is true when both `a` and `b` are Visible or Unset. |
-| OR | `,` | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible or Unset. |
+| NOT | `!` | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
+| AND | ` ` (space) | 2 | All operands must be true. `a b` is true when both `a` and `b` are Visible. If any operand is Unset, the block passes through. |
+| OR | `,` | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. If any operand is Unset, the block passes through. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!a b,c` MUST be parsed as `((!a) AND b) OR c`.
 
-NOT applies to a single condition name. It inverts the evaluation: `!name` is true when the condition is Hidden, and false when the condition is Visible or Unset.
+NOT applies to a single condition name. It inverts the evaluation: `!name` is true when the condition is Hidden, and false when the condition is Visible. If the condition is Unset, the block passes through without evaluation.
 
 ##### Nested Conditions
 
