@@ -1,6 +1,7 @@
 ---
 title: Processing model specification for Markdown++ extensions
 date: 2026-04-08
+last_refreshed: 2026-04-11
 category: documentation-gaps
 module: spec
 problem_type: documentation_gap
@@ -55,9 +56,9 @@ Created `spec/processing-model.md` (550 lines) — a normative two-phase process
 **Phase 1, Step 1 — Include Expansion:**
 - Depth-first recursive algorithm with cycle detection (MDPP013)
 - Path resolution relative to containing file's directory
-- Configurable depth limits (default 32, MDPP011)
+- Configurable depth limits (default 10, MDPP011)
 - Per-file condition evaluation during include processing
-- Tri-state condition model (Visible/Hidden/Use document value)
+- Tri-state condition model (Visible/Hidden/Unset)
 - Operator precedence: NOT > AND (space) > OR (comma)
 - Cross-file condition span detection (MDPP012)
 - Four edge cases with code examples
