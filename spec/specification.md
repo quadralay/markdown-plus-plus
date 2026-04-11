@@ -121,7 +121,7 @@ The following terms are used normatively throughout this specification.
 
 **Combined command** -- A single HTML comment containing multiple Markdown++ commands separated by semicolons. See [section 16](#16-combined-commands).
 
-**Condition set** -- A collection of condition names, each assigned a state of Visible or Hidden. A condition name not defined in the condition set is Unset (undefined). Provided to the processor at build time.
+**Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not defined in the condition set is **Unset** (undefined). Provided to the processor at build time.
 
 **Content island** -- A blockquote element styled with a Markdown++ custom style, creating a self-contained content block. See [section 15](#15-content-islands).
 
