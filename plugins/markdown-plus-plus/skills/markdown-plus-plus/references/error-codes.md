@@ -21,6 +21,14 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP007 | Invalid condition syntax | Error | Illegal characters or empty expression |
 | MDPP008 | Duplicate alias | Error | Same alias appears twice in one file |
 | MDPP009 | Orphaned comment tag | Warning | Tag not followed by content element |
+| MDPP010 | Undefined variable reference | Warning | `$name;` token references a name not in the variable map |
+| MDPP011 | Maximum include depth exceeded | Error | Include nesting exceeds the processor's configured maximum depth |
+| MDPP012 | Cross-file condition span | Error | Condition block opens in one file and closes in another |
+| MDPP013 | *(Reserved)* | — | Formerly "Circular include detected during processing" — consolidated into MDPP005 |
+| MDPP014 | Duplicate link reference slug across files | Warning | Two or more files define the same link reference slug |
+| MDPP015 | Newer minor version in document | Warning | Document's `mdpp-version` minor version exceeds processor's supported minor version |
+| MDPP016 | Different major version in document | Warning | Document's `mdpp-version` major version differs from processor's supported major version |
+| MDPP017 | Invalid UTF-8 encoding | Error | File contains an invalid UTF-8 byte sequence |
 
 ## General Rules
 
@@ -326,3 +334,177 @@ This paragraph is not styled because of the blank line.
 ```
 
 **Suggested fix:** Remove the blank line between the tag and the element it applies to. If multiple tags apply to the same element, combine them on one line using semicolons: `<!--style:Note; #my-note-->`.
+
+---
+
+## MDPP010 -- Undefined Variable Reference
+
+**Severity:** Warning
+
+**Description:** A `$name;` token references a variable name that is not present in the variable map at the point of substitution.
+
+**Detection logic:** During Phase 1, Step 2 (variable substitution), each `$name;` token is looked up in the variable map. If the name is not found, emit MDPP010 and leave the token unreplaced (or substitute an empty string, per the processor's fallback behavior).
+
+**Trigger examples:**
+
+```markdown
+<!-- WARNING: variable not defined anywhere in the document -->
+Product name: $productName;
+
+<!-- WARNING: referenced before the set directive -->
+Version: $version;
+<!--set:version=2.0-->
+```
+
+**Suggested fix:** Define the variable using `<!--set:name=value-->` before the first use. Ensure the variable name matches exactly, including case.
+
+---
+
+## MDPP011 -- Maximum Include Depth Exceeded
+
+**Severity:** Error
+
+**Description:** An include chain has exceeded the processor's configured maximum nesting depth. This prevents runaway recursion in deeply nested include trees.
+
+**Detection logic:** During Phase 1, Step 1 (include expansion), the processor tracks the current include nesting depth. Before processing each `<!--include:path-->` directive, the depth is compared against the processor's maximum. If processing the include would exceed the maximum, emit MDPP011 and skip the include.
+
+**Trigger examples:**
+
+```markdown
+<!-- In root.md — ERROR if chain is already at maximum depth -->
+<!--include:level1.md-->
+
+<!-- level1.md includes level2.md, level2.md includes level3.md, and so on -->
+<!-- until the configured maximum depth is exceeded -->
+```
+
+**Suggested fix:** Flatten the include structure by reducing nesting levels. If deeply nested includes are intentional, check whether the processor's maximum depth can be increased via configuration.
+
+---
+
+## MDPP012 -- Cross-File Condition Span
+
+**Severity:** Error
+
+**Description:** A condition block opens in one file and closes in another. Condition blocks must be fully contained within a single source file.
+
+**Detection logic:** During Phase 1, Step 1 (include expansion), condition block tracking is scoped per file. If a file ends with an open condition block, emit MDPP012 for the unclosed block. If a `<!--/condition-->` is encountered in a file with no matching open in that file, emit MDPP012 for the stray close.
+
+**Trigger examples:**
+
+```markdown
+<!-- file-a.md — ERROR: condition opened but not closed in this file -->
+<!--condition:web-->
+This content is conditional.
+<!--include:file-b.md-->
+
+<!-- file-b.md — the /condition here does not match the open in file-a.md -->
+<!--/condition-->
+```
+
+**Suggested fix:** Ensure every `<!--condition:EXPR-->` and `<!--/condition-->` pair is contained within the same file. Refactor include boundaries so that conditional content is not split across files.
+
+---
+
+## MDPP013 -- Reserved
+
+**Severity:** (Reserved)
+
+**Description:** Reserved. This code was formerly designated "Circular include detected during processing" (a runtime variant of MDPP005) but was consolidated into MDPP005, which covers all circular include detection. MDPP013 is retained as a placeholder to preserve code numbering stability.
+
+---
+
+## MDPP014 -- Duplicate Link Reference Slug Across Files
+
+**Severity:** Warning
+
+**Description:** Two or more link reference definitions with the same slug originate from different source files in the assembled document. The first definition wins; subsequent definitions from other files are ignored.
+
+**Detection logic:** During Phase 2 parsing of the assembled document, link reference definitions are tracked with their originating source file. When a slug is defined in more than one source file, emit MDPP014. Definitions within the same file are governed by MDPP008 (duplicate alias) or standard CommonMark first-definition-wins rules, not this code.
+
+**Trigger examples:**
+
+```markdown
+<!-- file-a.md -->
+[overview]: #section-1 "Overview"
+
+<!-- file-b.md (included in the same assembly) -->
+[overview]: #section-2 "Overview"
+<!-- WARNING: duplicate slug "overview" from a different source file -->
+```
+
+**Suggested fix:** Rename one of the conflicting link reference definitions to use a unique slug. See [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) for the full resolution rules.
+
+---
+
+## MDPP015 -- Newer Minor Version in Document
+
+**Severity:** Warning
+
+**Description:** The `mdpp-version` minor version declared in the document's frontmatter exceeds the processor's supported minor version within the same major series. The document may use features the processor does not recognize.
+
+**Detection logic:** During the preamble step (before Phase 1), the processor extracts the `mdpp-version` field from the root document's YAML frontmatter and parses it as MAJOR.MINOR. If the document's major version equals the processor's major version but the document's minor version exceeds the processor's minor version, emit MDPP015. Processing continues on a best-effort basis.
+
+**Trigger examples:**
+
+```yaml
+# Document declares version 1.2; processor supports 1.0
+---
+mdpp-version: 1.2
+---
+# WARNING MDPP015: Document targets newer minor version than processor supports
+```
+
+**Suggested fix:** Use a processor that supports the document's declared version. Alternatively, update the `mdpp-version` field to match the processor's supported version if the document does not use features from the newer minor release. See [Format Versioning](../../../../../spec/versioning.md) for compatibility rules.
+
+---
+
+## MDPP016 -- Different Major Version in Document
+
+**Severity:** Warning
+
+**Description:** The `mdpp-version` major version declared in the document's frontmatter differs from the processor's supported major version. Major version differences may indicate changed or removed syntax.
+
+**Detection logic:** During the preamble step (before Phase 1), the processor compares the document's declared major version against its supported major version. If they differ, emit MDPP016. A processor MAY refuse to process the document after emitting this diagnostic; if processing continues, it SHOULD do so on a best-effort basis.
+
+**Trigger examples:**
+
+```yaml
+# Document declares version 2.0; processor supports 1.2
+---
+mdpp-version: 2.0
+---
+# WARNING MDPP016: Document targets different major version than processor supports
+
+# Document declares version 1.0; processor supports 2.0
+---
+mdpp-version: 1.0
+---
+# WARNING MDPP016: Document targets different major version than processor supports
+```
+
+**Suggested fix:** Use a processor that supports the document's declared major version, or migrate the document to the processor's supported major version. Cross-major mismatches indicate the document may use syntax whose meaning has changed or been removed. See [Format Versioning](../../../../../spec/versioning.md) for compatibility rules.
+
+---
+
+## MDPP017 -- Invalid UTF-8 Encoding
+
+**Severity:** Error
+
+**Description:** The root document or an included file contains an invalid UTF-8 byte sequence when read during processing. All Markdown++ source files must be valid UTF-8.
+
+**Detection logic:** When reading a file during Phase 1, Step 1, the processor validates the file's byte content as UTF-8. If an invalid byte sequence is encountered, emit MDPP017. A processor MAY implement an implementation-defined recovery strategy (such as replacing invalid bytes with the Unicode replacement character U+FFFD), but MUST still emit the diagnostic regardless of whether processing continues.
+
+**Trigger examples:**
+
+```bash
+# File saved with Latin-1 or Windows-1252 encoding containing non-ASCII characters
+python validate-mdpp.py latin1-encoded.md
+# MDPP017: Invalid UTF-8 encoding in latin1-encoded.md at byte offset 142
+
+# Binary file accidentally referenced by an include directive
+python validate-mdpp.py document.md
+# MDPP017: Invalid UTF-8 encoding in images/logo.png at byte offset 0
+```
+
+**Suggested fix:** Save the file with UTF-8 encoding. In most editors: File > Save As > Encoding > UTF-8 (without BOM). Verify the encoding with a tool such as `file -i filename` (Unix) or a hex editor. Ensure include directives reference only text files, not binary assets.
