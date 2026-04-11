@@ -486,19 +486,31 @@ content
 <!--/condition-->
 ```
 
+### Condition States
+
+Each condition name has one of three states:
+
+| State | Meaning |
+|-------|---------|
+| **Visible** | Content inside the block is included in output. |
+| **Hidden** | Content inside the block is removed from output. |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is. |
+
+When a condition expression references an undefined (Unset) name, the processor does not evaluate the expression. The entire condition block passes through as-is, allowing the implementation to resolve undefined conditions downstream.
+
 ### Condition Expressions
 
 | Operator | Symbol | Meaning | Precedence |
 |----------|--------|---------|------------|
-| NOT | `!` | Negate condition | Highest (1) |
-| AND | space | All must be visible | Medium (2) |
-| OR | `,` | Any can be visible | Lowest (3) |
+| NOT | `!` | Negate condition. If operand is Unset, block passes through. | Highest (1) |
+| AND | space | All must be visible. If any operand is Unset, block passes through. | Medium (2) |
+| OR | `,` | Any can be visible. If any operand is Unset, block passes through. | Lowest (3) |
 
 ### Expression Examples
 
 | Expression | Interpretation |
 |------------|----------------|
-| `web` | Show when "web" is visible |
+| `web` | Show when "web" is visible. If "web" is Unset, block passes through. |
 | `!web` | Show when "web" is hidden |
 | `web print` | Show when "web" AND "print" are visible |
 | `web,print` | Show when "web" OR "print" is visible |

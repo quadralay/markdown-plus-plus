@@ -78,7 +78,7 @@ Processing a Markdown++ document is a two-phase operation with an optional pream
 
 **Phase 2: Markdown Parsing with Extension Extraction**
 
-3. **Parsing and Rendering** -- Parse the fully resolved text as CommonMark 0.30, extracting style, alias, marker, and multiline commands from recognized HTML comments during parsing.
+3. **Parsing and Rendering** -- Parse the Phase 1 output text as CommonMark 0.30, extracting style, alias, marker, and multiline commands from recognized HTML comments during parsing.
 
 The output of the pipeline is a CommonMark document tree annotated with Markdown++ metadata. Given the same input document, variable map, and condition set, a conformant processor MUST produce the same output tree.
 
@@ -176,6 +176,30 @@ Each condition name in the condition set has one of three states:
 
 When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
+For example, given the condition set `{web: Visible}` and input:
+
+```markdown
+<!--condition:web-->
+Web content here.
+<!--/condition-->
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The output is:
+
+```markdown
+Web content here.
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
+
 ##### Condition Expression Operators
 
 Condition expressions support three operators with the following precedence (highest to lowest):
@@ -205,7 +229,7 @@ Advanced web content here.
 <!--/condition-->
 ```
 
-If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed.
+If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed. If `web` is Unset, the entire outer block passes through without evaluation -- including the nested `advanced` block and its condition tags. Inner conditions within an Unset outer block are not evaluated.
 
 #### Edge Cases
 
@@ -290,7 +314,7 @@ This is a **fatal error**. The condition opens in `parent.md` and closes in `con
 
 ### Phase 1, Step 2: Variable Substitution
 
-After all includes are expanded and per-file conditions are evaluated, the processor performs variable substitution on the fully resolved text. This step replaces `$name;` tokens with values from the variable map.
+After all includes are expanded and per-file conditions are evaluated (with Unset condition blocks passed through as-is), the processor performs variable substitution on the resulting text. This step replaces `$name;` tokens with values from the variable map.
 
 #### Input Model
 
@@ -302,7 +326,7 @@ Variable names MUST match the naming rule `[a-zA-Z_][a-zA-Z0-9_\-]*`. Variable r
 
 Variable substitution MUST run after include expansion and condition evaluation are complete. This ordering has four critical implications that processors MUST observe:
 
-1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned.
+1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned. However, variables inside Unset (pass-through) condition blocks ARE resolved, because the block's content is preserved during condition evaluation and is present when variable substitution scans the text.
 
 2. **Variable values cannot contain condition syntax.** Because conditions are already resolved before variable substitution, a variable value containing `<!--condition:name-->` will not be evaluated as a condition directive. It will pass through as literal text into Phase 2.
 
@@ -358,11 +382,11 @@ This behavior enables incremental authoring workflows where not all variables ar
 
 ### Phase 2: Markdown Parsing with Extension Extraction
 
-Phase 2 receives the fully resolved text from Phase 1 -- all includes expanded, conditions evaluated, variables substituted -- and parses it as Markdown with extension-aware grammars. For the specific behavior of extensions within multiline table cells, see [Extensions in Multiline Table Cells](multiline-cell-extensions.md).
+Phase 2 receives the text from Phase 1 -- all includes expanded, defined conditions evaluated (Unset condition blocks pass through as-is), variables substituted -- and parses it as Markdown with extension-aware grammars. For the specific behavior of extensions within multiline table cells, see [Extensions in Multiline Table Cells](multiline-cell-extensions.md).
 
 #### Input
 
-The input to Phase 2 is a single string of text. This text contains no include directives (all expanded), no condition blocks (all evaluated), and no unresolved variable tokens (all substituted or left as literal text with warnings). The text MAY contain:
+The input to Phase 2 is a single string of text. This text contains no include directives (all expanded), no condition blocks referencing defined condition names (all evaluated -- blocks referencing undefined names pass through as-is), and no unresolved variable tokens (all substituted or left as literal text with warnings). The text MAY contain:
 
 - Standard CommonMark content
 - Recognized Markdown++ comment tags (style, alias, marker, multiline, combined commands)

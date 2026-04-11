@@ -113,7 +113,7 @@ Given the same input document, variable map, and condition set, a fully conforma
 
 The following terms are used normatively throughout this specification.
 
-**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, conditions are evaluated, and variables are substituted. This is the input to Phase 2.
+**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, defined conditions are evaluated (Unset condition blocks pass through as-is), and variables are substituted. This is the input to Phase 2.
 
 **Attachment** -- The positional relationship between a Markdown++ comment tag and the content element it modifies. A tag is attached when it appears on the line immediately above (block-level) or immediately before (inline) its target element with no intervening blank line or space. See [section 6](#6-the-attachment-rule).
 
@@ -271,7 +271,7 @@ The phases are strictly sequential -- Phase 2 MUST NOT begin until Phase 1 is co
 
 The sequential ordering of the pipeline has critical implications:
 
-1. Conditions are evaluated before variable substitution. Variables inside Hidden condition blocks are never resolved.
+1. Conditions are evaluated before variable substitution. Variables inside Hidden condition blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution.
 2. Includes are expanded before variable substitution. Variable values cannot contain include syntax.
 3. Variable values cannot contain condition syntax (conditions are already resolved).
 4. Variable values CAN contain Markdown syntax (variable substitution runs before Markdown parsing).
@@ -559,6 +559,30 @@ Each condition name has one of three states:
 
 When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
+For example, given the condition set `{web: Visible}` and input:
+
+```markdown
+<!--condition:web-->
+Web content here.
+<!--/condition-->
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The output is:
+
+```markdown
+Web content here.
+
+<!--condition:mobile-->
+Mobile content here.
+<!--/condition-->
+```
+
+The `web` block is evaluated (Visible, so its content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set.
+
 #### Expression Operators
 
 Condition expressions support three operators with explicit precedence:
@@ -588,7 +612,7 @@ Advanced web content.
 <!-- /condition -->
 ```
 
-If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed.
+If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed. If `web` is Unset, the entire outer block passes through without evaluation -- including the nested `advanced` block and its condition tags. Inner conditions within an Unset outer block are not evaluated.
 
 #### Block and Inline Usage
 
@@ -600,13 +624,13 @@ Contact us at <!--condition:web-->[email](mailto:x@x.com)<!--/condition--><!--co
 
 ### 11.4 Interaction with Other Extensions
 
-Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it.
+Conditions have the broadest interaction surface of any Markdown++ extension. Content within a Hidden condition block is removed before any other extension processes it. Content within an Unset (pass-through) condition block is preserved along with the condition tags -- embedded extension directives within the block survive into Phase 2 as regular HTML comments.
 
-**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
+**Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
 
 **Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed.
 
-**Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules.
+**Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules. Tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
 **Conditions and Multiline Tables:** Conditions MAY appear within multiline table cells. The condition content is evaluated during Phase 1 before table parsing in Phase 2.
 

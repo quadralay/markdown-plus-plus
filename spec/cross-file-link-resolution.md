@@ -21,7 +21,7 @@ The [syntax reference](../plugins/markdown-plus-plus/skills/markdown-plus-plus/r
 
 **Link reference** -- A reference to a link reference definition, using the slug as a key. CommonMark defines three forms: full (`[text][slug]`), collapsed (`[slug][]`), and shortcut (`[slug]`).
 
-**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, conditions are evaluated, and variables are substituted. This is the input to Phase 2.
+**Assembled document** -- The single text produced by Phase 1 of the processing pipeline after all includes are expanded, defined conditions are evaluated (Unset condition blocks pass through as-is), and variables are substituted. This is the input to Phase 2.
 
 **Source file** -- The original file in which a link reference definition was authored, before include expansion assembled it into the parent document.
 
@@ -117,7 +117,7 @@ MDPP014 applies only to cross-file duplicates. Duplicate slugs within a single f
 
 ### Conditions and Link Reference Definitions
 
-Condition evaluation occurs during Phase 1, Step 1, before link reference definitions are collected in Phase 2. A link reference definition inside a condition block that evaluates to Hidden is removed from the assembled text and is **not** part of the definition set.
+Condition evaluation occurs during Phase 1, Step 1, before link reference definitions are collected in Phase 2. A link reference definition inside a condition block that evaluates to Hidden is removed from the assembled text and is **not** part of the definition set. A link reference definition inside an Unset (pass-through) condition block survives into the assembled document along with the condition tags and is collected during Phase 2.
 
 This means conditions can control which link reference definitions are active in the assembled document. Authors can use conditions to provide platform-specific or audience-specific link targets:
 
