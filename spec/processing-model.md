@@ -407,7 +407,7 @@ When a single comment contains multiple commands separated by semicolons (`;`), 
 |---------|-------|----------|
 ```
 
-The processor evaluates: style `DataTable` first, then `multiline`, then marker `Keywords="specs"`, then alias `comparison`. All four directives attach to the table.
+Following the recommended order, the processor evaluates: style `DataTable` first, then `multiline`, then marker `Keywords="specs"`, then alias `comparison`. All four directives attach to the table.
 
 #### Orphaned Tag Handling
 

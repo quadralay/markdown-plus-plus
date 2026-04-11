@@ -99,7 +99,7 @@ A **fully conformant processor** is a tool that evaluates all Markdown++ extensi
 6. Comment disambiguation between recognized directives and regular HTML comments.
 7. Emission of all MDPP diagnostic codes defined in this specification at their specified severity levels.
 
-A fully conformant processor that also implements one or more optional features (such as combined commands) is a **fully conformant processor with extensions** and SHOULD document which optional features are supported.
+A fully conformant processor that also implements one or more optional features (such as version checking) is a **fully conformant processor with extensions** and SHOULD document which optional features are supported.
 
 > **Note:** The [Processing Model](processing-model.md#conformance) uses the equivalent terms "conformant Markdown++ processor" and "conformant Markdown++ processor with extensions" for the same conformance levels defined here.
 
@@ -429,7 +429,7 @@ When styling a nested list item, the tag MUST be indented to match the nesting l
 
 ### 9.4 Interaction with Other Extensions
 
-**Styles and Combined Commands:** A style MAY be combined with markers, aliases, and the multiline indicator using combined command syntax. In a combined command, the style is evaluated first. See [section 16](#16-combined-commands).
+**Styles and Combined Commands:** A style MAY be combined with markers, aliases, and the multiline indicator using combined command syntax. In the recommended evaluation order, the style is evaluated first. See [section 16](#16-combined-commands).
 
 **Styles and Multiline Tables:** A style MAY apply to a multiline table by placing it above the `<!-- multiline -->` tag via a combined command (`<!-- style:DataTable ; multiline -->`), or to content within table cells using inline or block placement within the cell.
 
@@ -495,7 +495,7 @@ An alias supplements the auto-generated heading ID -- both the alias and the hea
 
 **Aliases and Link References:** Aliases create anchor IDs that link reference definitions can target. This is the semantic cross-reference pattern: a combined command assigns an alias to a heading, and a link reference definition bridges a human-readable slug to that alias ID. In multi-file assemblies, cross-file link reference resolution (as specified in [Cross-File Link Reference Resolution](cross-file-link-resolution.md)) enables references from any file to resolve to alias-anchored headings in any other file.
 
-**Aliases and Combined Commands:** An alias MAY be combined with styles and markers using combined command syntax. In a combined command, the alias is evaluated last. See [section 16](#16-combined-commands).
+**Aliases and Combined Commands:** An alias MAY be combined with styles and markers using combined command syntax. In the recommended evaluation order, the alias is evaluated last. See [section 16](#16-combined-commands).
 
 **Aliases and Conditions:** Alias tags within a Hidden condition block are removed along with the rest of the block's content.
 
@@ -784,7 +784,7 @@ The `IndexMarker` key creates entries in generated indexes. Index entries use co
 
 ### 13.4 Interaction with Other Extensions
 
-**Markers and Combined Commands:** Markers MAY be combined with styles and aliases using combined command syntax. In a combined command, markers are evaluated third (after style and multiline, before alias). See [section 16](#16-combined-commands).
+**Markers and Combined Commands:** Markers MAY be combined with styles and aliases using combined command syntax. In the recommended evaluation order, markers are evaluated third (after style and multiline, before alias). See [section 16](#16-combined-commands).
 
 **Markers and Conditions:** Marker tags within a Hidden condition block are removed along with the rest of the block's content.
 
@@ -879,7 +879,7 @@ Standard Markdown alignment syntax (`:---`, `:---:`, `---:`) works in multiline 
 
 **Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. The condition content is evaluated during Phase 1.
 
-**Multiline Tables and Combined Commands:** The `multiline` indicator is second in combined command evaluation order (after style, before markers and alias). See [section 16](#16-combined-commands).
+**Multiline Tables and Combined Commands:** In the recommended evaluation order, the `multiline` indicator is second (after style, before markers and alias). See [section 16](#16-combined-commands).
 
 ### 14.5 Attachment Requirements
 
@@ -1010,7 +1010,7 @@ Conditions (`condition:`/`/condition`) and includes (`include:`) MUST NOT appear
 
 ### 16.3 Evaluation Order
 
-When a combined command contains multiple recognized commands, a processor MUST evaluate them in the following fixed order, regardless of the order in which they appear in the comment:
+When a combined command contains multiple recognized commands, a processor SHOULD evaluate them in the following order for readability and consistency, regardless of the order in which they appear in the comment. Processors MAY evaluate segments in any order.
 
 | Order | Command | Effect |
 |:-----:|---------|--------|
