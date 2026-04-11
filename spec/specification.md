@@ -531,7 +531,7 @@ See [Introduction](#introduction) for details.
 
 ### 11.1 Purpose
 
-Conditions control content visibility. A condition block wraps content that is included or excluded based on the condition set provided at build time. Conditions enable single-source authoring for multiple output formats, audiences, or platforms.
+Conditions control content visibility. A condition block wraps content that is included, excluded, or passed through based on the condition set provided at build time. Conditions enable single-source authoring for multiple output formats, audiences, or platforms.
 
 ### 11.2 Syntax
 

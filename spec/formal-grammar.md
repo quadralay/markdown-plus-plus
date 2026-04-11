@@ -191,7 +191,7 @@ alias_cmd          ::= "#" alias_name
 
 #### Condition Open Command
 
-Opens a conditional content block. Content between the opening and closing condition tags is included or excluded based on the condition expression.
+Opens a conditional content block. Content between the opening and closing condition tags is included, excluded, or passed through based on the condition expression and the condition set.
 
 ```ebnf
 condition_open_cmd ::= "condition:" condition_expr
