@@ -142,7 +142,7 @@ A processor recognizes an HTML comment as a Markdown++ directive only when its c
 | `include:path` | File include | `<!-- include:chapter.md -->` |
 | `multiline` | Multiline table | `<!-- multiline -->` |
 
-Any comment containing at least one of these patterns is recognized as a directive. Multiple commands can be joined by semicolons, and unrecognized segments are injected as **PassThrough markers** attached to the target element (see [Combined Commands](#combined-commands)).
+Any comment containing at least one of these patterns is recognized as a directive. Multiple commands can be joined by semicolons; unrecognized segments MUST NOT affect content processing and their disposition is implementation-defined (see [Combined Commands](#combined-commands)).
 
 ### Regular HTML Comments
 
@@ -982,16 +982,16 @@ Spaces around semicolons are optional but recommended for readability:
 
 ### Unrecognized Segments in Combined Commands
 
-When a combined command contains a mix of recognized and unrecognized segments, a processor MUST interpret the recognized segments normally and inject the unrecognized segments as **PassThrough markers** attached to the target element. PassThrough markers flow through the processing pipeline; their rendering is implementation-defined.
+When a combined command contains a mix of recognized and unrecognized segments, a processor MUST interpret the recognized segments normally. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. What a processor does with them is implementation-defined — it MAY pass them through as HTML comments (invisible to readers, visible to QA tools), inject them as markers, or discard them.
 
 ```markdown
 <!-- style:CustomHeading ; #alias-here ; TODO: add Keywords/Description markers -->
 # My Heading Text
 ```
 
-The segments `style:CustomHeading` and `#alias-here` match known command patterns and are applied to the heading. The segment `TODO: add Keywords/Description markers` does not match any command pattern and is injected as a PassThrough marker on the heading.
+The segments `style:CustomHeading` and `#alias-here` match known command patterns and are applied to the heading. The segment `TODO: add Keywords/Description markers` does not match any command pattern and MUST NOT affect content processing.
 
-**Why this is useful:** Unrecognized segments let authors embed metadata (status notes, review flags, tracking info) directly alongside the commands they relate to. That metadata flows through the pipeline as PassThrough markers, where downstream tools can act on it.
+**Why this is useful:** Authors can embed metadata (status notes, review flags, tracking info) directly alongside the commands they relate to. When an implementation passes them through as HTML comments, the notes are invisible to readers but visible to QA tools.
 
 ```markdown
 <!-- style:NoteBox ; marker:Keywords="setup" ; #getting-started ; Reviewed 2026-03 -->
@@ -1001,7 +1001,7 @@ The segments `style:CustomHeading` and `#alias-here` match known command pattern
 **Avoid stacking separate HTML comments.** Placing multiple HTML comments on consecutive lines above an element can cause scanning errors and reduces readability. Combining recognized commands with unrecognized metadata in a single directive is the preferred pattern:
 
 ```markdown
-<!-- Good: single combined command with metadata segment -->
+<!-- Good: single combined command with unrecognized segment -->
 <!-- style:Note ; marker:Priority="high" ; needs review before release -->
 > Important information here.
 

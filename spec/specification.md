@@ -211,7 +211,7 @@ Multiple commands MAY be joined in a single comment using semicolons as separato
 <!-- command1 ; command2 ; command3 -->
 ```
 
-Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. Unrecognized segments are collected and injected as **PassThrough markers** attached to the target element. This allows authors to embed metadata (status notes, review flags, tracking info) that flows through the processing pipeline. The rendering of PassThrough marker content from unrecognized segments is implementation-defined. See [section 16](#16-combined-commands) for the complete definition.
+Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives. See [section 16](#16-combined-commands) for the complete definition.
 
 ### 5.4 Whitespace
 
@@ -1032,14 +1032,14 @@ When a combined command contains multiple recognized commands, a processor SHOUL
 
 ### 16.4 Unrecognized Segments
 
-Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A processor MUST interpret recognized segments normally and MUST collect unrecognized segments for injection as **PassThrough markers** attached to the target element. This allows authors to embed metadata (status notes, review flags, tracking info) that flows through the processing pipeline. The rendering of PassThrough marker content from unrecognized segments is implementation-defined.
+Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A processor MUST interpret recognized segments normally. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives.
 
 ```markdown
 <!-- style:CustomHeading ; #alias-here ; TODO: add Keywords markers -->
 # My Heading Text
 ```
 
-The segments `style:CustomHeading` and `#alias-here` are recognized and applied. The segment `TODO: add Keywords markers` is unrecognized and injected as a PassThrough marker.
+The segments `style:CustomHeading` and `#alias-here` are recognized and applied. The segment `TODO: add Keywords markers` is unrecognized and MUST NOT affect content processing. What the processor does with it (pass through as an HTML comment, inject as a marker, discard) is implementation-defined.
 
 ### 16.5 Conformance Note
 
