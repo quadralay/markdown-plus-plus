@@ -78,7 +78,7 @@ python validate-mdpp.py /root/restricted.md
 
 **Description:** A condition block is opened without a matching close, or a closing tag appears without a preceding open. Condition blocks must form properly matched pairs and MUST NOT be nested.
 
-**Detection logic:** Stack-based tracking of `<!--condition:EXPR-->` / `<!--/condition-->` pairs. On a closing tag, pop the stack; if the stack is empty, emit "closing without opening." After processing all lines, any remaining entries on the stack emit "unclosed condition block."
+**Detection logic:** Stack-based tracking of `<!--condition:EXPR-->` / `<!--/condition-->` pairs. On an opening tag, push to the stack; if stack depth exceeds 1, emit "nested condition block." On a closing tag, pop the stack; if the stack is empty, emit "closing without opening." After processing all lines, any remaining entries on the stack emit "unclosed condition block."
 
 **Trigger examples:**
 
@@ -90,11 +90,20 @@ python validate-mdpp.py /root/restricted.md
 <!--condition:print-->
 This content is conditional.
 <!-- missing <!--/condition--> -->
+
+<!-- ERROR: nested condition block -->
+<!--condition:web-->
+Outer content.
+<!--condition:advanced-->
+Nested content — not permitted.
+<!--/condition-->
+<!--/condition-->
 ```
 
 **Suggested fix:**
 - For a stray closing tag: remove it, or add a matching `<!--condition:name-->` above
 - For an unclosed block: add `<!--/condition-->` to close the block
+- For a nested block: replace with a logical expression, e.g. `<!--condition:web advanced-->` instead of nesting
 
 ---
 

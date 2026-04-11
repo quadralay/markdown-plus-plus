@@ -260,40 +260,59 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     suggestion="Style names must start with a letter or underscore, followed by letters, digits, hyphens, underscores, or spaces (no leading/trailing spaces)"
                 ))
 
-        # Check condition opens
-        for match in PATTERNS['condition_open'].finditer(line):
-            expr = match.group(1).strip()
-            is_valid, error_msg = validate_condition_expression(expr)
-            if not is_valid:
-                issues.append(ValidationIssue(
-                    type=Severity.ERROR.value,
-                    code="MDPP007",
-                    message=f"Invalid condition syntax: {error_msg}",
-                    file=filepath,
-                    line=line_num,
-                    context=match.group(0),
-                    suggestion="Condition names must be alphanumeric with hyphens/underscores"
-                ))
-            condition_stack.append((line_num, expr))
-            if verbose:
-                print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Condition opened: {expr}")
+        # Process condition opens and closes in document order (by position on the line)
+        # so that adjacent inline conditions like <!--condition:a-->...<!--/condition--><!--condition:b-->
+        # are not falsely flagged as nested.
+        condition_events = (
+            [(m.start(), 'open', m) for m in PATTERNS['condition_open'].finditer(line)] +
+            [(m.start(), 'close', m) for m in PATTERNS['condition_close'].finditer(line)]
+        )
+        condition_events.sort(key=lambda e: e[0])
 
-        # Check condition closes
-        for match in PATTERNS['condition_close'].finditer(line):
-            if condition_stack:
-                opened_line, opened_expr = condition_stack.pop()
+        for _pos, event_type, match in condition_events:
+            if event_type == 'open':
+                expr = match.group(1).strip()
+                is_valid, error_msg = validate_condition_expression(expr)
+                if not is_valid:
+                    issues.append(ValidationIssue(
+                        type=Severity.ERROR.value,
+                        code="MDPP007",
+                        message=f"Invalid condition syntax: {error_msg}",
+                        file=filepath,
+                        line=line_num,
+                        context=match.group(0),
+                        suggestion="Condition names must be alphanumeric with hyphens/underscores"
+                    ))
+                condition_stack.append((line_num, expr))
+                if len(condition_stack) > 1:
+                    outer_line, outer_expr = condition_stack[-2]
+                    issues.append(ValidationIssue(
+                        type=Severity.ERROR.value,
+                        code="MDPP001",
+                        message=f"Nested condition block not permitted (outer block opened at line {outer_line} with expression '{outer_expr}')",
+                        file=filepath,
+                        line=line_num,
+                        context=match.group(0),
+                        suggestion="Condition blocks MUST NOT be nested. Use a logical expression instead, e.g. <!--condition:outer inner--> requires both"
+                    ))
                 if verbose:
-                    print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Condition closed (opened at line {opened_line})")
-            else:
-                issues.append(ValidationIssue(
-                    type=Severity.ERROR.value,
-                    code="MDPP001",
-                    message="Closing condition tag without matching opening tag",
-                    file=filepath,
-                    line=line_num,
-                    context=match.group(0),
-                    suggestion="Remove this tag or add a matching <!--condition:name--> above"
-                ))
+                    print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Condition opened: {expr}")
+
+            else:  # close
+                if condition_stack:
+                    opened_line, opened_expr = condition_stack.pop()
+                    if verbose:
+                        print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Condition closed (opened at line {opened_line})")
+                else:
+                    issues.append(ValidationIssue(
+                        type=Severity.ERROR.value,
+                        code="MDPP001",
+                        message="Closing condition tag without matching opening tag",
+                        file=filepath,
+                        line=line_num,
+                        context=match.group(0),
+                        suggestion="Remove this tag or add a matching <!--condition:name--> above"
+                    ))
 
         # Check markers JSON
         for match in PATTERNS['markers_json'].finditer(line):

@@ -216,7 +216,7 @@ NOT applies to a single condition name. It inverts the evaluation: `!name` is tr
 
 ##### Nesting
 
-Condition blocks MUST NOT be nested. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Condition Expression Operators](#condition-expression-operators) above). For example, `<!--condition:web advanced-->` requires both `web` and `advanced` to be true.
+Condition blocks MUST NOT be nested or overlap. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Condition Expression Operators](#condition-expression-operators) above). For example, `<!--condition:web advanced-->` requires both `web` and `advanced` to be true.
 
 #### Edge Cases
 

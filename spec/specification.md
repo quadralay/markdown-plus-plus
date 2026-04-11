@@ -599,7 +599,7 @@ Condition names MUST match the standard identifier pattern. Condition names are 
 
 #### Nesting
 
-Condition blocks MUST NOT be nested. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Expression Operators](#expression-operators) above). For example, instead of nesting a `web` condition inside an `advanced` condition, use `<!--condition:web advanced-->` to require both.
+Condition blocks MUST NOT be nested or overlap. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Expression Operators](#expression-operators) above). For example, instead of nesting a `web` condition inside an `advanced` condition, use `<!--condition:web advanced-->` to require both.
 
 #### Block and Inline Usage
 
