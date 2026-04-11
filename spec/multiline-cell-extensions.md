@@ -19,7 +19,7 @@ The [Processing Model](processing-model.md) defines a two-phase pipeline that de
 
 - **Phase 1** (pre-processing) operates on raw text before any Markdown parsing occurs. Phase 1 extensions -- includes, conditions, and variables -- see the raw pipe-delimited table rows as plain text. They do not know they are operating inside a table.
 
-- **Phase 2** (Markdown parsing with extension extraction) parses the fully resolved text as CommonMark. The multiline table directive is recognized during Phase 2, and each cell's content is parsed as a separate Markdown document. Phase 2 extensions -- styles, aliases, markers, and combined commands -- operate during this per-cell parsing.
+- **Phase 2** (Markdown parsing with extension extraction) parses the Phase 1 output text as CommonMark. The multiline table directive is recognized during Phase 2, and each cell's content is parsed as a separate Markdown document. Phase 2 extensions -- styles, aliases, markers, and combined commands -- operate during this per-cell parsing.
 
 This phase ordering is the organizing principle for the rest of this document. Whether an extension works in a cell, and how it works, follows directly from which phase processes it.
 
@@ -69,7 +69,7 @@ Phase 2 then parses the resolved table normally.
 
 ### Conditions
 
-Conditions work in multiline table cells at the raw-text level. Condition blocks are evaluated per-file in Phase 1, Step 1 before table parsing. Conditions see the table rows as plain text lines and remove or keep them based on the condition set.
+Conditions work in multiline table cells at the raw-text level. Condition blocks are evaluated per-file in Phase 1, Step 1 before table parsing. Conditions see the table rows as plain text lines and remove, keep, or pass them through (with condition tags preserved) based on the condition set.
 
 #### Wrapping Complete Rows
 
@@ -373,7 +373,7 @@ The `style:StepList` directive attaches to the ordered list. The preceding parag
 
 ### Conditions Wrapping the Entire Table
 
-A condition block MAY wrap an entire multiline table, including the `<!-- multiline -->` directive. This is a standard Phase 1 operation -- the condition removes or keeps all the table rows as raw text before Phase 2 sees them.
+A condition block MAY wrap an entire multiline table, including the `<!-- multiline -->` directive. This is a standard Phase 1 operation -- the condition removes, keeps, or passes through all the table rows (with condition tags preserved) as raw text before Phase 2 sees them.
 
 ```markdown
 <!--condition:show-comparison-->
