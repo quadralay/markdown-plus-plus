@@ -324,7 +324,7 @@ The following table summarizes which grammar productions require attachment:
 
 **Inline placement:** The `style_cmd` production may also appear in inline position, immediately before the styled inline element on the same line with no intervening space between the closing `-->` and the element. Inline placement applies only to `style_cmd`; all other commands that require attachment operate at block level only.
 
-**Condition pairing:** `condition_open_cmd` and `condition_close_cmd` form matched pairs. Every `condition_open_cmd` MUST have a corresponding `condition_close_cmd`. Condition blocks may nest but MUST NOT overlap.
+**Condition pairing:** `condition_open_cmd` and `condition_close_cmd` form matched pairs. Every `condition_open_cmd` MUST have a corresponding `condition_close_cmd`. Condition blocks MUST NOT nest or overlap.
 
 **Multiline table row structure:** The `multiline_cmd` production defines only the directive keyword. Once a table is marked multiline, the row-level structural behaviors -- row separator recognition (pipe-delimited rows with whitespace-only cells), continuation row merging (empty first cell), multiline header support, blank-line termination, and cell content dedent -- are table-level behaviors that depend on CommonMark table parsing. These cannot be expressed as EBNF/PEG productions. The [Processing Model](processing-model.md) defines the complete multiline table processing requirements, including conformance sub-requirements for each behavior.
 

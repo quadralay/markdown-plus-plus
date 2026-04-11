@@ -214,22 +214,9 @@ A processor MUST parse condition expressions according to this precedence. The e
 
 NOT applies to a single condition name. It inverts the evaluation: `!name` is true when the condition is Hidden, and false when the condition is Visible. If the condition is Unset, the block passes through without evaluation.
 
-##### Nested Conditions
+##### Nesting
 
-Condition blocks MAY be nested within a single file. Inner conditions are evaluated independently -- the outer condition does not affect the inner condition's expression, only whether the inner block's content is reachable.
-
-```markdown
-<!--condition:web-->
-Web content here.
-
-<!--condition:advanced-->
-Advanced web content here.
-<!--/condition-->
-
-<!--/condition-->
-```
-
-If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed. If `web` is Unset, the entire outer block passes through without evaluation -- including the nested `advanced` block and its condition tags. Inner conditions within an Unset outer block are not evaluated.
+Condition blocks MUST NOT be nested or overlap. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Condition Expression Operators](#condition-expression-operators) above). For example, `<!--condition:web advanced-->` requires both `web` and `advanced` to be true.
 
 #### Edge Cases
 

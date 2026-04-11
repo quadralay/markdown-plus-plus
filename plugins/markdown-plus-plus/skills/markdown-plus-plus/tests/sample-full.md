@@ -131,16 +131,23 @@ This means: (!draft) OR (web AND production)
 Complex precedence example.
 <!--/condition-->
 
-### Nested Conditions
+### Operator Precedence (!draft advanced)
 
-<!--condition:web-->
-Web content starts here.
-
-<!--condition:advanced-->
-Advanced web content (nested condition).
+<!--condition:!draft advanced-->
+Visible when NOT draft AND advanced (tests NOT + AND precedence).
 <!--/condition-->
 
-Regular web content continues.
+<!--condition:web-->
+Regular web content.
+<!--/condition-->
+
+### Nested Conditions (INVALID — expect MDPP001)
+
+<!--condition:web-->
+Outer block.
+<!--condition:advanced-->
+Nested block — MUST NOT be used. Validator should emit MDPP001.
+<!--/condition-->
 <!--/condition-->
 
 ### Inline Conditions

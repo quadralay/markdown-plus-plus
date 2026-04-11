@@ -541,7 +541,7 @@ content
 <!-- /condition -->
 ```
 
-A condition block consists of an opening tag with a condition expression and a closing tag. Every opening `<!-- condition:expr -->` MUST have a corresponding `<!-- /condition -->`. Condition blocks MAY nest but MUST NOT overlap.
+A condition block consists of an opening tag with a condition expression and a closing tag. Every opening `<!-- condition:expr -->` MUST have a corresponding `<!-- /condition -->`. Condition blocks MUST NOT nest or overlap.
 
 ### 11.3 Semantics
 
@@ -599,20 +599,7 @@ Condition names MUST match the standard identifier pattern. Condition names are 
 
 #### Nesting
 
-Condition blocks MAY be nested within a single file. Inner conditions are evaluated independently -- the outer condition does not affect the inner condition's expression, only whether the inner block's content is reachable.
-
-```markdown
-<!-- condition:web -->
-Web content here.
-
-<!-- condition:advanced -->
-Advanced web content.
-<!-- /condition -->
-
-<!-- /condition -->
-```
-
-If `web` is Hidden, the entire outer block (including the nested `advanced` block) is removed. If `web` is Visible and `advanced` is Hidden, only the inner block's content is removed. If `web` is Unset, the entire outer block passes through without evaluation -- including the nested `advanced` block and its condition tags. Inner conditions within an Unset outer block are not evaluated.
+Condition blocks MUST NOT be nested or overlap. To express multi-condition logic, use logical expressions with AND (space), OR (comma), and NOT (`!`) operators in condition expressions (see [Expression Operators](#expression-operators) above). For example, instead of nesting a `web` condition inside an `advanced` condition, use `<!--condition:web advanced-->` to require both.
 
 #### Block and Inline Usage
 
