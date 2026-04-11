@@ -24,7 +24,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP010 | Undefined variable reference | Warning | `$name;` token references a name not in the variable map |
 | MDPP011 | Maximum include depth exceeded | Error | Include nesting exceeds the processor's configured maximum depth |
 | MDPP012 | Cross-file condition span | Error | Condition block opens in one file and closes in another |
-| MDPP013 | *(Reserved)* | — | Formerly "Circular include detected during processing" — consolidated into MDPP005 |
+| MDPP013 | *(Reserved)* | — | Formerly "Include cycle detected during processing" — consolidated into MDPP005 |
 | MDPP014 | Duplicate link reference slug across files | Warning | Two or more files define the same link reference slug |
 | MDPP015 | Newer minor version in document | Warning | Document's `mdpp-version` minor version exceeds processor's supported minor version |
 | MDPP016 | Different major version in document | Warning | Document's `mdpp-version` major version differs from processor's supported major version |
@@ -408,9 +408,9 @@ This content is conditional.
 
 ## MDPP013 -- Reserved
 
-**Severity:** (Reserved)
+**Severity:** —
 
-**Description:** Reserved. This code was formerly designated "Circular include detected during processing" (a runtime variant of MDPP005) but was consolidated into MDPP005, which covers all circular include detection. MDPP013 is retained as a placeholder to preserve code numbering stability.
+**Description:** Reserved. This code was formerly designated "Include cycle detected during processing" (a runtime variant of MDPP005) but was consolidated into MDPP005, which covers all circular include detection. MDPP013 is retained as a placeholder to preserve code numbering stability.
 
 ---
 
@@ -420,7 +420,7 @@ This content is conditional.
 
 **Description:** Two or more link reference definitions with the same slug originate from different source files in the assembled document. The first definition wins; subsequent definitions from other files are ignored.
 
-**Detection logic:** During Phase 2 parsing of the assembled document, link reference definitions are tracked with their originating source file. When a slug is defined in more than one source file, emit MDPP014. Definitions within the same file are governed by MDPP008 (duplicate alias) or standard CommonMark first-definition-wins rules, not this code.
+**Detection logic:** During Phase 2 parsing of the assembled document, link reference definitions are tracked with their originating source file. When a slug is defined in more than one source file, emit MDPP014. Definitions within the same file are governed by standard CommonMark first-definition-wins rules, not this code. (MDPP008 applies only to custom HTML-comment aliases (`<!--#name-->`), not to link reference definitions.)
 
 **Trigger examples:**
 
