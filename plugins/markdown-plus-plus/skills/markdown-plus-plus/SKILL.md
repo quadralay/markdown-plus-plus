@@ -129,7 +129,7 @@ Means: (!draft) OR (web AND production)
 
 **Per-file scoping:** Condition blocks must open and close within the same file — they cannot span across an include boundary (MDPP012). See `spec/processing-model.md`.
 
-**Tri-state model:** Each condition name is Visible, Hidden, or Unset. Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditions downstream.
+**Tri-state model:** Each condition name is either Visible or Hidden; a name not in the condition set is Unset (undefined). Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditions downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
 
 ### File Includes
 

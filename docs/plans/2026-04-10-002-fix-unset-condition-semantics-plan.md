@@ -195,4 +195,5 @@ No prior solutions in `docs/solutions/` address this topic.
 
 - Related issue: #72
 - Related commit: `87ed46e fix: revise Unset condition semantics to pass-through instead of truthiness`
-- Related code: `spec/specification.md`, `spec/processing-model.md`
+- Related code: `spec/specification.md`, `spec/processing-model.md`, `spec/cross-file-link-resolution.md`, `spec/element-interactions.md`, `spec/formal-grammar.md`, `spec/multiline-cell-extensions.md`, `plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md`, `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md`
+- **Note:** Implementation expanded beyond the planned 3 normative files to 8 content files. Review phases discovered downstream references in cross-file-link-resolution.md, element-interactions.md, formal-grammar.md, multiline-cell-extensions.md, and syntax-reference.md that needed alignment with the corrected pass-through semantics.
