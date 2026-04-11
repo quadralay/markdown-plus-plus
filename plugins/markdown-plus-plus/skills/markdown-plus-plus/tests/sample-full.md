@@ -131,16 +131,14 @@ This means: (!draft) OR (web AND production)
 Complex precedence example.
 <!--/condition-->
 
-### Nested Conditions
+### Logical Expression Conditions
 
-<!--condition:web-->
-Web content starts here.
-
-<!--condition:advanced-->
-Advanced web content (nested condition).
+<!--condition:web advanced-->
+Advanced web content (requires both web AND advanced).
 <!--/condition-->
 
-Regular web content continues.
+<!--condition:web-->
+Regular web content.
 <!--/condition-->
 
 ### Inline Conditions

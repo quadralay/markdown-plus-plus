@@ -76,7 +76,7 @@ python validate-mdpp.py /root/restricted.md
 
 **Severity:** Error
 
-**Description:** A condition block is opened without a matching close, or a closing tag appears without a preceding open. Condition blocks must form properly nested pairs.
+**Description:** A condition block is opened without a matching close, or a closing tag appears without a preceding open. Condition blocks must form properly matched pairs and MUST NOT be nested.
 
 **Detection logic:** Stack-based tracking of `<!--condition:EXPR-->` / `<!--/condition-->` pairs. On a closing tag, pop the stack; if the stack is empty, emit "closing without opening." After processing all lines, any remaining entries on the stack emit "unclosed condition block."
 

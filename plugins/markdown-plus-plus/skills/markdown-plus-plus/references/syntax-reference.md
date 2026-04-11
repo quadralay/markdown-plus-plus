@@ -545,18 +545,24 @@ This entire section only appears in web output.
 Contact us at <!--condition:web-->[email](mailto:x@x.com)<!--/condition--><!--condition:print-->the address below<!--/condition-->.
 ```
 
-### Nesting Conditions
+### Multi-Condition Logic
 
-Conditions can be nested:
+Condition blocks MUST NOT be nested. Use logical expressions instead:
 
 ```markdown
-<!--condition:web-->
-## Web Content
-
-<!--condition:production-->
+<!-- AND: both must be true -->
+<!--condition:web production-->
 This appears in web AND production.
 <!--/condition-->
 
+<!-- OR: either must be true -->
+<!--condition:web,print-->
+This appears in web OR print.
+<!--/condition-->
+
+<!-- NOT: inverts the condition -->
+<!--condition:!draft-->
+This appears when draft is Hidden.
 <!--/condition-->
 ```
 
@@ -568,7 +574,7 @@ If the outer condition is Unset, the entire outer block (including nested condit
 |-------|---------|
 | Missing closing tag | `<!--condition:web-->` without `<!--/condition-->` |
 | Typo in closing | `<!--condition-->` instead of `<!--/condition-->` |
-| Mismatched nesting | Overlapping conditions |
+| Nested conditions | Condition blocks inside other condition blocks (use logical expressions instead) |
 
 **CommonMark rendering:** Opening and closing condition tags are hidden, but all conditional branches are visible simultaneously. Readers see content for every condition regardless of audience or output format.
 

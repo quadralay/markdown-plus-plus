@@ -147,7 +147,7 @@ python scripts/add-aliases.py document.md --levels 1,2,3
 **Avoid conditions for:**
 - Minor text differences (use variables instead)
 - Content that should always appear
-- Deeply nested conditions (hard to maintain)
+- Nesting condition blocks (not supported — use logical expressions instead)
 
 **Example - Good:**
 ```markdown
