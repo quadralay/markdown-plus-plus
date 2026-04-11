@@ -590,8 +590,8 @@ Condition expressions support three operators with explicit precedence:
 | Operator | Symbol | Precedence | Behavior |
 |----------|--------|:----------:|----------|
 | NOT | `!` (prefix) | 1 (highest) | Inverts the condition state. `!name` is true when `name` is Hidden, false when Visible. If `name` is Unset, the block passes through. |
-| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both are Visible. If any operand is Unset, the block passes through. |
-| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either is Visible. If any operand is Unset, the block passes through. |
+| AND | ` ` (space) | 2 (medium) | All operands must be true. `a b` is true when both `a` and `b` are Visible. If any operand is Unset, the block passes through. |
+| OR | `,` (comma) | 3 (lowest) | Any operand must be true. `a,b` is true when either `a` or `b` is Visible. If any operand is Unset, the block passes through. |
 
 A processor MUST parse condition expressions according to this precedence. The expression `!draft,web production` MUST be parsed as `(!draft) OR (web AND production)`.
 
