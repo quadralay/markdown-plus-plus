@@ -1,7 +1,7 @@
 ---
 title: "fix: Revise Unset condition semantics to pass-through instead of truthiness"
 type: fix
-status: active
+status: completed
 date: 2026-04-10
 ---
 
