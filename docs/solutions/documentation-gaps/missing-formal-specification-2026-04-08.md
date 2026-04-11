@@ -1,6 +1,7 @@
 ---
 title: Missing formal Markdown++ specification for tool implementers
 date: 2026-04-08
+last_updated: 2026-04-11
 category: documentation-gaps
 module: spec
 problem_type: documentation_gap
@@ -58,7 +59,7 @@ Created `spec/specification.md` -- a 1,208-line unified Markdown++ 1.0 specifica
 
 **Integration features (sections 16-17):** Combined commands and advanced topics (inline styling, book assembly, link reference definitions, semantic cross-references).
 
-**Reference material (sections 18-19):** Consolidated diagnostic registry (MDPP000-MDPP014) split into static validation and processing-phase categories. Full normative and informative reference tables.
+**Reference material (sections 18-19):** Consolidated diagnostic registry (MDPP000-MDPP014 at initial writing; extended to MDPP000-MDPP017 by subsequent issues #23 UTF-8 encoding and #25 format versioning) split into static validation and processing-phase categories. Full normative and informative reference tables.
 
 ### Key architectural decisions
 
