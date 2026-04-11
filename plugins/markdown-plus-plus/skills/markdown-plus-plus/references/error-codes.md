@@ -16,7 +16,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP002 | Invalid name | Error | Name with illegal characters in any named entity |
 | MDPP003 | Malformed marker JSON | Error | `<!--markers:{...}-->` fails to parse |
 | MDPP004 | *(Reserved)* | Warning | Formerly "Invalid style placement" — covered by MDPP009 (orphaned comment tag) |
-| MDPP005 | Circular include | Error | Include chain references itself (static analysis) |
+| MDPP005 | Circular include | Error | Include chain references itself |
 | MDPP006 | Missing include file | Warning | Referenced file does not exist |
 | MDPP007 | Invalid condition syntax | Error | Illegal characters or empty expression |
 | MDPP008 | Duplicate alias | Error | Same alias appears twice in one file |
@@ -178,11 +178,9 @@ $my variable;
 
 **Severity:** Error
 
-**Description:** An include chain forms a cycle, where a file directly or indirectly includes itself. This code is emitted by static analysis tools that inspect source files before processing.
+**Description:** An include chain forms a cycle, where a file directly or indirectly includes itself.
 
 **Detection logic:** Track the include chain as a set of resolved file paths. Before processing each `<!--include:path-->`, check whether the resolved path is already in the chain. If so, emit MDPP005.
-
-**Note:** MDPP005 and MDPP013 cover the same underlying condition (circular includes) at different phases: MDPP005 for static analysis tools that inspect source files before processing, and MDPP013 for runtime detection during Phase 1 expansion.
 
 ---
 

@@ -690,7 +690,7 @@ A processor MUST insert included content with block-level separation -- the incl
 
 #### Cycle Detection
 
-A processor MUST track the include chain and MUST detect circular references. When a cycle is detected, the processor MUST skip the circular include, leave the include tag in place as a regular HTML comment, and emit diagnostic **MDPP013**.
+A processor MUST track the include chain and MUST detect circular references. When a cycle is detected, the processor MUST skip the circular include, leave the include tag in place as a regular HTML comment, and emit diagnostic **MDPP005**.
 
 #### Include Depth
 
@@ -716,12 +716,9 @@ Include directives are **exempt** from the attachment rule. An include is a stan
 
 | Code | Description | Severity |
 |------|-------------|----------|
-| **MDPP005** | Circular include detected (static analysis) | Error |
+| **MDPP005** | Circular include detected | Error |
 | **MDPP006** | Missing or unreadable include file | Warning |
 | **MDPP011** | Maximum include depth exceeded | Error |
-| **MDPP013** | Include cycle detected during processing | Error |
-
-MDPP005 and MDPP013 cover the same underlying problem (circular includes) at different phases: MDPP005 for static analysis tools that inspect the source before processing, and MDPP013 for runtime detection during Phase 1 expansion.
 
 ### 12.7 Examples
 
@@ -1173,7 +1170,7 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 | **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard), `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias), or `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed (style/marker) |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 | The JSON content in a `markers:` command is not valid JSON | `markers:{invalid}` |
 | **MDPP004** | *(Reserved)* | Warning | — | Formerly "Invalid style placement" — covered by MDPP009 | — |
-| **MDPP005** | Circular include (static) | Error | Pre-processing | Static analysis detects a circular include chain | File A includes B which includes A |
+| **MDPP005** | Circular include | Error | Phase 1, Step 1 | Include chain references itself (directly or transitively) | File A includes B which includes A |
 | **MDPP006** | Missing include file | Warning | Phase 1, Step 1 | An included file does not exist or cannot be read | `<!-- include:nonexistent.md -->` |
 | **MDPP007** | Invalid condition syntax | Error | Phase 1, Step 1 | A condition expression cannot be parsed | `<!-- condition: -->` (empty) or malformed expression |
 | **MDPP008** | Duplicate alias | Error | Phase 2 | Two alias commands in the same file use the same identifier | Two `<!-- #name -->` with the same name |
@@ -1186,7 +1183,7 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 | **MDPP010** | Undefined variable | Warning | Phase 1, Step 2 | A `$name;` token references a name not in the variable map | Variable map lacks the referenced key |
 | **MDPP011** | Max include depth exceeded | Error | Phase 1, Step 1 | Include nesting exceeds the processor's configured maximum | Depth > configured limit (RECOMMENDED default: 10) |
 | **MDPP012** | Cross-file condition span | Error | Phase 1, Step 1 | A condition block opens in one file and closes in another | `<!-- condition:x -->` in parent, `<!-- /condition -->` in included file |
-| **MDPP013** | Include cycle detected | Error | Phase 1, Step 1 | A file appears in its own include chain during recursive expansion | Runtime cycle detection during Phase 1 |
+| **MDPP013** | *(Reserved)* | — | — | Formerly "Include cycle detected during processing" — consolidated into MDPP005 | — |
 | **MDPP014** | Duplicate link reference slug | Warning | Phase 2 | Two or more link reference definitions with the same slug originate from different source files | Cross-file slug conflict in assembled document |
 
 ---
