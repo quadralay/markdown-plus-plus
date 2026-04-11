@@ -52,6 +52,8 @@ Documenting the behavior without first documenting the *model* left readers with
 
 ## Solution
 
+**Note:** The per-operator Unset approach documented by F1-F10 was subsequently replaced by a single Unset Pre-Evaluation Check (see `docs/solutions/logic-errors/unset-condition-pre-evaluation-consolidation-2026-04-11.md`). Many F-item additions were removed or rewritten during that consolidation. The F-item descriptions below reflect the intermediate state, not the current spec.
+
 Fixes were applied in two commits (`04392c4` and `3404c85`).
 
 ### F1 — HTML comment phrasing clarified (spec/specification.md §11.4)
@@ -168,13 +170,7 @@ The documentation was inconsistent because **two mental models** were competing 
 1. **Tri-state parity** (misleading): Visible, Hidden, and Unset are three symmetrical states. Makes pass-through seem arbitrary.
 2. **Assignment model** (correct): Visible/Hidden are build-time assignments. Unset is the *absence* of an assignment. When the processor encounters an undefined name, there is nothing to evaluate against — pass-through is the only principled outcome.
 
-The fixes shift all documentation toward the assignment model:
-
-- Renaming "Tri-State Model" removes the false symmetry signal
-- Adding "Visible and Hidden are **assigned states**; Unset is **not an assigned state**" makes the model explicit
-- The compound-expression worked example cements the rule for the counter-intuitive case
-- Qualifying "as-is" with "condition evaluation only" focuses the concept on *what is skipped* rather than *what nothing happens*
-- Adding normative Phase 2 language closes the loop for processor implementers
+The fixes shifted documentation toward the assignment model. However, the per-operator approach was itself subsequently replaced by a single Unset Pre-Evaluation Check — one rule, one location — which implemented the assignment model more directly. The key insight survived: Unset is not an operator-level concern but a pre-condition for evaluation. The assignment model framing established here made that simplification possible.
 
 ## Prevention
 
@@ -195,5 +191,6 @@ The fixes shift all documentation toward the assignment model:
 - [Issue #79](https://github.com/quadralay/markdown-plus-plus/issues/79) — Tracking issue for all F1–F10 items
 - [PR #78 / Issue #72](https://github.com/quadralay/markdown-plus-plus/issues/72) — Established the Unset pass-through semantics this documentation describes
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Foundational spec document defining the Condition State Model
+- `docs/solutions/logic-errors/unset-condition-pre-evaluation-consolidation-2026-04-11.md` — Superseding fix that replaced the per-operator Unset approach with a single pre-evaluation check
 - `docs/solutions/documentation-gaps/variable-escaping-mechanism-2026-04-06.md` — Variable substitution (Phase 1 Step 2) that still applies inside Unset blocks
 - `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — Condition expression operator precedence (NOT > AND > OR); verify no residual tri-state references

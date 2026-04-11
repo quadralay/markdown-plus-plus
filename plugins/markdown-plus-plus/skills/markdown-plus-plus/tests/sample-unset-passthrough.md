@@ -57,7 +57,7 @@ This appears in print or mobile output.
 
 ## Compound OR Expression — One Operand Visible, One Operand Unset
 
-Both `web` (Visible) and `mobile` (Unset) appear in an OR expression. This is the most counter-intuitive OR case: even though `web` is Visible (which would normally satisfy the OR), `mobile` is Unset and the entire block MUST pass through. The OR expression is not evaluated.
+Both `web` (Visible) and `mobile` (Unset) appear in an OR expression. The Unset pre-evaluation check finds that `mobile` is not defined, so the entire block MUST pass through. The OR operator is never reached — the pre-check fires before any operator logic runs.
 
 <!--condition:web,mobile-->
 This is available on the web and mobile platforms.
