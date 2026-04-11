@@ -779,7 +779,7 @@ The `Passthrough` marker key has special semantics. Its value is emitted as-is i
 ## Migration Guide
 ```
 
-The Passthrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the general behavior where unrecognized HTML comments are ignored.
+The Passthrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the automatic PassThrough marker injection for unrecognized segments in combined commands (section 16.4), and from the general behavior where standalone unrecognized HTML comments are ignored (section 5.2).
 
 #### Index Markers
 
@@ -1032,7 +1032,7 @@ When a combined command contains multiple recognized commands, a processor SHOUL
 
 ### 16.4 Unrecognized Segments
 
-Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A processor MUST interpret recognized segments normally and MUST collect unrecognized segments for injection as **PassThrough markers** attached to the target element. This provides an invisible means for authors to embed metadata (status notes, review flags, tracking info) in rendered output. The rendering of PassThrough marker content from unrecognized segments is implementation-defined.
+Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A processor MUST interpret recognized segments normally and MUST collect unrecognized segments for injection as **PassThrough markers** attached to the target element. This allows authors to embed metadata (status notes, review flags, tracking info) that flows through the processing pipeline. The rendering of PassThrough marker content from unrecognized segments is implementation-defined.
 
 ```markdown
 <!-- style:CustomHeading ; #alias-here ; TODO: add Keywords markers -->
