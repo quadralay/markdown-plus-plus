@@ -553,7 +553,7 @@ This section defines what constitutes a conformant Markdown++ processor.
 A conformant Markdown++ processor MUST implement all of the following:
 
 1. **Include expansion** -- Recursive depth-first expansion with cycle detection and per-file condition evaluation, as specified in [Phase 1, Step 1](#phase-1-step-1-include-expansion).
-2. **Condition evaluation** -- Tri-state condition model with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation).
+2. **Condition evaluation** -- Condition state model (two assigned states plus Unset) with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation).
 3. **Variable substitution** -- Token replacement from a variable map with both escaping mechanisms, as specified in [Phase 1, Step 2](#phase-1-step-2-variable-substitution).
 4. **Style extraction** -- Extraction and attachment of `style:Name` commands to target elements.
 5. **Alias extraction** -- Extraction and attachment of `#name` commands to target elements.

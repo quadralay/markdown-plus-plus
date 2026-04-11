@@ -494,7 +494,7 @@ Each condition name has one of three states:
 |-------|---------|
 | **Visible** | Content inside the block is included in output. |
 | **Hidden** | Content inside the block is removed from output. |
-| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. |
+| **Unset** | The condition name is not defined in the condition set. The condition block passes through without evaluation -- the opening tag, content, and closing tag are preserved as-is in the output. As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content. |
 
 When a condition expression references an undefined (Unset) name, the processor MUST NOT evaluate the expression. The entire condition block -- opening tag, content, and closing tag -- passes through as-is. This allows the implementation to surface or resolve undefined conditional content downstream rather than silently including it.
 
@@ -517,6 +517,7 @@ When a condition expression references an undefined (Unset) name, the processor 
 | `!internal,web` | Show when "internal" is hidden OR "web" is visible |
 | `!draft,web production` | `(!draft) OR (web AND production)` |
 | `mobile` | **Pass through** — "mobile" is Unset (not defined in condition set) |
+| `!mobile` | **Pass through** — NOT applied to an Unset operand still forces pass-through; the expression is not evaluated |
 | `web mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the AND expression is not evaluated |
 | `web,mobile` | **Pass through** — any Unset operand forces pass-through; even though "web" may be Visible, the OR expression is not evaluated |
 
