@@ -55,7 +55,7 @@ Text with <!--style:Emphasis-->**inline styled bold**.
 
 Text with <!--style:ProductName-->*$product_name;* inline.
 
-A <!--style:ImportantLink-->[styled link](https://example.com) in text.
+A [<!--style:ImportantLink-->*styled link*](https://example.com) in text.
 
 ## Custom Aliases Test
 
