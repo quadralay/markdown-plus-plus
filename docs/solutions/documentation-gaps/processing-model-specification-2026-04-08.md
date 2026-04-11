@@ -54,7 +54,7 @@ Before this solution, understanding Markdown++ semantics required fragmented app
 Created `spec/processing-model.md` (550 lines) — a normative two-phase processing model specification covering 23 core requirements, modeled after `spec/attachment-rule.md` conventions. The spec has grown since initial creation as subsequent issues (UTF-8 encoding, format versioning, cross-file link resolution) added sections and diagnostic codes.
 
 **Phase 1, Step 1 — Include Expansion:**
-- Depth-first recursive algorithm with cycle detection (MDPP013)
+- Depth-first recursive algorithm with cycle detection (MDPP005)
 - Path resolution relative to containing file's directory
 - Configurable depth limits (default 10, MDPP011)
 - Per-file condition evaluation during include processing

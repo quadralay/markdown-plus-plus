@@ -74,23 +74,22 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 - MDPP002 section enhanced with alias naming exception (`^[a-zA-Z0-9_][a-zA-Z0-9_-]*$` for aliases, allowing digit-first)
 - MDPP001 wording unified to "Unmatched" across all documents (was inconsistently "Unclosed" in some files)
 
-### Follow-up Correction (2026-04-11): MDPP004 and MDPP005 promoted from reserved to active
+### Follow-up Correction (2026-04-11): MDPP004 and MDPP005 promoted, then MDPP004 re-reserved and MDPP013 removed
 
-After the initial error-codes.md was created, a subsequent review ([#67](https://github.com/quadralay/markdown-plus-plus/issues/67)) found that the normative specification already defined MDPP004 and MDPP005 with active triggering conditions. The "reserved" status applied in this solution was incorrect — it was a documentation error, not an intentional deferral.
+After the initial error-codes.md was created, a subsequent review ([#67](https://github.com/quadralay/markdown-plus-plus/issues/67)) promoted MDPP004 and MDPP005 from reserved to active. A further review then found:
+
+- **MDPP004** (Invalid style placement) is fully covered by MDPP009 (orphaned comment tag). MDPP004 was re-reserved as a placeholder for code numbering stability.
+- **MDPP013** (Include cycle detected during processing) was the runtime counterpart to MDPP005 (circular include). The static/runtime distinction was unnecessary — MDPP013 was removed and all circular include detection consolidated into MDPP005.
 
 **What was corrected:**
 
-- `error-codes.md` MDPP004 entry: replaced "Reserved -- not yet implemented" with the spec-aligned description for **Invalid Style Placement** (Warning, Phase 2 check)
-- `error-codes.md` MDPP005 entry: replaced "Reserved -- not yet implemented" with the spec-aligned description for **Circular Include** (Error, static analysis)
-- `syntax-reference.md` validation checks table: MDPP004 and MDPP005 rows updated from "(reserved, not yet implemented)" to their active names and severities
+- `error-codes.md` MDPP004 entry: re-reserved with note that MDPP009 provides full coverage
+- `error-codes.md` MDPP005 entry: promoted to active, "(static analysis)" qualifier removed, MDPP013 cross-reference note removed
+- `syntax-reference.md` validation checks table: MDPP004 marked *(Reserved)*, MDPP005 active
 - MDPP005 heading normalized from "Circular Include Detected" to "Circular Include" (noun-phrase convention)
-- MDPP005 gained a cross-reference note distinguishing it from MDPP013: MDPP005 is emitted by **static analysis** tools before processing begins; MDPP013 is emitted at **runtime** during Phase 1 expansion. Without this note, an implementor could implement only one and consider circular-include detection complete
+- MDPP013 marked as reserved in `spec/processing-model.md` and `spec/specification.md` diagnostic registries; all normative references changed to MDPP005
 - Plugin version bumped 1.1.13 → 1.1.14 (patch)
-
-**Residual gaps tracked separately:**
-- MDPP004 detection logic may conflate MDPP004 (invalid style placement) and MDPP009 (orphaned comment tag) — spec research required before shipping a validator
-- MDPP013 has no entry in error-codes.md yet (MDPP010-017 coverage is tracked in [#66](https://github.com/quadralay/markdown-plus-plus/issues/66))
-- No test fixtures exist for MDPP004 or MDPP005
+- Test fixture added: `tests/sample-circular-includes.md` for MDPP005
 
 ## Why This Works
 
