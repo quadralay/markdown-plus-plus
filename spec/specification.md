@@ -628,7 +628,7 @@ Conditions have the broadest interaction surface of any Markdown++ extension. Co
 
 **Conditions and Variables:** Conditions are evaluated before variable substitution. Variables inside Hidden blocks are never resolved. Variables inside Unset (pass-through) blocks are resolved, because the block's content survives into variable substitution. Variable values cannot contain condition syntax. See [section 7.2](#72-processing-order).
 
-**Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed.
+**Conditions and Includes:** Condition evaluation is per-file during include expansion. A condition block that opens in one file and closes in another is a fatal error (MDPP012). A condition block MAY wrap an include directive; if the condition is Hidden, the include is never processed. If the condition is Unset, the entire block -- including the include directive -- passes through as-is; the include is not processed.
 
 **Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules. Tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
@@ -714,7 +714,7 @@ When an included file does not exist or cannot be read, the processor MUST emit 
 
 ### 12.4 Interaction with Other Extensions
 
-**Includes and Conditions:** Condition evaluation is per-file during include expansion. Each file's condition blocks are evaluated before its content is spliced into the parent. A condition block MAY wrap an include directive -- if the condition is Hidden, the include is not processed. Cross-file condition spans (opening in one file, closing in another) are a fatal error (MDPP012).
+**Includes and Conditions:** Condition evaluation is per-file during include expansion. Each file's condition blocks are evaluated before its content is spliced into the parent. A condition block MAY wrap an include directive -- if the condition is Hidden, the include is not processed; if the condition is Unset, the entire block (including the include directive) passes through as-is and the include is not processed. Cross-file condition spans (opening in one file, closing in another) are a fatal error (MDPP012).
 
 **Includes and Variables:** Included files inherit the variable map from the parent document. All files in an include tree share the same variable map. Variable substitution runs after all includes are expanded.
 

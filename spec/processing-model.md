@@ -267,7 +267,7 @@ A condition block in the parent MAY wrap an include directive. The include is on
 <!--/condition-->
 ```
 
-If `detailed` is Hidden, the entire block including the include directive is removed. The file `appendix.md` is never read.
+If `detailed` is Hidden, the entire block including the include directive is removed. The file `appendix.md` is never read. If `detailed` is Unset, the entire condition block -- including the `<!-- include:appendix.md -->` directive -- passes through as-is. The file `appendix.md` is not read, and the include directive survives as literal text in the output.
 
 ##### 3. Nested Includes with Relative Path Resolution
 
@@ -328,7 +328,7 @@ Variable substitution MUST run after include expansion and condition evaluation 
 
 1. **Variables inside false condition blocks are never resolved.** When a condition block evaluates to Hidden, the block's content is removed during include expansion (Phase 1, Step 1) before variable substitution runs. Any `$name;` tokens within the removed content are never scanned. However, variables inside Unset (pass-through) condition blocks ARE resolved, because the block's content is preserved during condition evaluation and is present when variable substitution scans the text.
 
-2. **Variable values cannot contain condition syntax.** Because conditions are already resolved before variable substitution, a variable value containing `<!--condition:name-->` will not be evaluated as a condition directive. It will pass through as literal text into Phase 2.
+2. **Variable values cannot contain condition syntax.** Because defined conditions are already evaluated before variable substitution, a variable value containing `<!--condition:name-->` will not be evaluated as a condition directive. It will pass through as literal text into Phase 2.
 
 3. **Variable values can contain Markdown syntax.** Because variable substitution runs before Markdown parsing (Phase 2), a variable value containing `**bold**` or `[link](url)` will be parsed as Markdown in Phase 2 and rendered accordingly.
 
@@ -386,11 +386,12 @@ Phase 2 receives the text from Phase 1 -- all includes expanded, defined conditi
 
 #### Input
 
-The input to Phase 2 is a single string of text. This text contains no include directives (all expanded), no condition blocks referencing defined condition names (all evaluated -- blocks referencing undefined names pass through as-is), and no unresolved variable tokens (all substituted or left as literal text with warnings). The text MAY contain:
+The input to Phase 2 is a single string of text. This text contains no include directives outside of Unset condition blocks (all reachable includes expanded), no condition blocks referencing defined condition names (all evaluated -- blocks referencing undefined names pass through as-is), and no unresolved variable tokens (all substituted or left as literal text with warnings). The text MAY contain:
 
 - Standard CommonMark content
 - Recognized Markdown++ comment tags (style, alias, marker, multiline, combined commands)
 - Regular HTML comments (not matching any Markdown++ pattern)
+- Unset condition blocks (condition opening tags, content, condition closing tags, and any include directives within them) that passed through Phase 1 without evaluation
 
 #### Parsing
 
