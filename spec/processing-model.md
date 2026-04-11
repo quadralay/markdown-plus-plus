@@ -390,7 +390,7 @@ For each recognized Markdown++ comment tag, the processor extracts one or more c
 
 #### Combined Command Evaluation Order
 
-When a single comment contains multiple commands separated by semicolons (`;`), the processor MUST evaluate them in the following fixed order, regardless of the order in which they appear in the comment:
+When a single comment contains multiple commands separated by semicolons (`;`), the processor SHOULD evaluate them in the following order for readability and consistency, regardless of the order in which they appear in the comment. Processors MAY evaluate segments in any order.
 
 | Order | Command | Effect |
 |:-----:|---------|--------|
@@ -533,7 +533,7 @@ A conformant Markdown++ processor MUST implement all of the following:
 9. **Comment disambiguation** -- Correct identification of recognized vs. unrecognized HTML comments.
 10. **Diagnostic reporting** -- Emission of MDPP diagnostic codes at their specified severity levels for all required features. Diagnostic codes associated with optional features (e.g., MDPP015, MDPP016) are required only when the processor implements those features.
 11. **Encoding validation** -- UTF-8 encoding validation with BOM handling and MDPP017 emission, as specified in [Character Encoding](#character-encoding)
-12. **Combined commands** -- Semicolon-separated commands in a single comment tag. A conformant processor MUST evaluate them in the order specified in [Combined Command Evaluation Order](#combined-command-evaluation-order).
+12. **Combined commands** -- Semicolon-separated commands in a single comment tag. The evaluation order listed in [Combined Command Evaluation Order](#combined-command-evaluation-order) is RECOMMENDED for readability but not required; processors MAY evaluate segments in any order.
 
 ### Optional Features
 
