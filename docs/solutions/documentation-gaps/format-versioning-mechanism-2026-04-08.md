@@ -1,6 +1,7 @@
 ---
 title: Format versioning mechanism for Markdown++ specification
 date: 2026-04-08
+last_updated: 2026-04-11
 category: documentation-gaps
 module: spec
 problem_type: documentation_gap
@@ -81,6 +82,6 @@ The design follows Markdown++ principles: `mdpp-version` in YAML frontmatter is 
 - [#14](https://github.com/quadralay/markdown-plus-plus/issues/14) -- Standalone error code reference (MDPP range now extends to MDPP016)
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) -- Define the processing model (versioning extends it with preamble step)
 - [#11](https://github.com/quadralay/markdown-plus-plus/issues/11) -- Create formal grammar (versioning added frontmatter scope note)
-- Related learning: [processing-model-specification-2026-04-08.md](processing-model-specification-2026-04-08.md) -- Processing model spec (now extended with MDPP015/016 and version check preamble; note: that doc's references to "MDPP000-013" and "2 optional features" are now stale)
+- Related learning: [processing-model-specification-2026-04-08.md](processing-model-specification-2026-04-08.md) -- Processing model spec (extended with MDPP015/016 and version check preamble; refreshed 2026-04-11 to reflect current state: 12 required features, 2 optional features, MDPP000-MDPP017 range)
 - Related learning: [formal-ebnf-peg-grammar-for-extensions-2026-04-08.md](formal-ebnf-peg-grammar-for-extensions-2026-04-08.md) -- Grammar spec (now includes frontmatter scope note)
 - Related learning: [cross-file-link-resolution-semantics-2026-04-08.md](cross-file-link-resolution-semantics-2026-04-08.md) -- Cross-file link resolution (MDPP014 precedent; range now extends to MDPP016)

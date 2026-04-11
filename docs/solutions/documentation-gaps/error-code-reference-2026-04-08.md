@@ -1,6 +1,7 @@
 ---
 title: Standalone error code reference for MDPP000-MDPP009
 date: 2026-04-08
+last_updated: 2026-04-11
 category: documentation-gaps
 module: plugins/markdown-plus-plus
 problem_type: documentation_gap
@@ -10,6 +11,7 @@ symptoms:
   - syntax-reference.md had a brief summary table but no detailed detection logic
   - Alternative validator implementations would need to reverse-engineer Python script
   - MDPP000 was missing from the syntax-reference.md table entirely
+  - MDPP004 and MDPP005 incorrectly marked as "Reserved -- not yet implemented" (corrected 2026-04-11; see follow-up below)
 root_cause: inadequate_documentation
 resolution_type: documentation_update
 severity: medium
@@ -18,6 +20,10 @@ tags:
   - validation
   - specification
   - validate-mdpp
+  - mdpp004
+  - mdpp005
+  - spec-consistency
+  - reserved-codes
 ---
 
 # Standalone error code reference for MDPP000-MDPP009
@@ -55,7 +61,7 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 - General rules section documenting that all checks skip fenced code blocks
 - Naming rule section defining the shared grammar (`^[a-zA-Z_][a-zA-Z0-9_-]*$`) used by MDPP002 and MDPP007
 - Per-code sections (`## MDPPnnn -- Name`) with severity, description, detection logic, trigger examples, and suggested fixes
-- Reserved codes (MDPP004, MDPP005) documented with intended detection logic and reserved status
+- Reserved codes (MDPP004, MDPP005) documented with intended detection logic and reserved status — **note:** this was later found to be incorrect; see "Follow-up Correction" below
 
 **Cross-referencing updates:**
 
@@ -67,6 +73,23 @@ Created `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/error-c
 
 - MDPP002 section enhanced with alias naming exception (`^[a-zA-Z0-9_][a-zA-Z0-9_-]*$` for aliases, allowing digit-first)
 - MDPP001 wording unified to "Unmatched" across all documents (was inconsistently "Unclosed" in some files)
+
+### Follow-up Correction (2026-04-11): MDPP004 and MDPP005 promoted, then MDPP004 re-reserved and MDPP013 removed
+
+After the initial error-codes.md was created, a subsequent review ([#67](https://github.com/quadralay/markdown-plus-plus/issues/67)) promoted MDPP004 and MDPP005 from reserved to active. A further review then found:
+
+- **MDPP004** (Invalid style placement) is fully covered by MDPP009 (orphaned comment tag). MDPP004 was re-reserved as a placeholder for code numbering stability.
+- **MDPP013** (Include cycle detected during processing) was the runtime counterpart to MDPP005 (circular include). The static/runtime distinction was unnecessary — MDPP013 was removed and all circular include detection consolidated into MDPP005.
+
+**What was corrected:**
+
+- `error-codes.md` MDPP004 entry: re-reserved with note that MDPP009 provides full coverage
+- `error-codes.md` MDPP005 entry: promoted to active, "(static analysis)" qualifier removed, MDPP013 cross-reference note removed
+- `syntax-reference.md` validation checks table: MDPP004 marked *(Reserved)*, MDPP005 active
+- MDPP005 heading normalized from "Circular Include Detected" to "Circular Include" (noun-phrase convention)
+- MDPP013 marked as reserved in `spec/processing-model.md` and `spec/specification.md` diagnostic registries; all normative references changed to MDPP005
+- Plugin version bumped 1.1.13 → 1.1.14 (patch)
+- Test fixture added: `tests/sample-circular-includes.md` for MDPP005
 
 ## Why This Works
 
@@ -80,6 +103,8 @@ This also fulfills the principle established in the attachment rule solution doc
 - **Keep detection logic implementation-independent:** Describe algorithms in terms of data structures and conditions, not language-specific constructs, so the reference serves any implementation language.
 - **Maintain the diagnostic code registry:** The processing model (`spec/processing-model.md`) owns the registry of all MDPP codes. Static validation codes (000-009) are detailed in `error-codes.md`; processing-phase codes (010-013) are detailed in the processing model itself. New codes must be registered in both locations.
 - **Treat wording consistency as a reviewable concern:** When a concept has a canonical name (e.g., "Unmatched" not "Unclosed" for MDPP001), grep across all documents during review to catch drift before it ships.
+- **Never mark a code reserved without a spec citation.** If the normative spec defines the code, the plugin reference must reflect it. "Reserved" status is only appropriate when the spec itself designates the code as reserved. When reversing a deferral decision, explicitly supersede the prior solution doc (as done here) and treat any `error-codes.md` entry containing the word "reserved" as a review flag requiring justification.
+- **Wording-drift prevention is not one-time.** The follow-up correction on 2026-04-11 materialized exactly the wording-drift risk this solution flagged. Grep for "reserved" across all skill-surface documents before any release that touches error code definitions. Test fixtures for MDPP codes make drift immediately visible — a passing fixture cannot coexist with a "reserved" placeholder.
 
 ## Related Issues
 
@@ -87,6 +112,9 @@ This also fulfills the principle established in the attachment rule solution doc
 - [#15](https://github.com/quadralay/markdown-plus-plus/issues/15) -- Implement unified naming rule (resolved; naming grammar documented in error-codes.md)
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) -- Define processing model (resolved; established diagnostic code registry)
 - [#10](https://github.com/quadralay/markdown-plus-plus/issues/10) -- Formalize attachment rule (resolved; MDPP009 semantics cross-referenced)
+- [#67](https://github.com/quadralay/markdown-plus-plus/issues/67) -- Remove "reserved" annotations from MDPP004 and MDPP005 (follow-up correction to this solution; MDPP004/005 promoted to active, v1.1.14)
+- [#65](https://github.com/quadralay/markdown-plus-plus/issues/65) -- Align error-codes.md naming rules with three-pattern system (open; same reference file)
+- [#66](https://github.com/quadralay/markdown-plus-plus/issues/66) -- Add MDPP010-MDPP017 to error-codes.md and syntax-reference.md (open; extends coverage beyond MDPP009)
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` -- MDPP002 scope expansion
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` -- Prevention principle fulfilled
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` -- Diagnostic code registry

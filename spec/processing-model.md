@@ -97,7 +97,7 @@ A processor MUST resolve includes using the following depth-first recursive algo
 3. Scan the resolved content for `<!-- include:path -->` directives.
 4. For each include directive, in document order:
    a. Resolve the path relative to the current file's directory.
-   b. Check the include chain for cycles. If the resolved path already appears in the chain, skip the include with diagnostic **MDPP013** and leave the include tag in place as a regular HTML comment.
+   b. Check the include chain for cycles. If the resolved path already appears in the chain, skip the include with diagnostic **MDPP005** and leave the include tag in place as a regular HTML comment.
    c. Check the include depth. If the depth exceeds the processor's configured maximum, skip the include with diagnostic **MDPP011** and leave the include tag in place.
    d. If the file does not exist or cannot be read, emit diagnostic **MDPP006** and leave the include tag in place as a regular HTML comment.
    e. If the file contains invalid UTF-8 encoding (detected during step 1), emit diagnostic **MDPP017** and leave the include tag in place as a regular HTML comment.
@@ -132,7 +132,7 @@ Included files MUST inherit the variable map from the parent document. All files
 
 #### Cycle Detection
 
-A processor MUST track the include chain (the sequence of file paths from the root document to the current file) and MUST detect circular references. When a cycle is detected, the processor MUST skip the circular include, leave the include tag in place as a regular HTML comment, and emit diagnostic **MDPP013**.
+A processor MUST track the include chain (the sequence of file paths from the root document to the current file) and MUST detect circular references. When a cycle is detected, the processor MUST skip the circular include, leave the include tag in place as a regular HTML comment, and emit diagnostic **MDPP005**.
 
 **Example -- circular include:**
 
@@ -150,7 +150,7 @@ A processor MUST track the include chain (the sequence of file paths from the ro
 <!-- include:parent.md -->
 ```
 
-When processing `parent.md`, the processor includes `child.md`. When processing `child.md`, the processor detects that `parent.md` is already in the include chain, skips the include with **MDPP013**, and leaves `<!-- include:parent.md -->` in place.
+When processing `parent.md`, the processor includes `child.md`. When processing `child.md`, the processor detects that `parent.md` is already in the include chain, skips the include with **MDPP005**, and leaves `<!-- include:parent.md -->` in place.
 
 #### Include Depth
 
@@ -471,7 +471,7 @@ A **fatal error** prevents the processor from producing a meaningful output tree
 
 | Classification | Behavior | Examples |
 |---------------|----------|----------|
-| **Fatal error** | Processor MUST report the error. The affected construct's content MUST NOT be used for further pipeline processing, but the processor SHOULD continue processing the remainder of the document. A processor MAY implement an implementation-defined recovery strategy (e.g., encoding fallback for MDPP017), but MUST still emit the diagnostic regardless. | Invalid UTF-8 encoding (MDPP017), cross-file condition span (MDPP012), include cycle (MDPP013), max include depth exceeded (MDPP011) |
+| **Fatal error** | Processor MUST report the error. The affected construct's content MUST NOT be used for further pipeline processing, but the processor SHOULD continue processing the remainder of the document. A processor MAY implement an implementation-defined recovery strategy (e.g., encoding fallback for MDPP017), but MUST still emit the diagnostic regardless. | Invalid UTF-8 encoding (MDPP017), cross-file condition span (MDPP012), include cycle (MDPP005), max include depth exceeded (MDPP011) |
 | **Recoverable warning** | Processor MUST report the warning. Processing continues with a documented fallback behavior. | Missing include file (MDPP006), undefined variable (MDPP010), orphaned tag (MDPP009) |
 
 ### Diagnostic Collection
@@ -500,8 +500,8 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP001** | Unclosed or unmatched condition block | Error | Pre-processing |
 | **MDPP002** | Invalid name (variable, style, alias, or marker key) | Error | Any |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 |
-| **MDPP004** | Invalid style placement | Warning | Phase 2 |
-| **MDPP005** | Circular include detected (static analysis) | Error | Pre-processing |
+| **MDPP004** | *(Reserved)* | Warning | — |
+| **MDPP005** | Circular include | Error | Phase 1, Step 1 |
 | **MDPP006** | Missing include file | Warning | Phase 1, Step 1 |
 | **MDPP007** | Invalid condition syntax | Error | Phase 1, Step 1 |
 | **MDPP008** | Duplicate alias within file | Error | Phase 2 |
@@ -514,7 +514,7 @@ The following table defines all diagnostic codes for Markdown++ processing. Code
 | **MDPP010** | Undefined variable reference | Warning | Phase 1, Step 2 | A `$name;` token references a name not present in the variable map |
 | **MDPP011** | Maximum include depth exceeded | Error | Phase 1, Step 1 | Include nesting exceeds the processor's configured maximum depth |
 | **MDPP012** | Cross-file condition span | Error | Phase 1, Step 1 | A condition block opens in one file and closes in another |
-| **MDPP013** | Include cycle detected during processing | Error | Phase 1, Step 1 | A file appears in its own include chain during recursive expansion |
+| **MDPP013** | *(Reserved)* | — | — | Formerly "Include cycle detected during processing" — consolidated into MDPP005 |
 | **MDPP014** | Duplicate link reference slug across files | Warning | Phase 2 | Two or more link reference definitions with the same slug originate from different source files in the assembled document. See [Cross-File Link Reference Resolution](cross-file-link-resolution.md). |
 | **MDPP015** | Document targets newer minor version than processor supports | Warning | Preamble | The `mdpp-version` minor version exceeds the processor's supported minor version within the same major series. See [Format Versioning](versioning.md). |
 | **MDPP016** | Document targets different major version than processor supports | Warning | Preamble | The `mdpp-version` major version differs from the processor's supported major version. See [Format Versioning](versioning.md). |

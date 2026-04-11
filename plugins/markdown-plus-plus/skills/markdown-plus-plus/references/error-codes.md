@@ -15,8 +15,8 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP001 | Unmatched condition block | Error | Opening without closing, or stray close |
 | MDPP002 | Invalid name | Error | Name with illegal characters in any named entity |
 | MDPP003 | Malformed marker JSON | Error | `<!--markers:{...}-->` fails to parse |
-| MDPP004 | Invalid style placement | Warning | Style tag not properly attached (reserved) |
-| MDPP005 | Circular include | Error | Include chain references itself (reserved) |
+| MDPP004 | *(Reserved)* | Warning | Formerly "Invalid style placement" — covered by MDPP009 (orphaned comment tag) |
+| MDPP005 | Circular include | Error | Include chain references itself |
 | MDPP006 | Missing include file | Warning | Referenced file does not exist |
 | MDPP007 | Invalid condition syntax | Error | Illegal characters or empty expression |
 | MDPP008 | Duplicate alias | Error | Same alias appears twice in one file |
@@ -166,27 +166,21 @@ $my variable;
 
 ---
 
-## MDPP004 -- Invalid Style Placement (Reserved)
+## MDPP004 -- Reserved
 
 **Severity:** Warning
 
-**Status:** Reserved -- not yet implemented
-
-**Description:** A style tag is not properly attached to a content element. The style tag must appear on the line immediately above the element it applies to, with no blank lines between them.
-
-**Intended detection logic:** Verify that each `<!--style:name-->` tag is followed on the next line by a valid content element (heading, paragraph, list item, blockquote, table, or code block).
+**Description:** Reserved. This code was originally designated for "Invalid style placement" but that condition is fully covered by MDPP009 (orphaned comment tag), which detects any directive tag not properly attached to a content element. MDPP004 is retained as a placeholder to preserve code numbering stability.
 
 ---
 
-## MDPP005 -- Circular Include (Reserved)
+## MDPP005 -- Circular Include
 
 **Severity:** Error
 
-**Status:** Reserved -- not yet implemented
-
 **Description:** An include chain forms a cycle, where a file directly or indirectly includes itself.
 
-**Intended detection logic:** Track the include chain as a set of resolved file paths. Before processing each `<!--include:path-->`, check whether the resolved path is already in the chain. If so, emit MDPP005.
+**Detection logic:** Track the include chain as a set of resolved file paths. Before processing each `<!--include:path-->`, check whether the resolved path is already in the chain. If so, emit MDPP005.
 
 ---
 
