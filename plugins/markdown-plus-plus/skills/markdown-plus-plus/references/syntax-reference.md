@@ -510,7 +510,7 @@ When a condition expression references an undefined (Unset) name, the processor 
 
 | Expression | Interpretation |
 |------------|----------------|
-| `web` | Show when "web" is visible. If "web" is Unset, block passes through. |
+| `web` | Show when "web" is visible |
 | `!web` | Show when "web" is hidden |
 | `web print` | Show when "web" AND "print" are visible |
 | `web,print` | Show when "web" OR "print" is visible |
@@ -559,6 +559,8 @@ This appears in web AND production.
 
 <!--/condition-->
 ```
+
+If the outer condition is Unset, the entire outer block (including nested condition blocks and their tags) passes through without evaluation.
 
 ### Common Errors
 

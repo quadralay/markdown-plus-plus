@@ -336,7 +336,7 @@ Variables MAY appear in paragraphs, headings, list items, link text, link URLs, 
 
 ### 8.4 Interaction with Other Extensions
 
-**Variables and Conditions:** Variable substitution runs after condition evaluation (Phase 1, Step 2 follows Step 1). Variables inside Hidden condition blocks are never resolved -- the content is removed before variable scanning occurs. Variable values cannot contain condition syntax; such content passes through as literal text into Phase 2.
+**Variables and Conditions:** Variable substitution runs after condition evaluation (Phase 1, Step 2 follows Step 1). Variables inside Hidden condition blocks are never resolved -- the content is removed before variable scanning occurs. Variables inside Unset (pass-through) condition blocks are resolved, because the block content is preserved and present when variable substitution scans the text. Variable values cannot contain condition syntax; such content passes through as literal text into Phase 2.
 
 **Variables and Includes:** The variable map is document-global. All files in an include tree share the same variable map. Variable substitution runs after all includes are expanded. Variable values cannot contain include syntax; such content passes through as literal text into Phase 2.
 
