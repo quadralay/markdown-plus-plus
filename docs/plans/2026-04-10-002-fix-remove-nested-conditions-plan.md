@@ -1,7 +1,7 @@
 ---
 title: "fix: Remove nested condition support from spec"
 type: fix
-status: active
+status: completed
 date: 2026-04-10
 ---
 
