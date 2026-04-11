@@ -16,7 +16,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP002 | Invalid name | Error | Name with illegal characters in any named entity |
 | MDPP003 | Malformed marker JSON | Error | `<!--markers:{...}-->` fails to parse |
 | MDPP004 | Invalid style placement | Warning | Style tag not properly attached to a content element |
-| MDPP005 | Circular include detected | Error | Include chain references itself (static analysis) |
+| MDPP005 | Circular include | Error | Include chain references itself (static analysis) |
 | MDPP006 | Missing include file | Warning | Referenced file does not exist |
 | MDPP007 | Invalid condition syntax | Error | Illegal characters or empty expression |
 | MDPP008 | Duplicate alias | Error | Same alias appears twice in one file |
@@ -176,7 +176,7 @@ $my variable;
 
 ---
 
-## MDPP005 -- Circular Include Detected
+## MDPP005 -- Circular Include
 
 **Severity:** Error
 
