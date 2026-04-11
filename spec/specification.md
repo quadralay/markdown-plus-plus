@@ -407,7 +407,7 @@ code here
 
 #### Inline Placement
 
-An inline style tag MUST appear immediately before the styled inline element on the same line, with no space between the closing `-->` and the element.
+An inline style tag MUST appear immediately before the styled inline element on the same line, with no space between the closing `-->` and the element. For links, the style tag is placed inside the link text brackets (see section 17.1).
 
 ```markdown
 This is <!--style:Emphasis-->**bold text** in a paragraph.
