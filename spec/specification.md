@@ -632,7 +632,7 @@ Conditions have the broadest interaction surface of any Markdown++ extension. Co
 
 **Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules. Tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
-**Conditions and Multiline Tables:** Conditions MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
+**Conditions and Multiline Tables:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
 
 **Conditions and Content Islands:** Conditions MAY wrap or appear within content islands (styled blockquotes). If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
 
@@ -976,7 +976,7 @@ Blockquotes in CommonMark support rich nested content. Within a content island, 
 
 **Content Islands and Variables:** Variable tokens within the blockquote are substituted during Phase 1.
 
-**Content Islands and Conditions:** Conditions MAY wrap or appear within content islands. If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
+**Content Islands and Conditions:** Conditions MAY wrap or appear within content islands (styled blockquotes). If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
 
 ### 15.5 Attachment Requirements
 
