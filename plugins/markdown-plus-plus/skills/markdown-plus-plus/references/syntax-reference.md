@@ -566,8 +566,6 @@ This appears when draft is Hidden.
 <!--/condition-->
 ```
 
-If the outer condition is Unset, the entire outer block (including nested condition blocks and their tags) passes through without evaluation.
-
 ### Common Errors
 
 | Error | Problem |
