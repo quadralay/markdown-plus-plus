@@ -168,7 +168,7 @@ Condition evaluation occurs per-file during include expansion. Each file's condi
 
 ##### Tri-State Condition Model
 
-Each condition name in the condition set has one of three states:
+Each condition name has one of three states:
 
 - **Visible**: The condition evaluates to true. Content inside the block is **included** in the output.
 - **Hidden**: The condition evaluates to false. Content inside the block is **removed** from the output.
