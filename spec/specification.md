@@ -273,7 +273,7 @@ The sequential ordering of the pipeline has critical implications:
 
 1. Conditions are evaluated before variable substitution. Variables inside Hidden condition blocks are never resolved. Variables inside Unset (pass-through) condition blocks are resolved, because the block's content survives into variable substitution.
 2. Includes are expanded before variable substitution. Variable values cannot contain include syntax.
-3. Variable values cannot contain condition syntax (conditions are already resolved).
+3. Variable values cannot contain condition syntax (defined conditions are already evaluated).
 4. Variable values CAN contain Markdown syntax (variable substitution runs before Markdown parsing).
 
 ### 7.3 Error Model
