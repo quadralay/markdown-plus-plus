@@ -1,6 +1,6 @@
 ---
 date: 2026-04-08
-status: draft
+status: active
 ---
 
 # Extensions in Multiline Table Cells
