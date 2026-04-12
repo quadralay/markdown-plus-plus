@@ -812,7 +812,7 @@ For multiple key-value pairs:
 <!-- markers:{"Key1": "value1", "Key2": "value2"} -->
 ```
 
-The JSON content MUST be a valid JSON object as defined by [RFC 8259][rfc8259]. Keys within the JSON object MUST be strings conforming to the standard identifier pattern. Values MAY be any JSON type (string, number, boolean, array, object, null). A conformant processor MUST use a standards-compliant JSON parser for the JSON markers production.
+The JSON content MUST be a valid JSON object as defined by [RFC 8259][rfc8259]. Keys within the JSON object MUST be strings conforming to the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Values MAY be any JSON type (string, number, boolean, array, object, null). A conformant processor MUST use a standards-compliant JSON parser for the JSON markers production.
 
 ### 13.3 Semantics
 

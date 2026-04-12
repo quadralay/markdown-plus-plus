@@ -247,8 +247,8 @@ Attaches multiple key-value metadata pairs using JSON object syntax.
 markers_cmd        ::= "markers:" json_object
 
 json_object        ::= /* A JSON object as defined by RFC 8259.
-                          Keys MUST be strings conforming to the standard
-                          identifier rule. Values may be any JSON type
+                          Keys MUST be strings conforming to the style/marker
+                          name rule. Values may be any JSON type
                           (string, number, boolean, array, object, null). */
 ```
 
@@ -504,7 +504,7 @@ The following invalid cases from `tests/sample-invalid-names.md` were verified:
 | 3 | `<!--style:Bad Style-->` | `identifier` -- space in name |
 | 4 | `<!--#-bad-start-->` | `alias_name` -- hyphen-first |
 | 5 | `<!--marker:123Key="value"-->` | `identifier` -- digit-first |
-| 6 | `<!--markers:{"123Bad": "val"}-->` | `identifier` applied to JSON key |
+| 6 | `<!--markers:{"123Bad": "val"}-->` | `style_name` applied to JSON key -- digit-first |
 | 16 | `<!--#bad.alias-->` | `alias_name` -- period not in character set |
 | 17 | `<!--style:Bad!Style-->` | `identifier` -- exclamation not in character set |
 
