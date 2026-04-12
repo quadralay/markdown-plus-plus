@@ -1115,7 +1115,14 @@ The validation script checks for these issues. See [Error Code Reference](error-
 | MDPP007 | Invalid condition syntax | Error |
 | MDPP008 | Duplicate alias within file | Error |
 | MDPP009 | Orphaned comment tag (not attached to element) | Warning |
+| MDPP010 | Undefined variable reference | Warning |
+| MDPP011 | Maximum include depth exceeded | Error |
+| MDPP012 | Cross-file condition span | Error |
+| MDPP013 | *(Reserved)* | — |
 | MDPP014 | Duplicate link reference slug across files | Warning |
+| MDPP015 | Document targets newer minor version than processor supports | Warning |
+| MDPP016 | Document targets different major version than processor supports | Warning |
+| MDPP017 | Invalid UTF-8 encoding | Error |
 
 ---
 
