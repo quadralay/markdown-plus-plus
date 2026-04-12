@@ -348,15 +348,11 @@ This paragraph is not styled because of the blank line.
 **Trigger examples:**
 
 ```markdown
-<!-- WARNING: variable not defined anywhere in the document -->
+<!-- WARNING: variable not defined anywhere in the variable map -->
 Product name: $productName;
-
-<!-- WARNING: referenced before the set directive -->
-Version: $version;
-<!--set:version=2.0-->
 ```
 
-**Suggested fix:** Define the variable using `<!--set:name=value-->` before the first use. Ensure the variable name matches exactly, including case.
+**Suggested fix:** Ensure the variable is defined in the variable map provided to the processor at build time. Variable names are case-sensitive — verify the name matches exactly.
 
 ---
 
