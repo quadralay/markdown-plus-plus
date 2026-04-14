@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="brand/logo.svg" alt="Markdown++ logo" width="128" height="128">
+  <img src="brand/logo.png" alt="Markdown++ logo" width="128" height="128">
 </p>
 
 # Markdown++
