@@ -21,7 +21,7 @@ This recommendation is stronger than a normative SHOULD because it has a routing
 
 **Why this matters in practice.** A long document whose only Markdown++ signal is a `<!-- multiline -->` table past line 40 may not surface that signal during a partial read. The frontmatter sentinel guarantees a Markdown++ signal appears at the top of every such file regardless of where directive-bearing content sits.
 
-The versioning role still holds: the declaration also signals the spec version this file targets, which downstream processors and validators can use for compatibility decisions. See [`spec/versioning.md`](../../../../spec/versioning.md) for the full versioning rules and [`SKILL.md`](../SKILL.md)'s success criteria for the skill-side framing.
+The versioning role still holds: the declaration also signals the spec version this file targets, which downstream processors and validators can use for compatibility decisions. See [`spec/versioning.md`](../../../../../spec/versioning.md) for the full versioning rules and [`SKILL.md`](../SKILL.md)'s success criteria for the skill-side framing.
 
 **Suggested language for downstream consumers.** Repositories authoring Markdown++ documents are encouraged to adopt the same recommendation in their own conventions, so the routing-context benefit applies wherever Markdown++ is authored. See [`tests/auto-activation/cases.md`](../tests/auto-activation/cases.md) for the manual-verification suite that exercises this convention.
 

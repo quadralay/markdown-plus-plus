@@ -24,7 +24,7 @@ The suite exists so future revisions to the skill — especially to the
 `description:` frontmatter in
 [`SKILL.md`](../../SKILL.md) — can be regression-checked against the
 five gap patterns the brainstorm enumerated. See the [routing-context
-principle learning](../../../../../docs/solutions/conventions/skill-activation-description-completeness-2026-05-09.md)
+principle learning](../../../../../../docs/solutions/conventions/skill-activation-description-completeness-2026-05-09.md)
 for the principles behind these cases.
 
 This suite is also distinct from the sibling `tests/sample-*.md`
@@ -212,9 +212,9 @@ the right closure for that gap.
   cases exercise
 - [`references/best-practices.md`](../../references/best-practices.md) — the
   `mdpp-version: 1.0` recommendation that closes G3 and reinforces G4
-- [Top-level `CLAUDE.md`](../../../../../CLAUDE.md) — the "Working
+- [Top-level `CLAUDE.md`](../../../../../../CLAUDE.md) — the "Working
   with Markdown++ files" section that closes G2 and reinforces G4
-- [Routing-context principle learning](../../../../../docs/solutions/conventions/skill-activation-description-completeness-2026-05-09.md)
+- [Routing-context principle learning](../../../../../../docs/solutions/conventions/skill-activation-description-completeness-2026-05-09.md)
   — the institutional knowledge that explains why these closures are
   shaped this way
 - GitHub issue [#85](https://github.com/quadralay/markdown-plus-plus/issues/85)
