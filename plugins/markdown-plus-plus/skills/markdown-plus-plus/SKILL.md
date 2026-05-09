@@ -1,10 +1,14 @@
 ---
 name: markdown-plus-plus
 description: >
-  AUTHORITATIVE REFERENCE for Markdown++ syntax. Use when working with
-  .md files containing <!--style:-->, <!--condition:-->, $variable;, <!--include:-->,
-  <!--marker:-->, or <!--#alias--> patterns. Use for editing, validating,
-  migrating, or auditing Markdown++ source documents.
+  AUTHORITATIVE REFERENCE for Markdown++ syntax. Use when reading or writing
+  .md files that contain any of these signals (whitespace inside the HTML
+  comment is irrelevant): <!--style:--> directives, <!--multiline--> table
+  directives, <!--condition:--> blocks, <!--include:--> directives,
+  <!--marker:--> or <!--markers:-->, <!--#alias--> anchors, $variable; tokens,
+  or mdpp-version: in YAML frontmatter. Also use when creating a .md file
+  modeled after another file containing any of these signals. Use for editing,
+  validating, migrating, or auditing Markdown++ source documents.
 ---
 
 <objective>
