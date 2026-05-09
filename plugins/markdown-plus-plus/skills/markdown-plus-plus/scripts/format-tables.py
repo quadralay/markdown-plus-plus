@@ -21,7 +21,6 @@ Options:
     --col-widths CSV        Comma-separated integer widths for `fixed` strategy
                             (e.g., 30,12,55). Must match every table's column count.
     --verbose               Print effective parameter values to stderr
-    --json                  Reserved for future use
 
 Exit Codes:
     0 - Success (no changes needed, or changes written successfully)
@@ -68,7 +67,6 @@ class FormatterConfig:
     min_col_width: int = DEFAULT_MIN_COL_WIDTH
     col_width_strategy: str = DEFAULT_COL_WIDTH_STRATEGY
     col_widths: Optional[list[int]] = None  # only used when strategy == 'fixed'
-    verbose: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -83,10 +81,6 @@ SEPARATOR_RE = re.compile(r'^\s*\|[\s:|\-]+\|\s*$')
 
 # Code fence opening/closing pattern (CommonMark 0.30) -- mirrors validate-mdpp.py.
 CODE_FENCE_RE = re.compile(r'^\s{0,3}(`{3,}|~{3,})')
-
-# Multiline directive: a comment whose only command (or one of its
-# semicolon-separated commands) is `multiline`.
-MULTILINE_DIRECTIVE_RE = re.compile(r'<!--\s*[^>]*?\bmultiline\b[^>]*?-->')
 
 # A line that is *only* a multiline directive (or combined-commands form
 # including multiline) and nothing else.
@@ -103,7 +97,6 @@ CELL_SPLIT_RE = re.compile(r'(?<!\\)\|')
 @dataclass
 class TableBlock:
     """A pipe-table block scanned from the source."""
-    kind: str = 'table'
     start_line: int = 0          # 1-based line number of header row
     directive_line: Optional[str] = None  # original directive line, if any
     is_multiline: bool = False
@@ -115,7 +108,6 @@ class TableBlock:
 @dataclass
 class TextBlock:
     """A non-table block (prose, code fence, HTML, blank lines)."""
-    kind: str = 'text'
     lines: list[str] = field(default_factory=list)
 
 
@@ -822,8 +814,6 @@ Examples:
                         help='Comma-separated integer widths (e.g., 30,12,55) for `fixed` strategy')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Print effective parameter values to stderr')
-    parser.add_argument('--json', action='store_true',
-                        help='Reserved for future use')
 
     args = parser.parse_args()
 
@@ -864,7 +854,6 @@ Examples:
         min_col_width=args.min_col_width,
         col_width_strategy=args.col_width_strategy,
         col_widths=args.col_widths,
-        verbose=args.verbose,
     )
 
     if args.verbose:
@@ -927,9 +916,17 @@ Examples:
     # Default: write to stdout. Use binary write to preserve the exact
     # byte stream regardless of platform line-ending translation in the
     # text-mode stdout layer.
-    sys.stdout.flush()
-    sys.stdout.buffer.write(formatted.encode('utf-8'))
-    sys.stdout.buffer.flush()
+    try:
+        sys.stdout.flush()
+        sys.stdout.buffer.write(formatted.encode('utf-8'))
+        sys.stdout.buffer.flush()
+    except BrokenPipeError:
+        # Downstream consumer (e.g., `head`) closed the pipe early.
+        # Suppress Python's default traceback and exit cleanly.
+        try:
+            sys.stdout.close()
+        except Exception:
+            pass
     return 0
 
 
