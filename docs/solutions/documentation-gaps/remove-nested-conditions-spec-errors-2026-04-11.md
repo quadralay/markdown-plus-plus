@@ -1,6 +1,7 @@
 ---
 title: Condition Block Nesting Incorrectly Documented as Supported
 date: 2026-04-11
+last_refreshed: 2026-05-09
 category: documentation-gaps
 module: markdown-plus-plus
 problem_type: documentation_gap
@@ -36,7 +37,7 @@ The Markdown++ specification incorrectly documented that condition blocks could 
 - `spec/processing-model.md` lines 193–208: "Nested Conditions" subsection with evaluation order and example
 - `spec/formal-grammar.md` line 327: "Condition blocks may nest but MUST NOT overlap."
 - `plugins/.../references/syntax-reference.md`: Nested-condition example presented as valid syntax, plus an orphaned paragraph 19 lines below the new prohibition that still described nested block evaluation behavior
-- `validate-mdpp.py` silently accepted nested conditions without raising an error (validator enforcement gap — open)
+- `validate-mdpp.py` silently accepted nested conditions without raising an error (validator enforcement gap — resolved 2026-05-09; see Resolution Update below)
 
 ## What Didn't Work
 
@@ -100,11 +101,9 @@ Advanced web content.
 
 **Orphaned-text risk:** After any specification correction, grep for the old permissive claim alongside the new prohibition to catch contradicting text that survived the sweep. In this case, a paragraph in `syntax-reference.md` stating "If the outer condition is Unset, the entire outer block (including nested condition blocks and their tags) passes through without evaluation" appeared 19 lines below the new prohibition — a direct self-contradiction caught only during code review.
 
-**Validator enforcement gap (open):** The `validate-mdpp.py` stack algorithm does not check nesting depth. A condition block opened inside another open condition block causes stack depth > 1 but no error is raised. Fix needed:
-1. After each `<!--condition:-->` push, check `len(condition_stack) > 1` and raise MDPP001
-2. Add a negative test case: a file with a nested condition block must fail validation
+**Validator enforcement gap (resolved):** The `validate-mdpp.py` stack algorithm now checks nesting depth at the push site. After each `<!--condition:-->` push, it tests `len(condition_stack) > 1` and raises MDPP001 referencing the outer block's line and expression (`plugins/markdown-plus-plus/skills/markdown-plus-plus/scripts/validate-mdpp.py:287-297`). The earlier prescription (a/b alternative — separate MDPP010 vs. extending MDPP001) was decided in favor of (a): nesting detection is folded into MDPP001 with a dedicated message and suggestion to use a logical expression instead.
 
-**Error code documentation accuracy (open):** `error-codes.md` MDPP001 now states conditions "MUST NOT be nested" but the reference validator does not enforce this. Either (a) add nesting detection to the MDPP001 check in the validator, or (b) introduce a dedicated MDPP010 code for nesting violations and remove the nesting clause from MDPP001.
+**Error code documentation accuracy (resolved):** `error-codes.md` MDPP001 wording and validator behavior now agree — both treat nested condition blocks as MDPP001 violations.
 
 **Test cases to add:**
 - Valid: Flat AND expression `<!--condition:web advanced-->` (depth 1)
@@ -118,3 +117,12 @@ Advanced web content.
 - `docs/solutions/documentation-gaps/combined-commands-conformance-classification-2026-04-10.md` — Precedent for cross-file RFC 2119 specification corrections; recommended the grep-sweep approach used here
 - `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — Documents the condition expression grammar (AND/OR/NOT operator precedence); may still reference the old grammar production permitting nesting
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` — Documents condition evaluation model (Condition State Model: Visible/Hidden/Unset)
+
+## Resolution Update — 2026-05-09
+
+The two open items flagged in the Prevention section are now closed:
+
+- **Validator enforcement** lives at `plugins/markdown-plus-plus/skills/markdown-plus-plus/scripts/validate-mdpp.py:287-297`. After the push that opens a condition block, the validator inspects `condition_stack`; depth > 1 raises MDPP001 with the outer block's line and expression in the message, and a suggestion to fold the conditions into a single logical expression.
+- **Error-code wording and validator behavior** are aligned: `references/error-codes.md` MDPP001 says conditions "MUST NOT be nested," and the validator now enforces that exact rule under MDPP001 (the alternative MDPP010 path was not taken).
+
+Spec files (`spec/specification.md:545,607-609`, `spec/processing-model.md:223-225`, `spec/formal-grammar.md:327`) consistently use the "MUST NOT nest or overlap" phrasing.
