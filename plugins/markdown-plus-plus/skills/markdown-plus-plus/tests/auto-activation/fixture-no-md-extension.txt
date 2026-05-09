@@ -1,0 +1,21 @@
+Notes for $product_name; release prep
+
+This file is the G5 fixture. It uses a `.txt` extension on purpose. Even
+though the body contains Markdown++ signals, the skill should NOT
+auto-activate, because Markdown++ is a `.md`-only format. Listing more
+extensions in the skill description would over-trigger on plain text
+files that happen to contain dollar-sign-and-semicolon tokens.
+
+<!--style:NoteBox-->
+> Reminder: cut the release branch before tagging.
+
+<!-- multiline -->
+| Step | Action                                  |
+|------|-----------------------------------------|
+| 1    | Bump the version manifest.              |
+|      | - Update plugin.json                    |
+|      | - Update marketplace.json               |
+|      |                                         |
+| 2    | Run smoke tests against $staging_url;.  |
+|      | - Verify install path                   |
+|      | - Verify upgrade path                   |

@@ -11,6 +11,9 @@ applies_when:
   - A skill must auto-activate from file content patterns rather than slash invocation
   - The skill is one of multiple sibling skills competing for the same routing slot
   - Adding a new distinguishing directive or syntax surface to the skill's domain
+  - Diagnosing a "skill didn't fire when it should have" report on a vague prompt
+  - Diagnosing the same report on a long file where the distinguishing directive sits past the routing layer's read window
+  - Designing the project-level CLAUDE.md or frontmatter conventions that complement a skill description
 tags:
   - skill-authoring
   - skill-description
@@ -82,6 +85,40 @@ description: >
 ```
 
 The diff is confined to the `description: >` folded scalar; `name:`, the `---` delimiters, and the SKILL.md body stay byte-identical. The version bumps `1.1.15 → 1.1.16` in both `plugins/markdown-plus-plus/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` via `scripts/bump-version.sh patch`.
+
+## When the description is not enough: the routing-context principle
+
+The original lesson assumed the routing layer can match any signal you list in the description. That assumption holds only when the signal is actually visible to the routing layer at the moment it decides. Three failure shapes fall outside what a description rewrite can fix:
+
+1. **Vague prompts.** "Update the docs" carries no Markdown++ token, no directive, no extension. A perfect description has nothing to match because the prompt names no signal.
+2. **Buried directives.** A long document whose only distinguishing directive sits past line 40 may not surface that line in the read excerpt the routing layer sees. The description matches what is visible; what is not visible cannot be matched.
+3. **Edit without prior read.** Workflows that act on a file path without first reading the file deny the routing layer any file-content signal at all. The description only matches against context that exists; an unread file contributes none.
+
+These three shapes share a root: skill auto-activation depends on signals being **visible to the routing layer at the time it decides**. Description completeness handles the case where the signal exists in routable context; it cannot manufacture context that is missing.
+
+### The three orthogonal mitigations
+
+Each shape needs its own closure path. They reinforce each other but address different gaps:
+
+- **Project-level guidance (CLAUDE.md)** for prompts the description cannot match. A "Working with Markdown++ files" section in the consuming repo's `CLAUDE.md` directs the agent to invoke the skill before editing any `.md` file, regardless of prompt shape. See `CLAUDE.md` § Working with Markdown++ files.
+- **Frontmatter sentinels** for files where directives sit deep in the body. A `mdpp-version: 1.0` declaration in YAML frontmatter surfaces a distinguishing signal in the first 3-5 lines of every Markdown++ file, regardless of where directive-bearing content sits. See `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md` § Declare the format version in frontmatter.
+- **Read-before-edit discipline** for workflows that bypass file content surfacing. The CLAUDE.md guidance also establishes that any `.md` edit in this repo should be preceded by a `Read`. The frontmatter sentinel partially backstops this when discipline lapses.
+
+### What is *not* a mitigation
+
+- **Extending the description with non-signal text.** Marketing copy or aspirational use cases dilute the routing contract without adding matchable tokens. The trade-off is silent over-triggering or silent under-triggering, depending on which way the routing layer reads the noise.
+- **Listing additional file extensions.** Markdown++ is a `.md`-only format. Extending the extension list to catch stray Markdown++ syntax in `.txt` or other extensions over-triggers on plain CommonMark and loses the skill's signal-to-noise ratio.
+
+Future contributors investigating a "skill didn't fire" report should diagnose against this principle before reaching for a description rewrite. If the missing signal was visible to the routing layer, fix the description; if it was not, the closure lives in CLAUDE.md, in frontmatter conventions, or in workflow discipline.
+
+### References (routing-context principle)
+
+- Test fixture suite: `plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md`
+- Top-level workflow guidance: `CLAUDE.md` § Working with Markdown++ files
+- Frontmatter sentinel recommendation: `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md` § Declare the format version in frontmatter
+- Origin issue: GitHub #85
+- Origin brainstorm: `docs/brainstorms/2026-05-09-skill-auto-invocation-gaps-requirements.md`
+- Origin plan: `docs/plans/2026-05-09-003-docs-skill-auto-invocation-gaps-plan.md`
 
 ## Related
 

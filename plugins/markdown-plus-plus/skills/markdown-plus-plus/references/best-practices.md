@@ -7,6 +7,24 @@ status: active
 
 Guidelines for effective use of Markdown++ extensions in documentation projects. Examples here are minimal do/don't snippets that illustrate rules -- not full patterns. For complete scenario patterns, see [`examples.md`](examples.md). For standalone specimen documents you can open and preview, see the [`examples/`](../../../../../examples/) directory.
 
+## Declare the format version in frontmatter
+
+**Strongly recommended:** every file using Markdown++ extensions should declare `mdpp-version: 1.0` in YAML frontmatter.
+
+```yaml
+---
+mdpp-version: 1.0
+---
+```
+
+This recommendation is stronger than a normative SHOULD because it has a routing-context payoff in addition to the format-versioning role. Frontmatter sits in the first lines of the file and surfaces in any reasonable read excerpt, including partial reads. With the sentinel present, downstream tooling (including the Markdown++ skill's auto-activation logic) can recognize a file as Markdown++ even when its distinguishing directives appear later in the document.
+
+**Why this matters in practice.** A long document whose only Markdown++ signal is a `<!-- multiline -->` table past line 40 may not surface that signal during a partial read. The frontmatter sentinel guarantees a Markdown++ signal appears at the top of every such file regardless of where directive-bearing content sits.
+
+The versioning role still holds: the declaration also signals the spec version this file targets, which downstream processors and validators can use for compatibility decisions. See [`spec/versioning.md`](../../../../../spec/versioning.md) for the full versioning rules and [`SKILL.md`](../SKILL.md)'s success criteria for the skill-side framing.
+
+**Suggested language for downstream consumers.** Repositories authoring Markdown++ documents are encouraged to adopt the same recommendation in their own conventions, so the routing-context benefit applies wherever Markdown++ is authored. See [`tests/auto-activation/cases.md`](../tests/auto-activation/cases.md) for the manual-verification suite that exercises this convention.
+
 ## Start with Markdown, extend where needed
 
 Every Markdown++ file is a valid Markdown file. Start by writing standard Markdown -- headings, paragraphs, lists, tables, links, images -- using any editor or previewer you already know. Add Markdown++ extensions only where they provide value: a `<!-- style: -->` directive when you need custom output formatting, a `$variable;` when a value repeats across documents, a `<!-- condition: -->` block when content varies by audience or output format. Standard Markdown tools remain part of your workflow throughout. The extensions are additive, not a replacement for the Markdown you already write.

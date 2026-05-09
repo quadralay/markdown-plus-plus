@@ -57,6 +57,42 @@ status: draft | active | archived
 - Date prefix for time-bound content (e.g., `2026-03-28-whitepaper.md`)
 - Slug-only for evergreen content (e.g., `whitepaper.md`)
 
+## Working with Markdown++ files
+
+Most `.md` files in this repo are Markdown++ source documents. The
+`markdown-plus-plus:markdown-plus-plus` skill auto-activates on files
+containing distinguishing Markdown++ signals -- but auto-activation
+depends on the routing layer seeing those signals at decision time.
+Two workflow conventions close the gaps where the routing layer cannot
+see a signal on its own:
+
+1. **Read before edit.** Any agent working on a `.md` file in this
+   repo should `Read` the file before editing it. Reading brings the
+   file's frontmatter and Markdown++ directives into routing context,
+   which lets the skill auto-activate on the actual signals in the
+   document. Edit-without-read flows bypass this surfacing entirely.
+
+2. **Load the skill explicitly when the prompt is generic.** Prompts
+   like "update the docs" or "add a row to that table" do not carry
+   the file-content signals the routing layer keys on. When working
+   on Markdown++ files in this repo, invoke
+   `/markdown-plus-plus:markdown-plus-plus` (or load the skill
+   through whatever routing surface is available) before editing.
+
+This guidance is expectation-setting for human authors and AI agents,
+not a runtime contract -- the routing layer is not bound by anything
+written here. The convention exists because the alternative is silent
+authoring failures on documents the skill should have caught and didn't.
+
+**Suggested language for downstream consumers.** Repositories that
+author Markdown++ documents are encouraged to copy the two rules above
+into their own `CLAUDE.md` so the same routing-context discipline
+applies wherever Markdown++ is authored. The
+`references/best-practices.md` file in this skill carries the same
+guidance for downstream reference. See
+[`tests/auto-activation/cases.md`](plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md)
+for the manual-verification suite that exercises these conventions.
+
 ## Git workflow
 
 - **Primary branch:** `main`
