@@ -109,7 +109,7 @@ Markdown++ adds the publishing capabilities that technical writers need without 
 
 - **Custom styles** -- `<!-- style:Note -->`, `<!-- style:Important -->`, `<!-- style:Warning -->` map content to any output styling without embedding CSS classes or presentation markup in the source.
 - **Variables** -- `$product_name;`, `$version;`, `$release_date;` define reusable values managed centrally and resolved during publishing.
-- **Conditional content** -- `<!-- condition:online -->...<!-- /condition -->` shows or hides content based on output format, audience, or any defined condition.
+- **Conditional content** -- `<!-- condition:online -->...<!-- /condition -->` shows or hides content based on output format, audience, or any defined condition. The directive wraps content inline, unlike attribute-based filter systems used by XML formats.
 - **Metadata markers** -- `<!-- markers:{"Keywords": "IPsec, peering", "Description": "How to configure peering connections"} -->` attaches metadata for SEO, search indexing, and content management.
 - **Multiline tables** -- `<!-- multiline -->` allows table cells with block elements, lists, wrapped text, and continuation rows.
 
@@ -160,6 +160,8 @@ Markdown++ provides structured content capabilities comparable to DITA and DocBo
 | Source readability | XML tags throughout | Plain text with invisible comments |
 
 For the capabilities that most technical writing teams use daily, Markdown++ covers the ground that DITA and DocBook occupy -- with dramatically simpler source files. Some advanced DITA features (relationship tables, specialization constraints, key scoping, XLIFF-based localization workflows) do not have direct Markdown++ equivalents. For teams that rely heavily on those features, DITA's ecosystem tooling remains deeper. For teams that need structured content without XML overhead, the readability gap is enormous. A DITA topic requires XML declarations, namespaces, nested elements, and closing tags. A Markdown++ file reads like a document.
+
+Conditional content shows a structural difference between the two formats. Markdown++ wraps content with inline directives that sit next to the content they gate. DITA tags content with attributes (`@audience`, `@platform`, `@product`) and resolves them at build time against separate DITAVAL filter files. Three practical effects follow. Locality: a Markdown++ condition lives in the source file with the content it controls, but a DITA condition splits between content attributes and the DITAVAL rules that interpret them. Diff visibility: adding or removing a Markdown++ condition is a single-location edit with a clear diff; the DITA equivalent typically requires attribute edits in content paired with rule edits in DITAVAL across separate files. Authoring ergonomics: a writer editing a Markdown++ file can see what is conditional; a writer editing a DITA topic reads attribute markup and reasons about how each filter file resolves it. Both approaches work -- the choice is whether condition logic lives with the content or in a separate rule file.
 
 ### 8. Advanced content structures
 
