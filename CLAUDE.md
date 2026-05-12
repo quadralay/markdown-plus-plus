@@ -17,7 +17,7 @@ markdown-plus-plus/
 ├── .claude-plugin/
 │   └── marketplace.json        # Marketplace manifest
 ├── docs/
-│   └── solutions/              # Past solutions and learnings
+│   └── solutions/              # Past solutions and learnings, organized by category (bug-track and knowledge-track) with YAML frontmatter (module, tags, problem_type); relevant when implementing or debugging in documented areas
 ├── scripts/
 │   └── bump-version.sh         # Version bump utility
 ├── spec/                       # Whitepaper and eventual formal specification
