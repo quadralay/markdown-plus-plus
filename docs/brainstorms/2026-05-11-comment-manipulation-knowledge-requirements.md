@@ -1,5 +1,6 @@
 ---
 date: 2026-05-11
+status: active
 topic: comment-manipulation-knowledge
 ---
 

@@ -297,8 +297,8 @@ structural shape. Five rules cover the cases that arise.
 
 When content shortens inside a cell, pad with trailing whitespace to
 maintain the column's visible width. This keeps pipes vertically aligned
-and leaves the table in a state
-[`format-tables.py`](table-formatting.md) treats as already formatted.
+and leaves the table in a state the formatter described in
+[`table-formatting.md`](table-formatting.md) treats as already formatted.
 
 **Before:**
 
@@ -466,9 +466,10 @@ cleanup tooling must also:
 1. **Verify standalone-anchor matches are not inside a style comment.**
    Inspect the surrounding text to confirm the matched `<!--` and `-->`
    actually delimit the anchor, not a larger combined directive.
-2. **Evaluate each cell of a multiline-table row independently** (R11
-   above). A line-level scanner that gates on "is there a style comment
-   anywhere on this line?" mishandles cross-cell coexistence.
+2. **Evaluate each cell of a multiline-table row independently** (see
+   "Cross-cell detection inside multiline tables" above). A line-level
+   scanner that gates on "is there a style comment anywhere on this
+   line?" mishandles cross-cell coexistence.
 3. **Check for Setext headings** when deciding whether an anchor is on
    a heading. The `=` / `-` underline appears on the *next* line, not
    the current one.
