@@ -65,9 +65,10 @@ The order of link reference definitions in the assembled document is determined 
 Given this root document:
 
 ```markdown
+<!-- style:Heading1; #root-target -->
 # Root content
 
-[slug]: #root-target
+[slug]: #root-target "Root content"
 
 <!-- include:chapter-a.md -->
 <!-- include:chapter-b.md -->
@@ -76,13 +77,19 @@ Given this root document:
 And `chapter-a.md`:
 
 ```markdown
-[slug]: #chapter-a-target
+<!-- style:Heading1; #chapter-a-target -->
+# Chapter A
+
+[slug]: #chapter-a-target "Chapter A"
 ```
 
 And `chapter-b.md`:
 
 ```markdown
-[slug]: #chapter-b-target
+<!-- style:Heading1; #chapter-b-target -->
+# Chapter B
+
+[slug]: #chapter-b-target "Chapter B"
 ```
 
 The assembled document order is: root content, then chapter-a content, then chapter-b content. The root document's definition of `[slug]` appears first and wins.

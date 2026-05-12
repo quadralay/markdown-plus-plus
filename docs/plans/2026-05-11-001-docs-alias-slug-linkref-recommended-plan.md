@@ -1,6 +1,6 @@
 ---
 date: 2026-05-11
-status: active
+status: completed
 type: docs
 origin: docs/brainstorms/2026-05-11-alias-slug-linkref-recommended-requirements.md
 issue: 96
