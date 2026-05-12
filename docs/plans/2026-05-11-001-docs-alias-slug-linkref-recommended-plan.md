@@ -657,9 +657,9 @@ verification consists of:
 2. **Origin success criteria.** Each of the six success criteria in
    `docs/brainstorms/2026-05-11-alias-slug-linkref-recommended-requirements.md`
    § Success Criteria is satisfied:
-   - U1 satisfies the first three (dangling-target example fixed,
-     MDPP014 fixed via U2, recommended idiom obvious in
-     best-practices via U3).
+   - The first three are satisfied by U1 (dangling-target example
+     fixed), U2 (MDPP014 fixed), and U3 (recommended idiom obvious
+     in best-practices).
    - U4 satisfies "syntax-reference directs a reader who just learned
      about custom aliases to the paired-pattern guidance".
    - U5 satisfies "SKILL.md directs AI authors to apply the pattern
