@@ -355,6 +355,7 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 - `references/error-codes.md` - Error code reference with detection logic, trigger examples, and fixes
 - `references/examples.md` - Real-world document examples
 - `references/best-practices.md` - Usage guidance, naming conventions, and common mistakes
+- `references/table-formatting.md` - Readable-table conventions and the `format-tables.py` rule set
 - `../../../../spec/specification.md` - Consolidated Markdown++ 1.0 specification
 - `../../../../spec/processing-model.md` - Two-phase pipeline, variable/condition scoping, and processing order
 - `../../../../spec/attachment-rule.md` - Formal tag-to-element binding rule, edge cases, and exempt tags

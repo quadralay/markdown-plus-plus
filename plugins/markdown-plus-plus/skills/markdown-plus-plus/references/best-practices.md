@@ -278,6 +278,35 @@ Available in print and tablet editions.
 - Continuation rows use empty first cell (`|      |`)
 - Row separator: pipes with whitespace-only cells (blank line ends the table)
 
+### Table Formatting
+
+**Tables in Markdown++ documents follow a fixed-width, vertically aligned shape** -- columns are padded to uniform width, pipes line up across every row, separator dashes span the full column width, and (for `<!-- multiline -->` tables) long content wraps to continuation rows. The full rule set is documented in [`table-formatting.md`](table-formatting.md); the canonical enforcement tool is `scripts/format-tables.py --in-place`.
+
+**Why this matters.** Compact one-line tables overflow editor windows and PR review panes, and a one-character cell edit rewrites the entire row in version-control diffs. The formatter's output keeps column widths stable across edits, so a content change shows up as a content change, not as whitespace churn.
+
+**Use the formatter for:**
+- New tables before committing
+- Tables migrated from another format
+- Tables you've just edited by hand if column widths drifted
+
+**Run it:**
+```bash
+python scripts/format-tables.py document.md --in-place
+```
+
+**In CI:**
+```bash
+python scripts/format-tables.py document.md --check
+```
+`--check` exits 0 if the file is already formatted, exit 4 with a unified diff otherwise.
+
+**In-flow editing guidance for AI agents.** When editing a table by hand inside an authoring session, match the surrounding column widths -- pad new content with trailing spaces to the column's existing inner width and keep pipes vertically aligned. When in doubt, run the formatter rather than guessing. Both shapes are valid Markdown; the formatter exists so the same shape is produced consistently.
+
+**Avoid:**
+- Mixing formatted and unformatted tables in the same file -- pick one shape for the document
+- Hand-tuning column widths that the formatter would produce automatically (it will undo your work on the next pass)
+- Adding `<!-- multiline -->` to a standard table just to silence an over-width warning -- if the cell is genuinely long enough to wrap, the directive is a deliberate choice; otherwise, fix the content
+
 ### Combined Commands
 
 **Order priority:** style, multiline, marker(s), #alias

@@ -13,6 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.3.0] - 2026-05-09
+
+### Tooling
+
+- Added `format-tables.py` script for deterministic Markdown table reformatting (standard and `<!-- multiline -->`), with idempotent output, configurable column-width strategies (`auto` / `fixed` / `proportional`), `--in-place` and `--check` modes, and inline-formatting-aware word wrap ([#91](https://github.com/quadralay/markdown-plus-plus/issues/91))
+- Added `references/table-formatting.md` rule set documenting fixed-width column conventions, configurable parameters, and known limitations ([#91](https://github.com/quadralay/markdown-plus-plus/issues/91))
+- Added Table Formatting subsection to `references/best-practices.md` covering in-flow editing guidance ([#91](https://github.com/quadralay/markdown-plus-plus/issues/91))
+- Added test fixtures `sample-tables-multiline.md`, `sample-tables-standard-warn.md`, `sample-tables-already-formatted.md`, and the AE1-AE7 verification protocol `format-tables-cases.md` ([#91](https://github.com/quadralay/markdown-plus-plus/issues/91))
+
 ## [1.2.0] - 2026-04-12
 
 ### Spec
