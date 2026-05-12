@@ -566,11 +566,46 @@ Ensure include chains never loop back.
 
 5. Preview output before final publish
 
+## Semantic Cross-References on Topic-Defining Headings
+
+**Recommended** for file titles, primary H1s, and structurally important H2 headings. The alias+slug+linkref triple makes a heading externally referenceable with a stable, semantic name that survives heading-text renames. The same reference works in standalone preview, single-file publishing, and multi-file assembly.
+
+The pattern combines three pieces:
+
+```markdown
+<!-- style:Heading2; #200020 -->
+## Installation
+
+[installation]: #200020 "Installation"
+```
+
+1. The `<!-- style:HeadingN; #target -->` directive attaches a stable alias (`#200020`) to the heading. The alias does not change when you reword the heading.
+2. The heading line provides the human-visible label.
+3. The link reference definition binds a semantic slug (`installation`) to the stable alias and supplies a default link text via the trailing title.
+
+References elsewhere in the assembly use the slug:
+
+```markdown
+See [Installation][installation] for setup instructions.
+If setup fails, return to [Installation][installation].
+```
+
+**Why this is the recommended idiom:**
+- The same reference works whether the file is rendered standalone, published as a single document, or assembled with `<!-- include: -->` into a larger document. Link reference definitions resolve at document-global scope after assembly, so references in one file resolve to definitions in another.
+- The slug stays semantic. Reword the heading from "Installation" to "Installing the Product" and the reference still resolves -- the alias `#200020` is what binds them.
+- A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent.
+
+**When the rule fires:** Apply on the file's title (H1), and on H2 headings that name a major section a reader is likely to deep-link to. Below H2 is author judgement -- not blanket policy.
+
+**When the rule does not fire:** A custom alias used only as an internal anchor (no external references expected) is valid on its own. Do not pair every alias with a link reference definition reflexively.
+
+**Cross-file behavior:** If two files define the same slug with different targets, the first definition in assembled document order wins and the processor emits **MDPP014**. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the full resolution rules, and Worked Examples A and B in that document for the canonical pattern at full length.
+
 ## Advanced Patterns
 
 ### Link References
 
-Link references are a standard Markdown feature that allow defining link targets separately from their usage. While supported, they are **generally not recommended** for most documentation because they add indirection that makes content harder to understand and maintain.
+Link references are a standard Markdown feature that allow defining link targets separately from their usage. Outside the topic-heading idiom in [Semantic Cross-References on Topic-Defining Headings](#semantic-cross-references-on-topic-defining-headings), link references are **generally not recommended** for general-purpose link reuse because they add indirection that makes content harder to understand and maintain.
 
 **Standard inline links (recommended):**
 ```markdown
@@ -578,7 +613,7 @@ See [Installation](#installation) for setup instructions.
 Visit the [API Documentation](https://docs.example.com/api).
 ```
 
-**Link references (advanced):**
+**General-purpose link references (advanced):**
 ```markdown
 See [Installation][install-guide] for setup instructions.
 Visit the [API Documentation][api-docs].
@@ -587,17 +622,16 @@ Visit the [API Documentation][api-docs].
 [api-docs]: https://docs.example.com/api
 ```
 
-**Why inline links are preferred:**
+**Why inline links are preferred for general-purpose use:**
 - Self-contained and easier to understand
 - AI-assisted authoring works better with explicit links
 - No need to hunt for where references are defined
 - Simpler mental model for authors
 
-**When link references may be useful:**
+**When general-purpose link references may be useful:**
 - Redirecting links based on document context (e.g., pointing to the latest API version)
 - Conditional link targets for different output formats
 - Very long URLs that clutter the text
-- **Semantic cross-references in multi-file assemblies** -- the primary use case for link references in Markdown++
 
 **Example - version redirection:**
 ```markdown
@@ -607,25 +641,6 @@ See the [API Reference][latest-api] for endpoint details.
 ```
 
 When a new API version is released, only the reference definition needs updating.
-
-**Example - semantic cross-references across files:**
-
-In multi-file documentation assembled with `<!-- include: -->`, link reference definitions bridge human-readable slugs to alias IDs across all included files:
-
-```markdown
-<!-- In chapters/installation.md -->
-<!-- style:Heading2; #200020 -->
-## Installation
-
-[installation]: #200020 "Installation"
-```
-
-```markdown
-<!-- In chapters/troubleshooting.md -->
-If the issue persists, re-run [Installation][installation].
-```
-
-The reference in `troubleshooting.md` resolves to the definition in `installation.md` because all included files share document-global scope after assembly. If two files define the same slug with different targets, the first definition in assembled document order wins and the processor emits **MDPP014**. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the full resolution rules.
 
 **Tradeoffs:**
 - Adds complexity and indirection
