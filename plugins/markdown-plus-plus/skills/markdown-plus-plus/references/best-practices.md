@@ -481,6 +481,8 @@ Follow these steps to install...
 
 **Note:** Conditions (`condition:`/`/condition`) are exempt because they wrap content. Includes (`include:`) are exempt because they are standalone directives. Markers at the start of a file are not exempt -- they are attached to the Title paragraph that follows them.
 
+**Removing rather than authoring directives?** Cleanup edits (removing redundant `<!--style:-->` comments, simplifying style names, deleting non-heading anchors) follow a different rule set than authoring. See [`comment-manipulation.md`](comment-manipulation.md) for the safe-removal rules and the table-cell edge cases that make hand-removal error-prone.
+
 ### 2. Missing Semicolons on Variables
 
 **Wrong:**
