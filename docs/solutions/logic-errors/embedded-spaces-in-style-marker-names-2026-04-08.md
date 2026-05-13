@@ -84,5 +84,5 @@ This also resolves the circular correction: pre-#15 styles used `.+` (accepting 
 - [#15](https://github.com/quadralay/markdown-plus-plus/issues/15) — Direct predecessor: established the two-pattern naming system that #52 extends to three patterns
 - [#27](https://github.com/quadralay/markdown-plus-plus/issues/27) — ePublisher adapter regex updates (downstream, may need updating for STYLE_NAME_RE)
 - [#49](https://github.com/quadralay/markdown-plus-plus/issues/49) — Element interaction refinements (depends on embedded spaces being valid)
-- `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` — The #15 learning that established the two-pattern system; now partially stale (shows only two constants, needs refresh)
-- `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — States "two identifier productions" when the grammar now defines three; needs refresh
+- `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` — The #15 learning that established the two-pattern system; subsequently updated to reference `STYLE_NAME_RE` as the #52 extension
+- `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — Now describes "three identifier productions" (`identifier`, `alias_name`, `style_name`) reflecting the #52 extension
