@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.4.0] - 2026-05-13
+
+### Tooling
+
+- Added `references/comment-manipulation.md` rule set documenting safe removal and simplification of Markdown++ directive comments during cleanup, migration, or refactoring passes — block-style removal and reduction, inline-style removal when a Markdown token already conveys the role, keep-by-default semantic styles, anchor handling (standalone vs combined, ATX vs Setext, cross-cell detection inside multiline tables), table-cell preservation (width, escaped pipes, multiline row boundaries, partial-cell and bare-marker merges), and detection regex patterns with a companion-logic checklist ([#94](https://github.com/quadralay/markdown-plus-plus/issues/94))
+- Added pointer to `references/comment-manipulation.md` in `SKILL.md` and cross-reference in `references/best-practices.md` ([#94](https://github.com/quadralay/markdown-plus-plus/issues/94))
+
 ## [1.3.1] - 2026-05-11
 
 ### Spec
