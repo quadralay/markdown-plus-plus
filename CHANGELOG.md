@@ -13,6 +13,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.3.1] - 2026-05-11
+
+### Spec
+
+- Fixed dangling link reference targets in the conflict-resolution example in `spec/cross-file-link-resolution.md` so each `[slug]` definition pairs with the alias directive that produces its target, restoring consistency with Examples A and B in the same file ([#96](https://github.com/quadralay/markdown-plus-plus/issues/96))
+
+### Tooling
+
+- Promoted the alias+slug+linkref pattern from "advanced" to recommended for topic-defining headings (titles, primary H1s, structurally important H2s) in `references/best-practices.md`; general-purpose link references for arbitrary URL reuse remain marked as advanced ([#96](https://github.com/quadralay/markdown-plus-plus/issues/96))
+- Added recommendation in the Custom Aliases section of `references/syntax-reference.md` to pair aliases with link reference definitions when marking referenceable endpoints ([#96](https://github.com/quadralay/markdown-plus-plus/issues/96))
+- Added explicit guidance in `SKILL.md` directing AI authors to apply the alias+slug+linkref triple on significant headings when authoring or editing Markdown++ topic files ([#96](https://github.com/quadralay/markdown-plus-plus/issues/96))
+- Fixed the same dangling-target issue in the MDPP014 trigger example in `references/error-codes.md` for consistency with the spec ([#96](https://github.com/quadralay/markdown-plus-plus/issues/96))
+
 ## [1.3.0] - 2026-05-09
 
 ### Tooling

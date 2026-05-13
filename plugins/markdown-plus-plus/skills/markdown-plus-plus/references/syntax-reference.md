@@ -461,7 +461,9 @@ See [Introduction](#introduction) for details.
 See [API Auth](api-reference.md#authentication) for auth info.
 ```
 
-**Note:** Reference-style links (`[text][ref]` with `[ref]: url`) are supported but generally not recommended for simple use cases. See the **Advanced Patterns** section in [best-practices.md](best-practices.md#link-references) for guidance on when to use them. In multi-file assemblies, link reference definitions from all included files are visible throughout the assembled document — this is the foundation of the semantic cross-reference pattern. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the normative resolution rules.
+**Note:** When an alias marks a heading that is meant to be externally referenceable (a file title, a primary H1, or a structurally important H2), pair it with a link reference definition that binds a semantic slug to the alias target. This is the recommended Markdown++ cross-reference idiom — see [Semantic Cross-References on Topic-Defining Headings](best-practices.md#semantic-cross-references-on-topic-defining-headings) for the canonical pattern. An alias used as an internal-only anchor (no external references expected) is valid on its own and does not need a paired definition.
+
+General-purpose reference-style links (`[text][ref]` with `[ref]: url` for arbitrary URL reuse) are supported but generally not recommended for simple use cases. See the **Advanced Patterns** section in [best-practices.md](best-practices.md#link-references) for guidance on when to use them. In multi-file assemblies, link reference definitions from all included files are visible throughout the assembled document — this is the foundation of the semantic cross-reference pattern. See the [Cross-File Link Reference Resolution](../../../../../spec/cross-file-link-resolution.md) specification for the normative resolution rules.
 
 **CommonMark rendering:** Alias directives are hidden (HTML comments are invisible). Standard heading IDs still work for in-page navigation.
 

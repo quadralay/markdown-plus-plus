@@ -422,9 +422,15 @@ This content is conditional.
 
 ```markdown
 <!-- file-a.md -->
+<!-- style:Heading2; #section-1 -->
+## Overview
+
 [overview]: #section-1 "Overview"
 
 <!-- file-b.md (included in the same assembly) -->
+<!-- style:Heading2; #section-2 -->
+## Overview
+
 [overview]: #section-2 "Overview"
 <!-- WARNING: duplicate slug "overview" from a different source file -->
 ```

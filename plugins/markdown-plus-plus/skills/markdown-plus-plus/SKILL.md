@@ -109,7 +109,22 @@ See [Getting Started](#getting-started) for an introduction.
 
 **Auto-generated alias collisions:** When multiple headings produce the same auto-generated alias, the first heading keeps the bare alias and subsequent headings receive `-2`, `-3`, etc. (e.g., `setup`, `setup-2`, `setup-3`). Custom aliases and auto-generated aliases occupy separate namespaces -- when a custom alias and an auto-generated alias share the same identifier, both exist independently, but the custom alias wins at link resolution time (no suffixing or displacement of the auto-generated alias). Both overlap types are resolved silently -- no diagnostic is emitted. Custom alias duplicates remain an error (MDPP008). When a heading with a suffixed auto-generated alias also has a custom alias, both are valid anchors (e.g., `#db-setup` and `#setup-2`). See `spec/element-interactions.md` for the full algorithm.
 
-Use `scripts/add-aliases.py` to auto-generate aliases for headings.
+**Recommended pattern for referenceable headings:** When authoring or editing a Markdown++ topic file, apply the **alias+slug+linkref** triple on every heading meant to be externally referenceable:
+
+```markdown
+<!-- style:Heading2; #200020 -->
+## Installation
+
+[installation]: #200020 "Installation"
+```
+
+- **When the rule fires:** the file's title (H1), and H2 headings that name a major section a reader is likely to deep-link to.
+- **What to author:** all three pieces -- the `<!-- style:HeadingN; #target -->` directive on the heading, the heading itself, and a `[semantic-slug]: #target "Title"` link reference definition below it. Just an alias (without the paired definition) makes the heading internally addressable but does not establish a semantic cross-reference.
+- **When the rule does NOT fire:** H3+ headings are author judgement -- do not apply the triple reflexively to every subsection. A custom alias used purely as an internal anchor (no external references expected) is also valid on its own.
+
+See [Semantic Cross-References on Topic-Defining Headings](references/best-practices.md#semantic-cross-references-on-topic-defining-headings) for the full rationale and cross-file behavior.
+
+Use `scripts/add-aliases.py` to auto-generate aliases for headings. The script writes alias anchors only -- it does not author the paired link reference definitions, so you must add those by hand when the heading is meant to be externally referenceable.
 
 ### Conditions
 
