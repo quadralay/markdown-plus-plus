@@ -51,10 +51,10 @@ Every removal and reduction rule below derives from one principle:
 > API-documentation category, inline semantic role) is **not
 > redundant** and must be preserved.
 
-The illustrative style-name lists in the sections below are FrameMaker
-and ePublisher conventions surfaced by particular migration toolchains.
-The principle is the durable knowledge -- consumer repositories with
-different style families apply the same test to their own names.
+The illustrative style-name lists in the sections below are common
+FrameMaker and ePublisher style conventions. The principle is the
+durable knowledge -- documents with different style families apply
+the same test to their own names.
 
 ## Removing Block Style Comments
 
@@ -65,7 +65,7 @@ structure alone carries the same meaning.
 
 ### Illustrative removable block-style families
 
-The following style names, drawn from migrated FrameMaker / ePublisher
+The following style names, common in FrameMaker / ePublisher source
 documents, are routinely safe to remove:
 
 - **Paragraph / body**: `Body`, `Normal`, `Default`, `BodyText`,
@@ -81,8 +81,8 @@ documents, are routinely safe to remove:
   `AnchorIndent2` (anchor handling itself is covered separately below)
 
 *Illustrative, not canonical.* The names above are concrete examples
-from one migration toolchain. Apply the principle, not the list, to
-your own style families.
+from FrameMaker / ePublisher style conventions. Apply the principle,
+not the list, to your own style families.
 
 ### Worked example
 
@@ -130,9 +130,9 @@ with the canonical base form.
 - `Definition Description` -> `DefineListDefinition`
 - `d_caption` -> `FigureTitle`
 
-*Illustrative, not canonical.* The reductions above are the patterns
-observed in FrameMaker / ePublisher migrations. Apply the principle:
-when two style names render identically, prefer the canonical base name.
+*Illustrative, not canonical.* The reductions above are common in
+FrameMaker / ePublisher style families. Apply the principle: when
+two style names render identically, prefer the canonical base name.
 
 ### Worked example -- ChapterTitle to Title
 
@@ -482,50 +482,29 @@ cleanup tooling must also:
    marker behind. Merge the next line's corresponding cell content to
    complete the list item.
 
-## Reference Implementation
-
-The cleanup rules above are implemented by the Phase II scripts in the
-`epublisher-docs` repository. The scripts are reference implementations,
-not normative -- this document is the source of truth for *behavior*;
-the scripts are the source of truth for *implementation in that repo*.
-Those scripts live in a separate repository and may evolve
-independently.
-
-### Phase II scripts
-
-| Script                              | Purpose                                                          |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `detect-removable-block-styles.py`  | Remove semantic-free block styles                                |
-| `detect-reducible-styles.py`        | Simplify style names to canonical base forms                     |
-| `detect-removable-anchors.py`       | Remove non-heading anchors                                       |
-| `detect-removable-inline-styles.py` | Remove inline styles where a Markdown token already conveys role |
-| `markdown_table_utils.py`           | Shared library for table-cell manipulation                       |
-
-Repo-relative paths inside `epublisher-docs` are under
-`.claude/scripts/`. Path stability there is the responsibility of that
-repo's maintainers.
-
-### markdown_table_utils.py helper inventory
+## Implementation Helpers
 
 A re-implementer building cleanup tooling in any language should expect
-to need helpers shaped like the following:
+to need helpers with the following shapes. The shapes are the durable
+knowledge; specific function names, signatures, and call patterns
+depend on the host language and the broader cleanup toolchain.
 
-- **`find_unescaped_pipe`** -- locate cell boundaries while skipping
+- **Cell-boundary locator** -- locate cell boundaries while skipping
   escaped `\|` content.
-- **`replace_in_table_cell`** -- replace text inside a cell while
+- **Cell content replacer** -- replace text inside a cell while
   preserving the cell's visible width via trailing whitespace.
-- **`is_table_line_empty`** -- detect a row whose cells are all
+- **Empty-row detector** -- detect a row whose cells are all
   whitespace-only (the multiline row-boundary marker).
-- **`is_bare_list_marker`** -- detect a cell containing only a list
+- **Bare-marker detector** -- detect a cell containing only a list
   marker with no following content.
-- **`handle_table_line_after_removal`** -- post-removal cleanup that
-  decides whether a partial-cell or bare-marker merge is needed.
-- **`merge_table_line_up`** -- merge content from the next physical
-  line's corresponding cells into the current line's emptied cells.
+- **Post-removal handler** -- after a directive removal, decide
+  whether a partial-cell or bare-marker merge is needed.
+- **Upward merger** -- merge content from the next physical line's
+  corresponding cells into the current line's emptied cells.
 
-The names above are the Python script's conventions; the *shapes* are
-the durable knowledge. A Node, Ruby, or inline-Claude re-implementation
-needs equivalent capabilities under its own names.
+This document is the source of truth for cleanup *behavior*.
+Implementations in any specific language or toolchain are the source
+of truth for *how* the behavior is realized in that environment.
 
 ## See Also
 
