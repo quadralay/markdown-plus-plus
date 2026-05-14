@@ -821,9 +821,9 @@ Multiline tables classify each physical pipe-bearing line by one of three struct
 2. **Continuation row** -- A table row whose first cell is empty and that is not a row separator. Merged into the preceding logical row.
 3. **New logical row** -- A table row whose first cell contains content. Starts a new logical row.
 
-> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Record separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
+> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Logical-row separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
 
-See `spec/processing-model.md` §7 for the normative requirements.
+See `spec/processing-model.md`, *Conformance > Required Features* item 7, for the normative requirements.
 
 The multiline algorithm applies to both header rows (above the delimiter) and body rows (below it).
 
