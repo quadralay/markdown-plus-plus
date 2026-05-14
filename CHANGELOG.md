@@ -13,6 +13,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.5.0] - 2026-05-13
+
+### Project
+
+- Added `GLOSSARY.md` at the repo root with canonical definitions for six Markdown++ terms (`triple`/`alias+slug+linkref`, `Unset`, `attachment rule`, `content island`, `block content`), each linking to its full-treatment surface, plus a repeatable audit procedure for adding new terms ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+- Added `.github/PULL_REQUEST_TEMPLATE.md` with a terminology surfacing checkbox so PRs introducing or renaming Markdown++ terms update the glossary and at least one entry-point surface ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+
+### Spec
+
+- Named the `alias+slug+linkref triple` pattern on first prose use in `spec/specification.md` Section 17.3, `spec/cross-file-link-resolution.md`, and `spec/whitepaper.md`, with a glossary link from each ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+- Added a glossary link from the `block content` reference in `spec/specification.md` Section 14.1 ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+
+### Tooling
+
+- Added a glossary link from the existing `alias+slug+linkref` reference in `SKILL.md`, and from the recommended-idiom note in `references/syntax-reference.md` ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+- Labeled the standalone example in `examples/semantic-cross-references.md` as the `alias+slug+linkref triple` with a glossary link ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+- Backfilled glossary links for `Unset`, `attachment rule`, and `content island` on first prose use in `SKILL.md`, `references/best-practices.md`, `references/syntax-reference.md`, and `references/examples.md` ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+- Added a `GLOSSARY.md` pointer to `README.md`'s repo-contents list ([#99](https://github.com/quadralay/markdown-plus-plus/issues/99))
+
+This release is documentation surfacing only -- no Markdown++ syntax, semantics, or processing behavior changed.
+
 ## [1.4.0] - 2026-05-13
 
 ### Tooling

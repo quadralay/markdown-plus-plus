@@ -883,7 +883,7 @@ Marker commands require block-level attachment. The marker tag MUST appear on th
 
 ### 14.1 Purpose
 
-Multiline tables extend GFM table syntax to support block-level content within table cells. Standard GFM tables limit each cell to a single line. The multiline table indicator enables continuation rows, allowing lists, blockquotes, styled elements, and other block content within cells.
+Multiline tables extend GFM table syntax to support block-level content within table cells. Standard GFM tables limit each cell to a single line. The multiline table indicator enables continuation rows, allowing lists, blockquotes, styled elements, and other block content (see [GLOSSARY.md](../GLOSSARY.md#block-content)) within cells.
 
 ### 14.2 Syntax
 
@@ -1180,7 +1180,7 @@ When duplicate slugs originate from different source files, a conformant process
 
 #### The Semantic Cross-Reference Pattern
 
-The recommended pattern for cross-referenceable headings combines three elements:
+The recommended pattern for cross-referenceable headings -- the **alias+slug+linkref triple** (see [GLOSSARY.md](../GLOSSARY.md#triple)) -- combines three elements:
 
 1. A **combined command** with a style and a numeric alias ID.
 2. The **heading text**.

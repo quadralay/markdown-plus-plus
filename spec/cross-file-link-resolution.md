@@ -160,7 +160,7 @@ Because variable substitution (Phase 1, Step 2) runs before CommonMark parsing (
 
 ### Alias IDs in Link Reference Definitions
 
-The semantic cross-reference pattern in Markdown++ uses link reference definitions to bridge human-readable slugs to numeric alias IDs:
+The semantic cross-reference pattern in Markdown++ (the **triple** -- see [GLOSSARY.md](../GLOSSARY.md#triple)) uses link reference definitions to bridge human-readable slugs to numeric alias IDs:
 
 ```markdown
 <!-- style:Heading2; #200010 -->

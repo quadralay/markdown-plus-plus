@@ -506,7 +506,7 @@ Download the [<!--style:DownloadLink-->*latest release*]($download_url; "Downloa
 
 ## Example 9: Content Islands with Blockquotes
 
-Using styled blockquotes as "content islands" for rich callout boxes and learning sections.
+Using styled blockquotes as "content islands" (see [GLOSSARY.md](../../../../../GLOSSARY.md#content-island)) for rich callout boxes and learning sections.
 
 ```markdown
 <!--markers:{"Keywords": "blockquotes, callouts, layout", "Description": "Content islands using styled blockquotes"} ; #content-islands-->

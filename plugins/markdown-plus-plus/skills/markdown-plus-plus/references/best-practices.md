@@ -138,7 +138,7 @@ This is just regular text that doesn't need a style.
 
 **Keep alias values unique within each file.** The validation script checks for duplicates.
 
-**Aliases must be attached to their element** (no blank line between). The same attachment rule that applies to styles applies to aliases and element-level markers. See `syntax-reference.md` for the complete attachment rules table.
+**Aliases must be attached to their element** (no blank line between). The same attachment rule (see [GLOSSARY.md](../../../../../GLOSSARY.md#attachment-rule)) that applies to styles applies to aliases and element-level markers. See `syntax-reference.md` for the complete attachment rules table.
 
 **Example - Good:**
 ```markdown
@@ -187,7 +187,7 @@ Click <!--condition:windows10-->Start<!--/condition--><!--condition:windows11-->
 
 **Undefined condition names (Unset) — authoring guidance:**
 
-A condition name that is not included in the condition set at build time is **Unset**. Unset condition blocks pass through the processor with their opening tags, content, and closing tags intact. This is intentional: it lets you author content for multiple output targets in a single source file, even if only some targets are active in a given build.
+A condition name that is not included in the condition set at build time is **Unset** (see [GLOSSARY.md](../../../../../GLOSSARY.md#unset)). Unset condition blocks pass through the processor with their opening tags, content, and closing tags intact. This is intentional: it lets you author content for multiple output targets in a single source file, even if only some targets are active in a given build.
 
 - **Define all active conditions explicitly.** An omitted name is not "off" — it is undefined. If you intend a block to be removed, set the condition to Hidden. If you leave it undefined, the block passes through to the output, which may not be what you want.
 - **Unset is useful for staged or multi-pass builds.** A `mobile` condition block that passes through in a web build can be processed by a separate mobile pipeline in a later stage.
@@ -340,7 +340,7 @@ python scripts/format-tables.py document.md --check
 
 ### Content Islands (Blockquotes)
 
-**Use content islands for:**
+**Use content islands (see [GLOSSARY.md](../../../../../GLOSSARY.md#content-island)) for:**
 - Learning boxes with multiple content types
 - Warning/caution callouts with lists
 - Tips with code examples
