@@ -818,7 +818,7 @@ Index markers create entries in generated indexes (back-of-book style).
 Multiline tables classify each physical pipe-bearing line by one of two structural roles:
 
 1. **Row separator** -- A table row where every cell contains only whitespace. Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`. Starts a new logical row. This is the only way to signal a new logical row.
-2. **Continuation row** -- Any other pipe-bearing row. Merged into the current logical row. By convention, authors leave the first cell empty on continuation lines for visual readability, but the first cell's content is not what determines continuation -- any cell may carry content on any line.
+2. **Continuation row** -- Any other pipe-bearing row. Merged into the current logical row. Cells appear empty on a continuation line when their column has no more content to flow there; the presence or absence of content in any particular cell is not what determines continuation.
 
 > **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Logical-row separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
 
@@ -841,7 +841,7 @@ Header rows can span multiple physical lines using the same continuation row mec
 |                | - Client Credentials     |
 ```
 
-In this example, the header row `Feature | Description` is extended by a continuation row carrying `and additional context` in the second cell, before the delimiter row. The empty first cell follows the readability convention; it is not what makes the row a continuation.
+In this example, the header row `Feature | Description` is extended by a continuation row carrying `and additional context` in the second cell, before the delimiter row. The `Feature` column has no further content to flow on that line.
 
 ### Cell Content Dedent
 
