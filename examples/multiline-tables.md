@@ -26,7 +26,7 @@ This example demonstrates rich table content using the `<!-- multiline -->` dire
 |                | - Default: 100 req/min   | In Progress |
 |                | - Maximum: 1000 req/min  |             |
 
-Continuation rows (empty first cell) extend a logical row across multiple physical lines. Separator rows (pipes with whitespace-only cells) mark row boundaries. A completely blank line ends the table.
+Continuation rows (empty first cell) extend the preceding logical row across multiple physical lines. Row separators (pipe-bearing rows with whitespace-only cells) mark logical-row boundaries. A no-pipe blank line ends the table entirely.
 
 ## Styled table with combined directives
 

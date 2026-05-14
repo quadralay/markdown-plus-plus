@@ -275,8 +275,9 @@ Available in print and tablet editions.
 |      | - Works as a teacher     |
 ```
 
-- Continuation rows use empty first cell (`|      |`)
-- Row separator: pipes with whitespace-only cells (blank line ends the table)
+- Continuation rows have an empty first cell (`|      |`) and merge into the preceding logical row
+- Row separator: a pipe-bearing row with whitespace-only cells -- marks the boundary between logical rows
+- A no-pipe blank line ends the table entirely (it does **not** separate rows)
 
 ### Table Formatting
 

@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.6.1] - 2026-05-13
+
+### Tooling
+
+- Clarified the multiline table row-continuation mechanism across `SKILL.md`, `references/syntax-reference.md`, `references/best-practices.md`, `references/examples.md`, and `examples/multiline-tables.md` by naming the three structural triggers (row separator, continuation row, new logical row) in evaluation order, and added a "List markers in multi-line cells" readability subsection to `references/syntax-reference.md`. No syntax, semantics, or processing behavior changed ([#92](https://github.com/quadralay/markdown-plus-plus/issues/92))
+
 ## [1.6.0] - 2026-05-13
 
 ### Tooling

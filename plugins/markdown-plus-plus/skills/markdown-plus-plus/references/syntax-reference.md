@@ -815,13 +815,15 @@ Index markers create entries in generated indexes (back-of-book style).
 
 ### Structure Rules
 
-Multiline tables use a specific row structure:
+Multiline tables classify each physical pipe-bearing line by one of three structural triggers, evaluated in this order:
 
-1. **First content row** -- Contains the row identifier in the first cell
-2. **Continuation rows** -- Empty first cell (`|          |`) continues the previous row
-3. **Row separator** -- A table row where every cell contains only whitespace (pipes must be present). Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`
+1. **Row separator** -- A table row where every cell contains only whitespace. Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`. Marks the boundary between two logical rows.
+2. **Continuation row** -- A table row whose first cell is empty and that is not a row separator. Merged into the preceding logical row.
+3. **New logical row** -- A table row whose first cell contains content. Starts a new logical row.
 
-> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Only rows with pipe characters and whitespace-only cells act as row separators.
+> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Record separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
+
+See `spec/processing-model.md` §7 for the normative requirements.
 
 The multiline algorithm applies to both header rows (above the delimiter) and body rows (below it).
 
@@ -861,6 +863,32 @@ When a cell spans multiple physical lines, the processor strips the minimum comm
 ```
 
 The single leading space common to all three lines is stripped. If one line had no leading whitespace, no stripping would occur.
+
+### List markers in multi-line cells
+
+When a multiline cell carries several values, prefixing each value with `- ` on its own continuation line makes the entries visually scannable. This is especially useful when rows have varying numbers of continuation lines, where bare values can blend together.
+
+**Without list markers:**
+```markdown
+<!-- multiline -->
+| Component | Notes               |
+|-----------|---------------------|
+| Database  | PostgreSQL 14+      |
+|           | 4 GB RAM minimum    |
+|           | 50 GB disk space    |
+```
+
+**With list markers:**
+```markdown
+<!-- multiline -->
+| Component | Notes               |
+|-----------|---------------------|
+| Database  | PostgreSQL 14+      |
+|           | - 4 GB RAM minimum  |
+|           | - 50 GB disk space  |
+```
+
+The `- ` prefix is a CommonMark list marker, so each continuation line still renders as a list item under graceful degradation -- readers viewing the source as plain CommonMark see a bulleted list inside the cell column rather than a stream of values. See `references/examples.md` for scenario tables that use this convention.
 
 ### Basic Example
 

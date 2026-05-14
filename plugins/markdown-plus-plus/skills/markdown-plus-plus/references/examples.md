@@ -213,7 +213,7 @@ When you first launch $product_name;, the setup wizard guides you through:
 
 ## Example 4: Multiline Tables
 
-Complex tables with rich content in cells. Each row uses continuation lines (empty first cell) and is separated by a row with pipes and whitespace-only cells. A completely blank line ends the table.
+Complex tables with rich content in cells. Each logical row may span multiple physical lines: continuation rows (empty first cell) extend the preceding row, and row separators (pipe-bearing rows with whitespace-only cells) delimit logical rows. A no-pipe blank line ends the table entirely.
 
 ```markdown
 # Feature Comparison
