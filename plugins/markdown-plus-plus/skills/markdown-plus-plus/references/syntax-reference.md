@@ -815,11 +815,10 @@ Index markers create entries in generated indexes (back-of-book style).
 
 ### Structure Rules
 
-Multiline tables classify each physical pipe-bearing line by one of three structural triggers, evaluated in this order:
+Multiline tables classify each physical pipe-bearing line by one of two structural roles:
 
-1. **Row separator** -- A table row where every cell contains only whitespace. Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`. Marks the boundary between two logical rows.
-2. **Continuation row** -- A table row whose first cell is empty and that is not a row separator. Merged into the preceding logical row.
-3. **New logical row** -- A table row whose first cell contains content. Starts a new logical row.
+1. **Row separator** -- A table row where every cell contains only whitespace. Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`. Starts a new logical row. This is the only way to signal a new logical row.
+2. **Continuation row** -- Any other pipe-bearing row. Merged into the current logical row. By convention, authors leave the first cell empty on continuation lines for visual readability, but the first cell's content is not what determines continuation -- any cell may carry content on any line.
 
 > **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Logical-row separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
 
@@ -842,7 +841,7 @@ Header rows can span multiple physical lines using the same continuation row mec
 |                | - Client Credentials     |
 ```
 
-In this example, the header row `Feature | Description` is extended by a continuation row with an empty first cell and `and additional context` in the second cell, before the delimiter row.
+In this example, the header row `Feature | Description` is extended by a continuation row carrying `and additional context` in the second cell, before the delimiter row. The empty first cell follows the readability convention; it is not what makes the row a continuation.
 
 ### Cell Content Dedent
 
@@ -989,7 +988,7 @@ Standard Markdown alignment syntax works:
 | Auth    | OAuth 2.0 support.       |
 ```
 
-**CommonMark rendering:** The multiline directive is hidden. The table renders as standard GFM, but continuation rows (empty first cell) appear as separate rows. Content is readable but the intended row grouping is lost.
+**CommonMark rendering:** The multiline directive is hidden. The table renders as standard GFM, but continuation rows appear as separate rows. Content is readable but the intended row grouping is lost.
 
 ---
 

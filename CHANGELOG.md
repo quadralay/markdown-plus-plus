@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Tooling
 
-- Clarified the multiline table row-continuation mechanism across `SKILL.md`, `references/syntax-reference.md`, `references/best-practices.md`, `references/examples.md`, and `examples/multiline-tables.md` by naming the three structural triggers (row separator, continuation row, new logical row) in evaluation order, and added a "List markers in multi-line cells" readability subsection to `references/syntax-reference.md`. No syntax, semantics, or processing behavior changed ([#92](https://github.com/quadralay/markdown-plus-plus/issues/92))
+- Clarified the multiline table row-continuation mechanism across `SKILL.md`, `references/syntax-reference.md`, `references/best-practices.md`, `references/examples.md`, and `examples/multiline-tables.md` by naming the two structural roles (row separator vs continuation row) and making explicit that every pipe-bearing row continues the current logical row by default — the empty first cell on continuation rows is a readability convention, not the trigger. Also added a "List markers in multi-line cells" readability subsection to `references/syntax-reference.md`. No syntax, semantics, or processing behavior changed ([#92](https://github.com/quadralay/markdown-plus-plus/issues/92))
 
 ## [1.6.0] - 2026-05-13
 

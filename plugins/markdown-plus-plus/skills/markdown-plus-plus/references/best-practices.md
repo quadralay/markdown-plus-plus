@@ -275,8 +275,8 @@ Available in print and tablet editions.
 |      | - Works as a teacher     |
 ```
 
-- Continuation rows have an empty first cell (`|      |`) and merge into the preceding logical row
-- Row separator: a pipe-bearing row with whitespace-only cells -- marks the boundary between logical rows
+- Every pipe-bearing row automatically continues the current logical row; the empty first cell on continuation rows (`|      |`) is a readability convention, not the trigger -- any cell can carry content on any line
+- Row separator: a pipe-bearing row whose cells are all whitespace -- this is the only way to start a new logical row
 - A no-pipe blank line ends the table entirely (it does **not** separate rows)
 
 ### Table Formatting
