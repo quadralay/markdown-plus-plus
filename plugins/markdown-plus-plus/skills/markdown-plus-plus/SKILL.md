@@ -80,7 +80,7 @@ Content immediately follows.
 
 - Put a blank line between a directive comment and its target content. The blank line silently breaks the [attachment rule](../../../../GLOSSARY.md#attachment-rule); the directive passes through as a regular HTML comment with no effect.
 - Place the alias on a separate line from `style:` or `markers:`. Stacked HTML comments leave the top one orphaned -- combine them with `;` in a single directive instead.
-- Vary the spacing inside `<!-- ... -->` or around `;` arbitrarily. The canonical form has a space after `<!--`, a space before `-->`, and spaces around each `;`. The no-space form (`<!--style:A;#b-->`) is also valid, but pick one form and stay consistent within a document.
+- Vary the spacing inside `<!-- ... -->` or around `;` arbitrarily. The canonical form has a space after `<!--`, a space before `-->`, and spaces around each `;`. The no-space form (`<!--style:A;#b-->`) is also valid; the spaced form is recommended for readability per `references/syntax-reference.md` (Combined Commands -> Whitespace).
 
 See `references/syntax-reference.md` (Attachment Rules, Combined Commands) and the `<common_mistakes>` section below for the full rule set and edge cases. See `../../../../spec/attachment-rule.md` for the normative definition.
 
