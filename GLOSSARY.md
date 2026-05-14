@@ -5,14 +5,14 @@ status: active
 
 # Markdown++ Glossary
 
-Canonical definitions for Markdown++ terminology. Each entry names the term, gives a one-paragraph definition extracted from its canonical surface, and links to the full treatment. Entries are pointers, not new prose -- the canonical surface is the source of truth.
+Canonical definitions for Markdown++ terminology. Each entry names a term, gives a one-paragraph definition lifted from its canonical surface, and links to the full treatment. Entries are pointers; the canonical surface owns the definition.
 
 ## Conventions
 
-Every entry has three parts:
+Each entry has three parts:
 
-- The **term** as a level-3 heading. The heading text determines the anchor (GitHub kebab-cases the heading) that other surfaces link to. Synonyms appear in the entry body so they do not pollute the anchor.
-- A one-paragraph definition extracted (not paraphrased loosely) from the canonical surface.
+- The **term** as a level-3 heading. The heading text determines the anchor (GitHub kebab-cases the heading) that other surfaces link to. Synonyms go in the entry body so they stay out of the anchor.
+- A one-paragraph definition lifted from the canonical surface.
 - A "Full treatment" line pointing to the canonical surface with a repo-relative link.
 
 When a term is introduced or renamed in a PR, the term's canonical surface owns the definition and this glossary tracks the term name plus a pointer.
@@ -22,9 +22,9 @@ When a term is introduced or renamed in a PR, the term's canonical surface owns 
 To add a new term:
 
 1. Decide on the canonical surface (typically the spec section, best-practices section, or dedicated spec file that already discusses the pattern in prose).
-2. Add an entry below with the term, a one-paragraph definition extracted from that surface, and a "Full treatment" link.
+2. Add an entry below with the term, a one-paragraph definition lifted from that surface, and a "Full treatment" link.
 3. Grep the term across the entry-point surfaces (`README.md`, `spec/`, `examples/`, `plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md`, and the skill `references/` directory).
-4. For each (term, surface) pair, decide one of: (a) use the term and link to the glossary anchor on first prose use, (b) leave the surface untouched. Skip surfaces that do not currently discuss the pattern in prose -- this is a surfacing pass, not an authoring pass.
+4. For each (term, surface) pair, decide one of: (a) use the term and link to the glossary anchor on first prose use, (b) leave the surface untouched. Skip surfaces that do not currently discuss the pattern in prose; the audit surfaces existing terminology rather than authoring new content.
 
 Surfaces that already link directly to the canonical surface (not the glossary) do not need an additional glossary link.
 
@@ -40,7 +40,7 @@ Full treatment: [Semantic Cross-References on Topic-Defining Headings](plugins/m
 
 ### Unset
 
-A condition state representing the absence of a definition. Each condition name has one of three states: **Visible** and **Hidden** are assigned states (set in the condition set provided at build time); **Unset** means the condition name is not defined in the condition set. Before evaluating a condition expression, a conformant processor MUST check whether all condition names are defined; if any operand is Unset, the entire block passes through as-is (opening tag, content, and closing tag preserved). This allows implementations to surface or resolve undefined conditional content downstream rather than silently including it. Variable substitution still applies to the block's content because the content survives Phase 1, Step 1 into Phase 1, Step 2.
+A condition state for a name that is not defined in the condition set. Each condition name has one of three states: **Visible** and **Hidden** are assigned states (set in the condition set provided at build time); **Unset** means the condition name is not defined in the condition set. Before evaluating a condition expression, a conformant processor MUST check whether all condition names are defined; if any operand is Unset, the entire block passes through as-is (opening tag, content, and closing tag preserved). This allows implementations to surface or resolve undefined conditional content downstream rather than silently including it. Variable substitution still applies to the block's content because the content survives Phase 1, Step 1 into Phase 1, Step 2.
 
 Full treatment: [Section 11.3 Condition State Model](spec/specification.md#condition-state-model).
 
@@ -52,7 +52,7 @@ Full treatment: [The Attachment Rule](spec/attachment-rule.md).
 
 ### content island
 
-A self-contained content block created by applying a Markdown++ custom style to a CommonMark blockquote. Content islands provide a mechanism for callouts, notes, warnings, and other visually distinct content areas using standard blockquote syntax with a style convention -- they are not a new syntactic form. The style name determines how the processor renders the island (callout box, warning panel, information card, etc.); the rendering is implementation-defined. Blockquotes support rich nested content within an island (headings, lists, code blocks, nested formatting, other Markdown++ extensions).
+A self-contained content block created by applying a Markdown++ custom style to a CommonMark blockquote. Content islands are how authors mark up callouts, notes, warnings, and other visually distinct content areas without inventing new syntax -- the blockquote stays a standard CommonMark blockquote, and the style name on it tells the processor how to render the island (callout box, warning panel, information card, etc.). The rendering is implementation-defined. Blockquotes support rich nested content within an island (headings, lists, code blocks, nested formatting, other Markdown++ extensions).
 
 Full treatment: [Section 15 Content Islands](spec/specification.md#15-content-islands).
 
