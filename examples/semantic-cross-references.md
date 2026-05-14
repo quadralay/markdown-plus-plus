@@ -13,7 +13,7 @@ This example demonstrates how Markdown++ cross-references work across every outp
 
 ## The pattern
 
-Every linkable heading uses three parts:
+Every linkable heading uses the **alias+slug+linkref triple** (see [GLOSSARY.md](../GLOSSARY.md#triple)):
 
 1. A **combined command** with a style and a numeric alias ID
 2. The **heading text** on the next line

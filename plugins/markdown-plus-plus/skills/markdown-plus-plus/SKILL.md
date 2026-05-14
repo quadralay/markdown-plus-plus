@@ -109,7 +109,7 @@ See [Getting Started](#getting-started) for an introduction.
 
 **Auto-generated alias collisions:** When multiple headings produce the same auto-generated alias, the first heading keeps the bare alias and subsequent headings receive `-2`, `-3`, etc. (e.g., `setup`, `setup-2`, `setup-3`). Custom aliases and auto-generated aliases occupy separate namespaces -- when a custom alias and an auto-generated alias share the same identifier, both exist independently, but the custom alias wins at link resolution time (no suffixing or displacement of the auto-generated alias). Both overlap types are resolved silently -- no diagnostic is emitted. Custom alias duplicates remain an error (MDPP008). When a heading with a suffixed auto-generated alias also has a custom alias, both are valid anchors (e.g., `#db-setup` and `#setup-2`). See `spec/element-interactions.md` for the full algorithm.
 
-**Recommended pattern for referenceable headings:** When authoring or editing a Markdown++ topic file, apply the **alias+slug+linkref** triple on every heading meant to be externally referenceable:
+**Recommended pattern for referenceable headings:** When authoring or editing a Markdown++ topic file, apply the **alias+slug+linkref** triple (see [GLOSSARY.md](../../../../GLOSSARY.md#triple)) on every heading meant to be externally referenceable:
 
 ```markdown
 <!-- style:Heading2; #200020 -->
@@ -148,7 +148,7 @@ Means: (!draft) OR (web AND production)
 
 **Per-file scoping:** Condition blocks must open and close within the same file — they cannot span across an include boundary (MDPP012). See `spec/processing-model.md`.
 
-**Condition state model:** Each condition name is either Visible or Hidden (assigned states); a name not defined in the condition set is Unset — not an assigned state, but the absence of one. Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditional content downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
+**Condition state model:** Each condition name is either Visible or Hidden (assigned states); a name not defined in the condition set is Unset (see [GLOSSARY.md](../../../../GLOSSARY.md#unset)) — not an assigned state, but the absence of one. Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditional content downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
 
 **Variable substitution inside Unset blocks:** "Passes through as-is" refers to condition evaluation only. Variable substitution (Phase 1, Step 2) still resolves `$variable;` tokens inside Unset blocks because the content survives into that processing step. Include directives inside Unset blocks are NOT processed — the include tag passes through as literal text.
 
@@ -220,7 +220,7 @@ Multiple commands in a single comment, separated by semicolons. Order: style, mu
 
 ### Content Islands (Blockquotes)
 
-Blockquotes with custom styles create configurable content islands for callouts and notes.
+Blockquotes with custom styles create configurable content islands (see [GLOSSARY.md](../../../../GLOSSARY.md#content-island)) for callouts and notes.
 
 ```markdown
 <!--style:BQ_Warning-->

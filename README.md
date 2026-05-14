@@ -33,6 +33,7 @@ This is the home of the Markdown++ format standard -- its specification, example
 - **[spec/](spec/)** -- The [Markdown++ whitepaper](spec/whitepaper.md) explaining the format, its design rationale, and how it compares to DITA, FrameMaker, Word, and other documentation formats.
 - **[examples/](examples/)** -- Sample `.md` files demonstrating Markdown++ features.
 - **[Syntax reference](plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md)** -- Complete reference for all extensions, rules, and validation codes.
+- **[GLOSSARY.md](GLOSSARY.md)** -- Canonical definitions for Markdown++ terminology.
 
 ## Tools
 

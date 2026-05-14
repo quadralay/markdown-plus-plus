@@ -82,7 +82,7 @@ Adopting composite publishing does not change how individual documents are autho
 
 ### 3. Semantic cross-references that work everywhere
 
-Cross-referencing in multi-file documentation has always been fragile. Markdown++ introduces a link reference pattern that bridges alias IDs (used by publishing tools for stable cross-file linking) with standard Markdown heading anchors (used by renderers for in-page navigation):
+Cross-referencing in multi-file documentation has always been fragile. Markdown++ introduces a link reference pattern -- the **alias+slug+linkref triple** (see [GLOSSARY.md](../GLOSSARY.md#triple)) -- that bridges alias IDs (used by publishing tools for stable cross-file linking) with standard Markdown heading anchors (used by renderers for in-page navigation):
 
 ```markdown
 <!-- style:Heading1; #316492 -->
