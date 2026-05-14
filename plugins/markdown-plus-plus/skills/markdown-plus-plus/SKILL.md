@@ -39,6 +39,53 @@ Markdown++ extends CommonMark with HTML comment-based extensions. All extensions
 
 </overview>
 
+<command_block_syntax>
+
+## Command Block Syntax (MUST follow exactly)
+
+ALWAYS use this format -- no variations. Content MUST follow the directive on the very next line with no blank line between them.
+
+### Style + alias (combined)
+
+```markdown
+<!-- style:StyleName ; #anchor-name -->
+Content immediately follows (NO blank line).
+```
+
+### Markers + alias (combined)
+
+```markdown
+<!-- markers:{"Keywords": "word1, word2", "Description": "Brief description"} ; #anchor-name -->
+## Heading immediately follows (NO blank line).
+```
+
+### Single-directive forms
+
+```markdown
+<!-- style:StyleName -->
+Content immediately follows.
+```
+
+```markdown
+<!-- marker:Keywords="..." -->
+Content immediately follows.
+```
+
+```markdown
+<!-- #anchor-name -->
+Content immediately follows.
+```
+
+### NEVER
+
+- Put a blank line between a directive comment and its target content. The blank line silently breaks the [attachment rule](../../../../GLOSSARY.md#attachment-rule); the directive passes through as a regular HTML comment with no effect.
+- Place the alias on a separate line from `style:` or `markers:`. Stacked HTML comments leave the top one orphaned -- combine them with `;` in a single directive instead.
+- Vary the spacing inside `<!-- ... -->` or around `;` arbitrarily. The canonical form has a space after `<!--`, a space before `-->`, and spaces around each `;`. The no-space form (`<!--style:A;#b-->`) is also valid, but pick one form and stay consistent within a document.
+
+See `references/syntax-reference.md` (Attachment Rules, Combined Commands) and the `<common_mistakes>` section below for the full rule set and edge cases. See `../../../../spec/attachment-rule.md` for the normative definition.
+
+</command_block_syntax>
+
 <syntax_examples>
 
 ## Syntax Examples

@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.6.0] - 2026-05-13
+
+### Tooling
+
+- Added a high-visibility Command Block Syntax anchor section to `SKILL.md` with MUST/ALWAYS/NEVER framing for the canonical `style + alias` and `markers + alias` combined directive patterns, plus a NEVER list for the three most common authoring mistakes (blank line after directive, alias on a separate line, inconsistent spacing). The new section is additive -- existing detailed sections in `<syntax_examples>`, `<common_mistakes>`, and `references/syntax-reference.md` are unchanged ([#93](https://github.com/quadralay/markdown-plus-plus/issues/93))
+
 ## [1.5.0] - 2026-05-13
 
 ### Project
