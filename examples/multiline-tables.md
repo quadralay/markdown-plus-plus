@@ -26,7 +26,7 @@ This example demonstrates rich table content using the `<!-- multiline -->` dire
 |                | - Default: 100 req/min   | In Progress |
 |                | - Maximum: 1000 req/min  |             |
 
-Continuation rows (empty first cell) extend a logical row across multiple physical lines. Separator rows (pipes with whitespace-only cells) mark row boundaries. A completely blank line ends the table.
+Every pipe-bearing row automatically continues the current logical row across multiple physical lines. Row separators (pipe-bearing rows with whitespace-only cells) are the only way to mark a logical-row boundary. A no-pipe blank line ends the table entirely.
 
 ## Styled table with combined directives
 
@@ -60,4 +60,4 @@ Headers can span multiple physical lines using continuation rows above the delim
 | Rate Limiting  | Per-endpoint limits      |
 |                | - Default: 100 req/min   |
 
-The header row `Feature | Description` is extended by a continuation row with an empty first cell and `and Requirements` in the second cell, before the delimiter row.
+The header row `Feature | Description` is extended by a continuation row carrying `and Requirements` in the second cell, before the delimiter row. The `Feature` column has no further content to flow on that line.

@@ -245,7 +245,7 @@ Enable block content (lists, blockquotes, styled elements) inside table cells.
 |      | - Enjoys cycling |
 ```
 
-Empty first cell continues previous row; a row with pipes and whitespace-only cells separates rows (a blank line ends the table). Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
+Every pipe-bearing row continues the current logical row. A row whose cells are all whitespace starts a new logical row — that's the only way to signal one. A no-pipe blank line ends the table. Cells on a continuation line appear empty when their column has no more content to flow there. Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
 
 **Extensions in cells:** Variables, block/inline styles, markers, conditions (wrapping complete rows only — not partial rows), and combined commands work inside multiline table cells. Includes and nested multiline tables are not supported in cells. See `spec/multiline-cell-extensions.md`.
 

@@ -815,13 +815,14 @@ Index markers create entries in generated indexes (back-of-book style).
 
 ### Structure Rules
 
-Multiline tables use a specific row structure:
+Multiline tables classify each physical pipe-bearing line by one of two structural roles:
 
-1. **First content row** -- Contains the row identifier in the first cell
-2. **Continuation rows** -- Empty first cell (`|          |`) continues the previous row
-3. **Row separator** -- A table row where every cell contains only whitespace (pipes must be present). Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`
+1. **Row separator** -- A table row where every cell contains only whitespace. Matches the pattern `^ {0,3}\|(?:[ ]*\|)+[ ]*$`. Starts a new logical row. This is the only way to signal a new logical row.
+2. **Continuation row** -- Any other pipe-bearing row. Merged into the current logical row. Cells appear empty on a continuation line when their column has no more content to flow there; the presence or absence of content in any particular cell is not what determines continuation.
 
-> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Only rows with pipe characters and whitespace-only cells act as row separators.
+> **Important:** A completely blank line (no pipe characters) **ends the table entirely** -- it does not separate rows. Logical-row separation requires a pipe-bearing row with whitespace-only cells, not a blank line.
+
+See `spec/processing-model.md`, *Conformance > Required Features* item 7, for the normative requirements.
 
 The multiline algorithm applies to both header rows (above the delimiter) and body rows (below it).
 
@@ -840,7 +841,7 @@ Header rows can span multiple physical lines using the same continuation row mec
 |                | - Client Credentials     |
 ```
 
-In this example, the header row `Feature | Description` is extended by a continuation row with an empty first cell and `and additional context` in the second cell, before the delimiter row.
+In this example, the header row `Feature | Description` is extended by a continuation row carrying `and additional context` in the second cell, before the delimiter row. The `Feature` column has no further content to flow on that line.
 
 ### Cell Content Dedent
 
@@ -861,6 +862,32 @@ When a cell spans multiple physical lines, the processor strips the minimum comm
 ```
 
 The single leading space common to all three lines is stripped. If one line had no leading whitespace, no stripping would occur.
+
+### List markers in multi-line cells
+
+When a multiline cell carries several values, prefixing each value with `- ` on its own continuation line makes the entries visually scannable. This is especially useful when rows have varying numbers of continuation lines, where bare values can blend together.
+
+**Without list markers:**
+```markdown
+<!-- multiline -->
+| Component | Notes               |
+|-----------|---------------------|
+| Database  | PostgreSQL 14+      |
+|           | 4 GB RAM minimum    |
+|           | 50 GB disk space    |
+```
+
+**With list markers:**
+```markdown
+<!-- multiline -->
+| Component | Notes               |
+|-----------|---------------------|
+| Database  | PostgreSQL 14+      |
+|           | - 4 GB RAM minimum  |
+|           | - 50 GB disk space  |
+```
+
+The `- ` prefix is a CommonMark list marker, so each continuation line still renders as a list item under graceful degradation -- readers viewing the source as plain CommonMark see a bulleted list inside the cell column rather than a stream of values. See `references/examples.md` for scenario tables that use this convention.
 
 ### Basic Example
 
@@ -961,7 +988,7 @@ Standard Markdown alignment syntax works:
 | Auth    | OAuth 2.0 support.       |
 ```
 
-**CommonMark rendering:** The multiline directive is hidden. The table renders as standard GFM, but continuation rows (empty first cell) appear as separate rows. Content is readable but the intended row grouping is lost.
+**CommonMark rendering:** The multiline directive is hidden. The table renders as standard GFM, but continuation rows appear as separate rows. Content is readable but the intended row grouping is lost.
 
 ---
 

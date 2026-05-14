@@ -119,4 +119,6 @@ The fix works because:
 - [#11](https://github.com/quadralay/markdown-plus-plus/issues/11) -- Formal grammar (multiline table syntax in scope)
 - [#24](https://github.com/quadralay/markdown-plus-plus/issues/24) -- Extensions inside multiline table cells (follow-on)
 - [#8](https://github.com/quadralay/markdown-plus-plus/issues/8) -- Processing model specification (R7a-d added here)
+- [#92](https://github.com/quadralay/markdown-plus-plus/issues/92) -- Multiline table row-continuation doc clarification (successor framing, see next entry)
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` -- Processing model spec work that added R7a-d conformance requirements (moderate overlap, complementary scope)
+- [multiline-table-row-continuation-mechanism-2026-05-13](multiline-table-row-continuation-mechanism-2026-05-13.md) -- successor framing from issue #92; reframes row continuation as three triggers evaluated in order (row separator > continuation row > new logical row), addressing a different axis than this April doc's "empty-row terminology" fix. The "Review-phase corrections" entry above about "empty first cell" reflects the April framing -- the May 13 doc supersedes that mental model without invalidating the terminology fix recorded here.
