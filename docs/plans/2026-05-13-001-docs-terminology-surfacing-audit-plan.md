@@ -49,7 +49,7 @@ pattern, while leaving the meaning of every term unchanged.
 
 ## Requirements (carried from origin)
 
-- **R1.** Create `GLOSSARY.md` at the repo root with six initial entries
+- **R1.** Create `GLOSSARY.md` at the repo root with five initial entries
   (`triple`/`alias+slug+linkref` as a single synonym entry, `Unset`,
   `attachment rule`, `content island`, `block content`), each pointing
   to its canonical definition surface.
@@ -73,7 +73,7 @@ pattern, while leaving the meaning of every term unchanged.
 
 - New file: `GLOSSARY.md` at repo root.
 - New file: `.github/PULL_REQUEST_TEMPLATE.md`.
-- Targeted edits to surfaces enumerated in U3-U8 below.
+- Targeted edits to surfaces enumerated in U3-U9 below.
 - Version bump to 1.5.0 and `CHANGELOG.md` entry.
 
 ### Deferred to Follow-Up Work
@@ -544,10 +544,10 @@ accurately describes what shipped).
 
 ## Success Criteria (carried from origin)
 
-1. `GLOSSARY.md` exists at the repo root with six initial entries
+1. `GLOSSARY.md` exists at the repo root with five initial entries
    (triple/alias+slug+linkref, Unset, attachment rule, content island,
    block content), each linking to its canonical surface.
-2. Every surface in U3-U8 that currently discusses a pattern names the
+2. Every surface in U3-U9 that currently discusses a pattern names the
    term and links to its glossary anchor.
 3. `.github/PULL_REQUEST_TEMPLATE.md` exists with a terminology
    checkbox.
