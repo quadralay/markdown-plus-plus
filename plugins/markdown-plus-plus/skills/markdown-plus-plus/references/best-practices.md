@@ -586,6 +586,8 @@ The pattern combines three pieces:
 2. The heading line provides the human-visible label.
 3. The link reference definition binds a semantic slug (`installation`) to the stable alias and supplies a default link text via the trailing title.
 
+**All three pieces appear adjacent:** the directive on the line directly above the heading, the heading itself, a single blank line, then the link reference definition on the next line. Co-location is part of the pattern, not a layout choice -- do not migrate the link reference definitions to a block at the bottom of the file in conventional CommonMark style.
+
 References elsewhere in the assembly use the slug:
 
 ```markdown
@@ -597,6 +599,7 @@ If setup fails, return to [Installation][installation].
 - The same reference works whether the file is rendered standalone, published as a single document, or assembled with `<!-- include: -->` into a larger document. Link reference definitions resolve at document-global scope after assembly, so references in one file resolve to definitions in another.
 - The slug stays semantic. Reword the heading from "Installation" to "Installing the Product" and the reference still resolves -- the alias `#200020` is what binds them.
 - A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent.
+- **The three pieces move as a unit when a section moves.** Because they sit adjacent in source, a heading rename, deletion, or reordering carries the directive and the link reference definition with it. Splitting them across the file -- for example, collecting all link reference definitions in a block at the bottom -- means a section move can silently desync the slug from its target, and the validator cannot detect the mismatch.
 
 **When the rule fires:** Apply on the file's title (H1), and on H2 headings that name a major section a reader is likely to deep-link to. Below H2 is author judgement -- not blanket policy.
 
@@ -609,6 +612,8 @@ If setup fails, return to [Installation][installation].
 ### Link References
 
 Link references are a standard Markdown feature that allow defining link targets separately from their usage. Outside the topic-heading idiom in [Semantic Cross-References on Topic-Defining Headings](#semantic-cross-references-on-topic-defining-headings), link references are **generally not recommended** for general-purpose link reuse because they add indirection that makes content harder to understand and maintain.
+
+**Placement differs from the triple pattern.** General-purpose link reference definitions are conventionally grouped at the bottom of the file -- the standard CommonMark style. The triple's link reference definition, by contrast, lives adjacent to its heading (see [Semantic Cross-References on Topic-Defining Headings](#semantic-cross-references-on-topic-defining-headings)). Both placements are valid CommonMark, but the conventions encode different intent: grouped definitions signal "this is a shared URL table that many parts of the document point at"; adjacent definitions signal "this is the semantic slug for *this* heading, and the two move together." Do not migrate triple definitions into the bottom-of-file block.
 
 **Standard inline links (recommended):**
 ```markdown
