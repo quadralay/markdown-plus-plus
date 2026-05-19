@@ -19,6 +19,8 @@ Every linkable heading uses the **alias+slug+linkref triple** (see [GLOSSARY.md]
 2. The **heading text** on the next line
 3. A **link reference definition** that bridges a semantic slug to the alias ID
 
+**The three pieces sit adjacent in source on every linkable heading:** directive line, heading line, blank line, link reference definition. The headings below show the shape -- copy this layout, do not collect the link reference definitions in a block at the bottom of the file. See [`references/best-practices.md` § Semantic Cross-References on Topic-Defining Headings](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#semantic-cross-references-on-topic-defining-headings) for the full rationale.
+
 <!-- style:Heading2; #200002 -->
 ## Getting started
 

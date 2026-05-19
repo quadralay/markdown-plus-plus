@@ -166,7 +166,7 @@ See [Getting Started](#getting-started) for an introduction.
 ```
 
 - **When the rule fires:** the file's title (H1), and H2 headings that name a major section a reader is likely to deep-link to.
-- **What to author:** all three pieces -- the `<!-- style:HeadingN; #target -->` directive on the heading, the heading itself, and a `[semantic-slug]: #target "Title"` link reference definition below it. Just an alias (without the paired definition) makes the heading internally addressable but does not establish a semantic cross-reference.
+- **What to author:** all three pieces, adjacent in source -- the `<!-- style:HeadingN; #target -->` directive on the line directly above the heading, the heading itself, and a `[semantic-slug]: #target "Title"` link reference definition on the line directly after the heading (separated by a single blank line). Do not migrate the link reference definition to a block at the bottom of the file. Just an alias (without the paired definition) makes the heading internally addressable but does not establish a semantic cross-reference.
 - **When the rule does NOT fire:** H3+ headings are author judgement -- do not apply the triple reflexively to every subsection. A custom alias used purely as an internal anchor (no external references expected) is also valid on its own.
 
 See [Semantic Cross-References on Topic-Defining Headings](references/best-practices.md#semantic-cross-references-on-topic-defining-headings) for the full rationale and cross-file behavior.

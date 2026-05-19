@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.6.2] - 2026-05-18
+
+### Tooling
+
+- Made the **adjacent placement rule** of the `alias+slug+linkref` triple normative across `SKILL.md`, `references/best-practices.md`, and `examples/semantic-cross-references.md`. The directive, heading, and link reference definition sit adjacent in source -- co-location is part of the pattern, so a heading rename, deletion, or section move carries all three pieces as a unit. Also added a placement-contrast note in `references/best-practices.md` § *Advanced Patterns → Link References* explaining why general-purpose link reference definitions (conventionally grouped at the bottom of a file) and the triple's adjacent link reference definition encode different authoring intent. Forward-looking documentation guidance only -- no syntax, semantics, processing, or validator behavior changed ([#103](https://github.com/quadralay/markdown-plus-plus/issues/103))
+
 ## [1.6.1] - 2026-05-13
 
 ### Tooling
