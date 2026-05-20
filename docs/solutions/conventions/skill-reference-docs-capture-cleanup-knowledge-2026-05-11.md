@@ -256,6 +256,6 @@ its output during authoring keeps the review pass quiet.
   the formatting gotcha above:
   [`../tooling-decisions/markdown-table-formatter-design-2026-05-09.md`](../tooling-decisions/markdown-table-formatter-design-2026-05-09.md)
 - GitHub issue #94 — origin of the comment-manipulation reference doc
-- Plan: `docs/plans/2026-05-11-001-docs-comment-manipulation-knowledge-plan.md`
-- Brainstorm: `docs/brainstorms/2026-05-11-comment-manipulation-knowledge-requirements.md`
+- Plan commit: `be83329` (`docs(plans): plan comment manipulation knowledge reference doc (#94)`)
+- Brainstorm commit: `d63a6f1` (`docs(brainstorms): capture comment manipulation knowledge requirements (#94)`)
 - Work commits: `6bfca29` (feat), `77b4737` (autofix) on `claude/issue-94`

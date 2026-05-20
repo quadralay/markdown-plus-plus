@@ -117,13 +117,13 @@ Future contributors investigating a "skill didn't fire" report should diagnose a
 - Top-level workflow guidance: `CLAUDE.md` § Working with Markdown++ files
 - Frontmatter sentinel recommendation: `plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md` § Declare the format version in frontmatter
 - Origin issue: GitHub #85
-- Origin brainstorm: `docs/brainstorms/2026-05-09-skill-auto-invocation-gaps-requirements.md`
-- Origin plan: `docs/plans/2026-05-09-003-docs-skill-auto-invocation-gaps-plan.md`
+- Origin brainstorm commit: `0b326c3` (`docs(brainstorms): capture closure-path requirements for skill auto-invocation gaps`)
+- Origin plan commit: `ab159b3` (`docs(plans): plan closure for skill auto-invocation gaps (#85)`)
 
 ## Related
 
 - GitHub issue #84 — original report of the auto-activation failure case
-- Plan: `docs/plans/2026-05-09-002-docs-skill-description-trigger-signals-plan.md`
+- Plan commit: `8731759` (`docs(plans): add plan for SKILL.md description trigger signals`)
 - Work commit: `1d921c0` on `claude/issue-84`
 - `CLAUDE.md` § Version Management — the patch-bump convention applied here
 - `plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md` — the file whose description this convention governs

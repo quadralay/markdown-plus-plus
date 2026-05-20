@@ -160,4 +160,4 @@ validating it would defeat the purpose of the case.
 - [`plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md`](../../../plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md) — the suite itself
 - GitHub issue #85 — the gap-investigation issue that produced the suite
 - GitHub issue #84 — the original failure case that prompted the description-completeness learning
-- Plan: [`docs/plans/2026-05-09-003-docs-skill-auto-invocation-gaps-plan.md`](../../plans/2026-05-09-003-docs-skill-auto-invocation-gaps-plan.md)
+- Plan commit: `ab159b3` (`docs(plans): plan closure for skill auto-invocation gaps (#85)`)

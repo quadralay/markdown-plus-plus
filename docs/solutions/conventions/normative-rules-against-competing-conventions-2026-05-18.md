@@ -162,6 +162,6 @@ The convention also does **not** advocate pushing the rule into the spec. The pl
 - GitHub issue #103 -- this issue. Origin: an agent's 16-file misapplication of the triple, caught and corrected by the user.
 - GitHub issue #96 -- made the alias+slug+linkref pattern recommended; established the canonical example.
 - GitHub issue #99 -- audited the "triple" terminology across repo surfaces; established the named term.
-- Brainstorm: `docs/brainstorms/2026-05-18-triple-adjacent-placement-requirements.md`
-- Plan: `docs/plans/2026-05-18-001-docs-triple-adjacent-placement-plan.md`
+- Brainstorm commit: `072d00c` (`docs(brainstorm): capture triple adjacent-placement clarification (#103)`)
+- Plan commit: `b5bcb65` (`docs(plan): add plan for adjacent placement of triple (#103)`)
 - Work commit: `1e66214` on `claude/issue-103` -- the three-surface rewrite that motivated this convention.
