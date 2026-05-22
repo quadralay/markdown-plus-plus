@@ -1208,7 +1208,13 @@ The pattern admits a second variant when the alias itself is semantic and unique
 [sh-ug-installation]: #sh-ug-installation "Installation"
 ```
 
-Both forms are conformant. The choice depends on whether the alias carries semantic meaning of its own; see [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug) *Choosing the slug* for guidance.
+References from any file use the slug, which in this variant happens to equal the alias value:
+
+```markdown
+See [Installation][sh-ug-installation] for setup instructions.
+```
+
+Both forms are conformant. The alias `sh-ug-installation` satisfies the alias-name rule enforced by **MDPP002** (`[a-zA-Z0-9_][a-zA-Z0-9_-]*`), and the alias namespace and the link-reference-label namespace are independent: a single string used as both an alias and as a link reference label on the same heading is not a duplicate. The choice between the two variants depends on whether the alias carries semantic meaning of its own; see [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug) *Choosing the slug* for guidance.
 
 This pattern works in every context: standard Markdown viewers (slug matches heading anchor), publishing tools (alias ID resolves), and composite assemblies (cross-file resolution).
 

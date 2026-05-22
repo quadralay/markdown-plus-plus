@@ -599,7 +599,7 @@ Two conformant variants. Pick by where the alias comes from.
 [installation]: #200020 "Installation"
 ```
 
-**Slug = alias value** (generated anchors, automation pipelines, agent-minted IDs). The alias is itself semantic and unique-by-construction; the slug reuses the same value so the heading carries one identifier, not two:
+**Slug = alias value** (generated anchors, automation pipelines, agent-minted IDs). The alias is itself semantic and unique-by-construction -- meaning the minting process guarantees the value is unique across the entire assembled document, not merely within one file. The slug reuses the same value so the heading carries one identifier, not two:
 
 ```markdown
 <!-- style:Heading2; #sh-ug-installation -->
@@ -641,7 +641,7 @@ Readers already using inline anchor links (`[text](#anchor)`) within a single do
 | Within-document linking        | Works                                                                      | Works                                                                                                |
 | Cross-file (assembled) linking | Does not resolve across `<!-- include: -->` boundaries                     | Resolves at document-global scope after assembly                                                     |
 | Heading-rename safety          | Yes, when the anchor is a custom alias                                     | Yes, via the alias -- and slug<->alias binding survives the rename                                   |
-| Section-move safety            | No -- anchor and references are not co-located                             | Yes -- directive, heading, and link reference definition move together                               |
+| Section-move safety            | Partial -- the heading anchor moves with the heading, but call sites scattered through the file are not co-located and nothing binds the slug-to-anchor pairing if the anchor is renamed | Yes -- directive, heading, and link reference definition move together as a unit                     |
 | Default link text              | Author writes it inline at every call site                                 | Comes from the link reference definition's trailing title                                            |
 | Authoring overhead per heading | Author writes the link text at each reference                              | One link reference definition adjacent to the heading; references use the slug                       |
 | Best fit for                   | Within-assembly-only references with no cross-file or future-assembly need | Cross-file resolution, future-proofing for assembly, or any heading the next author may deep-link to |
