@@ -97,9 +97,9 @@ The semantic slug (`about-ipsec-peering-connections`) is derived from the headin
 See [About IPsec Peering Connections][about-ipsec-peering-connections] for details.
 ```
 
-In standard Markdown, heading links are auto-generated from the heading text -- change the heading, break every link that points to it. Across a large documentation set, a single heading rename can require dozens of edits. The semantic slug and alias ID in Markdown++ decouple the link target from the heading text, so references remain stable as content evolves.
+This single reference resolves correctly in every context: standard Markdown viewers treat the slug as a heading anchor (working in-page link), standalone publishing keeps internal links intact, composite assemblies resolve the alias ID across all included files, and multi-document projects use the numeric identifier for cross-file linking. The same `[About IPsec Peering Connections][about-ipsec-peering-connections]` works in every one of those contexts without rewriting.
 
-This single reference resolves correctly in every context: standard Markdown viewers treat the slug as a heading anchor (working in-page link), standalone publishing keeps internal links intact, composite assemblies resolve the alias ID across all included files, and multi-document projects use the numeric identifier for cross-file linking.
+The pattern also resists drift on two distinct axes. The alias decouples the link target from the heading text, so a heading rename does not break the references that point at it -- in standard Markdown, where heading links are auto-generated from the heading text, a single rename across a large documentation set can require dozens of edits. And because the directive, the heading, and the link reference definition sit adjacent in source, a section move, deletion, or reorder carries the three pieces together as a unit. Anti-drift is one of several properties the pattern earns; the headline property is cross-context resolution.
 
 One reference, every output context.
 

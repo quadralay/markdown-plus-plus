@@ -1199,6 +1199,17 @@ References from any file use the semantic slug:
 See [Getting Started][getting-started] for an introduction.
 ```
 
+The pattern admits a second variant when the alias itself is semantic and unique-by-construction (for example, an anchor minted by an authoring agent or a publishing pipeline). In that case, the link reference definition may reuse the alias value as its slug rather than introduce a separate semantic name:
+
+```markdown
+<!-- style:Heading2; #sh-ug-installation -->
+## Installation
+
+[sh-ug-installation]: #sh-ug-installation "Installation"
+```
+
+Both forms are conformant. The choice depends on whether the alias carries semantic meaning of its own; see [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug) *Choosing the slug* for guidance.
+
 This pattern works in every context: standard Markdown viewers (slug matches heading anchor), publishing tools (alias ID resolves), and composite assemblies (cross-file resolution).
 
 ---
