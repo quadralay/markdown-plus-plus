@@ -608,7 +608,7 @@ Two conformant variants. Pick by where the alias comes from.
 [sh-ug-installation]: #sh-ug-installation "Installation"
 ```
 
-**Rule of thumb:** if the alias is opaque, pair it with a semantic slug. If the alias is itself semantic and unique-by-construction, the slug = alias variant is the cleaner fit -- fewer identifiers to keep in sync, and authoring agents can treat the alias as the single source of truth for the heading.
+**Rule of thumb:** if the alias is opaque, pair it with a semantic slug. If the alias is itself semantic and unique-by-construction, the slug = alias variant is the cleaner fit -- one identifier per heading instead of two, and an authoring agent only has to mint and track the alias.
 
 **All three pieces appear adjacent:** the directive on the line directly above the heading, the heading itself, a single blank line, then the link reference definition on the next line. Co-location is part of the pattern, not a layout choice -- do not migrate the link reference definitions to a block at the bottom of the file in conventional CommonMark style.
 
@@ -626,7 +626,7 @@ If setup fails, return to [Installation][installation].
 - **Anti-drift.** Two distinct axes:
 
   - *Heading-rename drift.* The alias decouples the link target from heading text. Reword the heading from "Installation" to "Installing the Product" and the reference still resolves because the alias `#200020` is what binds them. An alias plus an inline anchor link gets this benefit on its own; the triple's contribution is to extend the same benefit to assembly-wide reference-style links and to readers who rely on the slug as the human-readable handle.
-  - *Section-move drift.* The three pieces move as a unit when a section moves, is deleted, or reordered. Because they sit adjacent in source, a heading rename, deletion, or reordering carries the directive and the link reference definition with it. Splitting them across the file -- for example, collecting all link reference definitions in a block at the bottom -- means a section move can silently desync the slug from its target. The validator cannot detect a silent slug-target desync; the layout is what prevents it. This benefit is the one inline anchor links and bottom-of-file linkref tables cannot give you.
+  - *Section-move drift.* Because the three pieces sit adjacent in source, a section move, deletion, or reorder carries the directive and the link reference definition along with the heading. Splitting them across the file -- for example, collecting all link reference definitions in a block at the bottom -- means a section move can silently desync the slug from its target. The validator cannot detect a silent slug-target desync; the layout is what prevents it. This benefit is the one inline anchor links and bottom-of-file linkref tables cannot give you.
 
 - **Intent signal.** A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent and tells the next author this heading is a public reference point, not an internal anchor.
 
