@@ -169,6 +169,8 @@ The semantic cross-reference pattern in Markdown++ (the **triple** -- see [GLOSS
 [getting-started]: #200010 "Getting Started"
 ```
 
+The slug may be a separate semantic name (as shown above) or reuse the alias value when the alias is unique-by-construction (see the *Choosing the slug* guidance in [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug)).
+
 In a multi-file assembly, this pattern works across files because:
 
 1. The alias command (`#200010`) attaches to the heading in Phase 2.

@@ -393,33 +393,33 @@ The top-level file (`_user-guide.md`) contains the document title, markers, and 
 
 ## Variable Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Product names | lowercase with underscores | `$product_name;` |
-| Versions | descriptive | `$version;`, `$api_version;` |
-| URLs | descriptive with suffix | `$download_url;`, `$support_url;` |
-| Dates | descriptive | `$release_date;`, `$last_updated;` |
-| Platform-specific | platform prefix | `$windows_path;`, `$mac_path;` |
+| Type              | Convention                 | Example                            |
+| ----------------- | -------------------------- | ---------------------------------- |
+| Product names     | lowercase with underscores | `$product_name;`                   |
+| Versions          | descriptive                | `$version;`, `$api_version;`       |
+| URLs              | descriptive with suffix    | `$download_url;`, `$support_url;`  |
+| Dates             | descriptive                | `$release_date;`, `$last_updated;` |
+| Platform-specific | platform prefix            | `$windows_path;`, `$mac_path;`     |
 
 ## Condition Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Output format | format name | `web`, `print`, `pdf`, `chm` |
-| Platform | platform name | `windows`, `mac`, `linux` |
-| Audience | audience level | `beginner`, `advanced`, `admin` |
-| Environment | environment name | `production`, `development`, `staging` |
-| Feature flags | feature name | `feature_x`, `beta_feature` |
+| Type          | Convention       | Example                                |
+| ------------- | ---------------- | -------------------------------------- |
+| Output format | format name      | `web`, `print`, `pdf`, `chm`           |
+| Platform      | platform name    | `windows`, `mac`, `linux`              |
+| Audience      | audience level   | `beginner`, `advanced`, `admin`        |
+| Environment   | environment name | `production`, `development`, `staging` |
+| Feature flags | feature name     | `feature_x`, `beta_feature`            |
 
 ## Style Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Headings | `Heading` + context | `HeadingChapter`, `HeadingSection` |
-| Notes/Callouts | Box type | `NoteBox`, `WarningBox`, `TipBox` |
-| Code | `Code` + type | `CodeExample`, `CodeOutput` |
-| Tables | `Table` + purpose | `TableData`, `TableComparison` |
-| UI Elements | `UI` + element | `UIButton`, `UIMenu` |
+| Type           | Convention          | Example                            |
+| -------------- | ------------------- | ---------------------------------- |
+| Headings       | `Heading` + context | `HeadingChapter`, `HeadingSection` |
+| Notes/Callouts | Box type            | `NoteBox`, `WarningBox`, `TipBox`  |
+| Code           | `Code` + type       | `CodeExample`, `CodeOutput`        |
+| Tables         | `Table` + purpose   | `TableData`, `TableComparison`     |
+| UI Elements    | `UI` + element      | `UIButton`, `UIMenu`               |
 
 ## Common Mistakes to Avoid
 
@@ -571,7 +571,7 @@ Ensure include chains never loop back.
 
 ## Semantic Cross-References on Topic-Defining Headings
 
-**Recommended** for file titles, primary H1s, and structurally important H2 headings. The alias+slug+linkref triple makes a heading externally referenceable with a stable, semantic name that survives heading-text renames. The same reference works in standalone preview, single-file publishing, and multi-file assembly.
+**Recommended** for file titles, primary H1s, and structurally important H2 headings. The alias+slug+linkref triple makes a heading externally referenceable with a stable, semantic name. The same reference works in standalone preview, single-file publishing, and multi-file assembly, and the three pieces stay aligned as content evolves.
 
 The pattern combines three pieces:
 
@@ -586,6 +586,30 @@ The pattern combines three pieces:
 2. The heading line provides the human-visible label.
 3. The link reference definition binds a semantic slug (`installation`) to the stable alias and supplies a default link text via the trailing title.
 
+### Choosing the slug
+
+Two conformant variants. Pick by where the alias comes from.
+
+**Semantic slug + opaque alias** (hand-authored aliases, publishing-tool numeric IDs). The alias carries no human meaning; the slug supplies the readable handle:
+
+```markdown
+<!-- style:Heading2; #200020 -->
+## Installation
+
+[installation]: #200020 "Installation"
+```
+
+**Slug = alias value** (generated anchors, automation pipelines, agent-minted IDs). The alias is itself semantic and unique-by-construction -- meaning the minting process guarantees the value is unique across the entire assembled document, not merely within one file. The slug reuses the same value so the heading carries one identifier, not two:
+
+```markdown
+<!-- style:Heading2; #sh-ug-installation -->
+## Installation
+
+[sh-ug-installation]: #sh-ug-installation "Installation"
+```
+
+**Rule of thumb:** if the alias is opaque, pair it with a semantic slug. If the alias is itself semantic and unique-by-construction, the slug = alias variant is the cleaner fit -- one identifier per heading instead of two, and an authoring agent only has to mint and track the alias.
+
 **All three pieces appear adjacent:** the directive on the line directly above the heading, the heading itself, a single blank line, then the link reference definition on the next line. Co-location is part of the pattern, not a layout choice -- do not migrate the link reference definitions to a block at the bottom of the file in conventional CommonMark style.
 
 References elsewhere in the assembly use the slug:
@@ -596,10 +620,35 @@ If setup fails, return to [Installation][installation].
 ```
 
 **Why this is the recommended idiom:**
-- The same reference works whether the file is rendered standalone, published as a single document, or assembled with `<!-- include: -->` into a larger document. Link reference definitions resolve at document-global scope after assembly, so references in one file resolve to definitions in another.
-- The slug stays semantic. Reword the heading from "Installation" to "Installing the Product" and the reference still resolves -- the alias `#200020` is what binds them.
-- A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent.
-- **The three pieces move as a unit when a section moves.** Because they sit adjacent in source, a heading rename, deletion, or reordering carries the directive and the link reference definition with it. Splitting them across the file -- for example, collecting all link reference definitions in a block at the bottom -- means a section move can silently desync the slug from its target, and the validator cannot detect the mismatch.
+
+- **Cross-context resolution.** The same reference works whether the file is rendered standalone, published as a single document, or assembled with `<!-- include: -->` into a larger document. Link reference definitions resolve at document-global scope after assembly, so references in one file resolve to definitions in another. Inline anchor links (`[text](#anchor)`) cannot give you this -- they only resolve in the standalone or single-file case.
+
+- **Anti-drift.** Two distinct axes:
+
+  - *Heading-rename drift.* The alias decouples the link target from heading text. Reword the heading from "Installation" to "Installing the Product" and the reference still resolves because the alias `#200020` is what binds them. An alias plus an inline anchor link gets this benefit on its own; the triple's contribution is to extend the same benefit to assembly-wide reference-style links and to readers who rely on the slug as the human-readable handle.
+  - *Section-move drift.* Because the three pieces sit adjacent in source, a section move, deletion, or reorder carries the directive and the link reference definition along with the heading. Splitting them across the file -- for example, collecting all link reference definitions in a block at the bottom -- means a section move can silently desync the slug from its target. The validator cannot detect a silent slug-target desync; the layout is what prevents it. This benefit is the one inline anchor links and bottom-of-file linkref tables cannot give you.
+
+- **Intent signal.** A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent and tells the next author this heading is a public reference point, not an internal anchor.
+
+**For generated-anchor and pipeline workflows:** authoring agents and publishing pipelines that mint unique anchors (contextual IDs like `sh-ug-installation`, hash-derived slugs, registry-issued identifiers) get a specific win from the slug = alias variant. The pipeline already produces one unique semantic identifier per heading; reusing it as the slug eliminates a parallel naming vocabulary and the slug<->alias mapping table the pipeline would otherwise have to maintain. The link reference definition still does real work in this variant: it gives the pipeline's anchor a cross-assembly reference handle, and the co-located placement keeps the three pieces moving together through edits.
+
+### Inline anchor links vs. the triple
+
+Readers already using inline anchor links (`[text](#anchor)`) within a single document or a single assembled file often ask what the triple replaces and what it adds. The two patterns overlap on within-document linking; they diverge on cross-file resolution and on what stays aligned when content moves.
+
+| Property                       | Inline anchor link `[text](#anchor)`                                       | alias+slug+linkref triple                                                                            |
+| ------------------------------ | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Within-document linking        | Works                                                                      | Works                                                                                                |
+| Cross-file (assembled) linking | Does not resolve across `<!-- include: -->` boundaries                     | Resolves at document-global scope after assembly                                                     |
+| Heading-rename safety          | Yes, when the anchor is a custom alias                                     | Yes, via the alias -- and slug<->alias binding survives the rename                                   |
+| Section-move safety            | Partial -- the heading anchor moves with the heading, but call sites scattered through the file are not co-located and nothing binds the slug-to-anchor pairing if the anchor is renamed | Yes -- directive, heading, and link reference definition move together as a unit                     |
+| Default link text              | Author writes it inline at every call site                                 | Comes from the link reference definition's trailing title                                            |
+| Authoring overhead per heading | Author writes the link text at each reference                              | One link reference definition adjacent to the heading; references use the slug                       |
+| Best fit for                   | Within-assembly-only references with no cross-file or future-assembly need | Cross-file resolution, future-proofing for assembly, or any heading the next author may deep-link to |
+
+**When the inline anchor link is enough.** A document that will only ever be rendered standalone or as a single file, with anchors you control and references you can grep for, can stay on inline anchor links. The triple's cross-file resolution and section-move safety are paying for capacity you do not use.
+
+**When the triple is worth the extra structure.** As soon as the document is a candidate for inclusion in a multi-file assembly, or the heading is one a reader (human or agent) elsewhere in the project will deep-link to, the triple's cross-context resolution and section-move safety start mattering. The pattern is forward-compatible: a triple authored today on a standalone file keeps working when the file is later assembled.
 
 **When the rule fires:** Apply on the file's title (H1), and on H2 headings that name a major section a reader is likely to deep-link to. Below H2 is author judgement -- not blanket policy.
 

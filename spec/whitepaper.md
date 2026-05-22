@@ -82,7 +82,11 @@ Adopting composite publishing does not change how individual documents are autho
 
 ### 3. Semantic cross-references that work everywhere
 
-Cross-referencing in multi-file documentation has always been fragile. Markdown++ introduces a link reference pattern -- the **alias+slug+linkref triple** (see [GLOSSARY.md](../GLOSSARY.md#triple)) -- that bridges alias IDs (used by publishing tools for stable cross-file linking) with standard Markdown heading anchors (used by renderers for in-page navigation):
+Cross-referencing in multi-file documentation has always been fragile. Markdown++ introduces a link reference pattern -- the **alias+slug+linkref triple** (see [GLOSSARY.md](../GLOSSARY.md#triple)) -- that bridges alias IDs (used by publishing tools for stable cross-file linking) with standard Markdown heading anchors (used by renderers for in-page navigation). The triple has three adjacent pieces on one heading:
+
+1. A combined command carrying a style and an alias identifier (`<!-- style:Heading1; #316492 -->`).
+2. The heading line (`## About IPsec Peering Connections`).
+3. A link reference definition binding a semantic slug to the alias and supplying a default link text (`[about-ipsec-peering-connections]: #316492 "About IPsec Peering Connections"`).
 
 ```markdown
 <!-- style:Heading1; #316492 -->
@@ -97,9 +101,9 @@ The semantic slug (`about-ipsec-peering-connections`) is derived from the headin
 See [About IPsec Peering Connections][about-ipsec-peering-connections] for details.
 ```
 
-In standard Markdown, heading links are auto-generated from the heading text -- change the heading, break every link that points to it. Across a large documentation set, a single heading rename can require dozens of edits. The semantic slug and alias ID in Markdown++ decouple the link target from the heading text, so references remain stable as content evolves.
+This single reference resolves correctly in every context: standard Markdown viewers treat the slug as a heading anchor (working in-page link), standalone publishing keeps internal links intact, composite assemblies resolve the alias ID across all included files, and multi-document projects use the numeric identifier for cross-file linking. The same `[About IPsec Peering Connections][about-ipsec-peering-connections]` works in every one of those contexts without rewriting.
 
-This single reference resolves correctly in every context: standard Markdown viewers treat the slug as a heading anchor (working in-page link), standalone publishing keeps internal links intact, composite assemblies resolve the alias ID across all included files, and multi-document projects use the numeric identifier for cross-file linking.
+The pattern also resists drift in two ways. The alias decouples the link target from the heading text, so a heading rename does not break the references that point at it -- in standard Markdown, where heading links are auto-generated from the heading text, a single rename across a large documentation set can require dozens of edits. And because the directive, the heading, and the link reference definition sit adjacent in source, a section move, deletion, or reorder carries the three pieces together as a unit. Drift resistance is a useful second benefit; cross-context resolution is the main reason to use the pattern.
 
 One reference, every output context.
 

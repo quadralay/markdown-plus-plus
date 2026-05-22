@@ -34,7 +34,7 @@ Surfaces that already link directly to the canonical surface (not the glossary) 
 
 **Synonym:** `alias+slug+linkref`.
 
-The recommended Markdown++ pattern for cross-referenceable headings. The **triple** combines three pieces on a single heading: a `<!-- style:HeadingN; #alias -->` directive that attaches a stable alias to the heading, the heading text itself, and a `[semantic-slug]: #alias "Title"` link reference definition below it. The alias is a stable identifier that survives heading-text renames; the semantic slug is what other documents link with; the link reference definition binds the slug to the alias and supplies a default link text. The same reference works in standalone preview, single-file publishing, and multi-file assembly.
+The recommended Markdown++ pattern for cross-referenceable headings. The **triple** combines three pieces on a single heading: a `<!-- style:HeadingN; #alias -->` directive that attaches a stable alias to the heading, the heading text itself, and a `[semantic-slug]: #alias "Title"` link reference definition below it. The same reference works in standalone preview, single-file publishing, and multi-file assembly. The alias decouples the link target from heading text (heading renames don't break references); co-location keeps the three pieces together when a section moves, is deleted, or reordered. The slug may be a separate semantic name (when the alias is opaque) or reuse the alias value (when the alias is itself semantic and unique-by-construction).
 
 Full treatment: [Semantic Cross-References on Topic-Defining Headings](plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#semantic-cross-references-on-topic-defining-headings).
 

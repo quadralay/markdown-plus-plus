@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.6.3] - 2026-05-22
+
+### Tooling
+
+- Audited every cross-reference doc surface so a reader with unique-by-construction generated anchors and within-assembly inline anchor links can answer "what does the triple add for me?" without cross-referencing other surfaces. Documented the *slug = alias value* variant alongside the existing *semantic slug + opaque alias* variant as a recommended degree of freedom for generated/automated anchors. In `references/best-practices.md` § *Semantic Cross-References on Topic-Defining Headings*, restructured *Why this is the recommended idiom* into three labeled benefit groups (*Cross-context resolution*, *Anti-drift* with two named axes *Heading-rename drift* and *Section-move drift*, *Intent signal*), added a new *Choosing the slug* subsection with a worked example for each variant, added an *Inline anchor links vs. the triple* comparison table for readers already operating with `[text](#anchor)`, and added a *For generated-anchor and pipeline workflows* callout for automation pipelines. Reframed `GLOSSARY.md` § *triple*, `spec/whitepaper.md` § 3, and `examples/semantic-cross-references.md` § *Surviving heading renames* so cross-context resolution leads and rename-survival reads as one of several anti-drift properties. Added a paired worked example in `spec/specification.md` § 17.3.1 showing the slug = alias variant alongside the existing opaque-alias example, a slug-variant note in `spec/cross-file-link-resolution.md` § *Alias IDs in Link Reference Definitions*, a slug-variant pointer and benefit-stack pitch in `SKILL.md` § *Custom Aliases / Recommended pattern*, a slug-variant + comparison pointer in `references/syntax-reference.md` § *Custom Aliases*, and a new H2 section *Slug equals alias value (pipeline-generated anchors)* in `examples/semantic-cross-references.md`. Forward-looking documentation guidance only -- no syntax, semantics, processing, or validator behavior changed ([#106](https://github.com/quadralay/markdown-plus-plus/issues/106))
+
 ## [1.6.2] - 2026-05-18
 
 ### Tooling
