@@ -66,7 +66,7 @@ The publishing tool resolves `[getting-started]` across all included files. In a
 
 [surviving-heading-renames]: #200003 "Surviving heading renames"
 
-Anti-drift is one of several properties the triple earns -- the headline property is cross-context resolution (the same reference works standalone, single-file, and assembled). Drift resistance comes on two axes: the alias decouples the link target from heading text (heading-rename drift), and the three pieces sit adjacent in source so they move as a unit when a section moves, is deleted, or reordered (section-move drift). The example below works through the heading-rename axis. In standard Markdown, heading links are auto-generated from the heading text; rename a heading, and every link that points to it breaks. In Markdown++, the semantic slug and alias ID decouple the link target from the heading text.
+The triple's main benefit is cross-context resolution -- the same reference works standalone, single-file, and assembled. Drift resistance is a second benefit, and it comes in two flavors: the alias decouples the link target from heading text (heading-rename drift), and the three pieces sit adjacent in source so they move as a unit when a section moves, is deleted, or reordered (section-move drift). The example below covers the heading-rename case. In standard Markdown, heading links are auto-generated from the heading text; rename a heading, and every link that points to it breaks. In Markdown++, the semantic slug and alias ID decouple the link target from the heading text.
 
 If this heading were renamed from "Surviving heading renames" to "Stable links across renames", the alias `#200003` stays the same. Update the link reference definition and the semantic slug once:
 

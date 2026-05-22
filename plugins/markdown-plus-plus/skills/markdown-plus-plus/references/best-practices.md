@@ -630,7 +630,7 @@ If setup fails, return to [Installation][installation].
 
 - **Intent signal.** A custom alias on a heading already implies the heading is meant to be externally referenceable. The paired link reference definition completes that intent and tells the next author this heading is a public reference point, not an internal anchor.
 
-**For generated-anchor and pipeline workflows:** authoring agents and publishing pipelines that mint unique anchors (contextual IDs like `sh-ug-installation`, hash-derived slugs, registry-issued identifiers) get a specific win from the slug = alias variant. The pipeline already produces one unique semantic identifier per heading; reusing it as the slug eliminates a parallel naming vocabulary and the slug<->alias mapping table the pipeline would otherwise have to maintain. The triple still earns its place: the link reference definition is what gives the pipeline's anchor a cross-assembly reference handle and lets co-located edits carry the three pieces together.
+**For generated-anchor and pipeline workflows:** authoring agents and publishing pipelines that mint unique anchors (contextual IDs like `sh-ug-installation`, hash-derived slugs, registry-issued identifiers) get a specific win from the slug = alias variant. The pipeline already produces one unique semantic identifier per heading; reusing it as the slug eliminates a parallel naming vocabulary and the slug<->alias mapping table the pipeline would otherwise have to maintain. The link reference definition still does real work in this variant: it gives the pipeline's anchor a cross-assembly reference handle, and the co-located placement keeps the three pieces moving together through edits.
 
 ### Inline anchor links vs. the triple
 
@@ -648,7 +648,7 @@ Readers already using inline anchor links (`[text](#anchor)`) within a single do
 
 **When the inline anchor link is enough.** A document that will only ever be rendered standalone or as a single file, with anchors you control and references you can grep for, can stay on inline anchor links. The triple's cross-file resolution and section-move safety are paying for capacity you do not use.
 
-**When the triple earns its place.** As soon as the document is a candidate for inclusion in a multi-file assembly, or the heading is one a reader (human or agent) elsewhere in the project will deep-link to, the triple's cross-context resolution and section-move safety start mattering. The pattern is forward-compatible: a triple authored today on a standalone file continues to work unchanged when the file is later assembled.
+**When the triple is worth the extra structure.** As soon as the document is a candidate for inclusion in a multi-file assembly, or the heading is one a reader (human or agent) elsewhere in the project will deep-link to, the triple's cross-context resolution and section-move safety start mattering. The pattern is forward-compatible: a triple authored today on a standalone file keeps working when the file is later assembled.
 
 **When the rule fires:** Apply on the file's title (H1), and on H2 headings that name a major section a reader is likely to deep-link to. Below H2 is author judgement -- not blanket policy.
 
