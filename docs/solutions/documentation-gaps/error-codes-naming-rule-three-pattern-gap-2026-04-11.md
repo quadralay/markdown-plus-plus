@@ -54,7 +54,7 @@ with one implicit regex (`^[a-zA-Z_][a-zA-Z0-9_\-]*$`) applying to all entity ty
 
 **After — three-pattern table, per-entity MDPP002, precise cross-references:**
 
-The naming rule section now leads with an intro table covering all three patterns:
+The naming rule section now leads with an intro table covering all three patterns (regexes shown here reflect the 2026-04-11 state; the alias-name row was later widened to admit XML 1.0 NCName letters by [#108](https://github.com/quadralay/markdown-plus-plus/issues/108) — see Related solution docs below):
 
 | Form | Regex | Used By | Spaces |
 |------|-------|---------|--------|
@@ -97,3 +97,4 @@ The advisory spec-internal contradiction between §13.2 prose (marker keys use s
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` — Documents the original unified-rule creation (#15); solution narrative predates the three-pattern state
 - `docs/solutions/logic-errors/embedded-spaces-in-style-marker-names-2026-04-08.md` — Documents the three-pattern extension (#52); the problem that created the gap this fix closes
 - `docs/solutions/documentation-gaps/error-code-reference-2026-04-08.md` — Documents the creation of `error-codes.md` (#14); its MDPP002 naming rule description (single-regex) is now superseded by the three-pattern table
+- `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` — Later (2026-05-22) extension that widened the alias-name row of the three-pattern table to XML 1.0 NCName letters and tightened MDPP008 to NFC + case-fold; the standard-identifier and style/marker-name rows remain ASCII

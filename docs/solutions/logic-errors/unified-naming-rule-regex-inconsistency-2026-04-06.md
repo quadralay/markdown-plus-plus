@@ -117,4 +117,6 @@ Unifying the grammar in one spec section, compiling shared regex constants in th
 - [#11](https://github.com/quadralay/markdown-plus-plus/issues/11) — Formal grammar (defines `identifier` production backed by this rule)
 - [#27](https://github.com/quadralay/markdown-plus-plus/issues/27) — ePublisher adapter regex updates (downstream, separate repo)
 - [#52](https://github.com/quadralay/markdown-plus-plus/issues/52) — Extended the two-pattern system to three patterns, adding `STYLE_NAME_RE` for styles and markers with embedded spaces
+- [#108](https://github.com/quadralay/markdown-plus-plus/issues/108) — Widened the **alias-name** letter class to XML 1.0 NCName ranges (Unicode letters) and tightened MDPP008 to NFC + case-fold. The `STANDARD_NAME_RE` and `STYLE_NAME_RE` letter classes remain ASCII pending a separate audit.
 - `docs/solutions/logic-errors/embedded-spaces-in-style-marker-names-2026-04-08.md` — Follow-up learning documenting the #52 correction
+- `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` — Follow-up learning documenting the #108 alias extension; supersedes the alias regex shown on line 54 above, which captures the April 2026 state

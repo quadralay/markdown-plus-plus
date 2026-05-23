@@ -53,10 +53,36 @@ Productions are listed in dependency order: lexical terminals first, then compos
 
 ```ebnf
 letter         ::= [a-zA-Z]
-                    /* ASCII letters. Future versions may extend to Unicode
-                       Letter categories for non-English identifier support. */
+                    /* ASCII letters. The alias-name path additionally accepts
+                       the XML 1.0 NCName NameStartChar letter ranges (see
+                       alias_name_start_char). The standard identifier and
+                       style-name letter class remain ASCII pending a separate
+                       audit. */
 
 digit          ::= [0-9]
+
+alias_name_start_char ::= "_" | [A-Z] | [a-z]
+                        | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF]
+                        | [#x370-#x37D] | [#x37F-#x1FFF]
+                        | [#x200C-#x200D] | [#x2070-#x218F]
+                        | [#x2C00-#x2FEF] | [#x3001-#xD7FF]
+                        | [#xF900-#xFDCF] | [#xFDF0-#xFFFD]
+                        | [#x10000-#xEFFFF]
+                            /* XML 1.0 NCName NameStartChar letter ranges plus
+                               underscore. These are the characters permitted in
+                               the first position of an alias name (which also
+                               accepts a leading digit -- see alias_name). */
+
+alias_name_char       ::= alias_name_start_char | digit | "-"
+                        | [#x0300-#x036F] | [#x203F-#x2040]
+                            /* Non-first-position characters of an alias name.
+                               Combining-mark ranges from XML 1.0 NCName
+                               NameChar are permitted so that decomposed
+                               forms (e.g., "e" + U+0301 combining acute)
+                               accept under MDPP002 at the raw-byte level;
+                               MDPP008 then normalizes (NFC + casefold) for
+                               duplicate detection. NCName extras "." and
+                               middle dot (#xB7) remain excluded. */
 
 ws             ::= (#x20 | #x9)+
                     /* One or more spaces or horizontal tabs.
@@ -82,20 +108,20 @@ These three forms are the complete set of Markdown++ syntactic extensions to Com
 Markdown++ defines three identifier forms:
 
 - The **standard identifier** is used for variables and conditions.
-- The **alias name** additionally permits a leading digit, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`).
+- The **alias name** additionally permits a leading digit, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`), and extends its letter class to the XML 1.0 NCName `NameStartChar` ranges so authors of non-English documentation can mint native-script identifiers.
 - The **style name** additionally permits embedded spaces, since styles and markers use compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems use space-embedded style names.
 
 ```ebnf
 identifier         ::= (letter | "_") (letter | digit | "-" | "_")*
 
-alias_name         ::= (letter | digit | "_") (letter | digit | "-" | "_")*
+alias_name         ::= (alias_name_start_char | digit) (alias_name_char)*
 
 style_name         ::= (letter | "_") (letter | digit | "-" | "_" | " ")*
                        /* Leading and trailing spaces are stripped before matching.
                           The trimmed result must not be empty. */
 ```
 
-The standard identifier corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\-]*`. The alias name corresponds to the regex `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`. The style name corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\- ]*` applied after trimming.
+The standard identifier corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\-]*`. The alias name corresponds to the explicit character class defined by `alias_name_start_char` and `alias_name_char` above; see the production definitions for the complete enumeration. The style name corresponds to the regex `[a-zA-Z_][a-zA-Z0-9_\- ]*` applied after trimming.
 
 **Rationale for three forms:** The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs), and requiring a letter prefix would force unnatural naming. The style name exception allows embedded spaces for processor-defined compound names and legacy compatibility. Variables and conditions use the standard identifier to avoid ambiguity with numeric literals (e.g., `$100;` is not a variable reference).
 
@@ -418,7 +444,24 @@ close_delim        <- ws? '-->'
 
 # Identifiers
 identifier         <- [a-zA-Z_] [a-zA-Z0-9_-]*
-alias_name         <- [a-zA-Z0-9_] [a-zA-Z0-9_-]*
+
+# Alias name: XML 1.0 NCName NameStartChar letter ranges plus underscore
+# in the first position (digit also permitted in first position), and the
+# same ranges plus digit and hyphen in subsequent positions. Ranges are
+# spelled in the same W3C #xHHHH form as the EBNF for surface symmetry.
+alias_name         <- alias_name_start_char (alias_name_char)*
+                    / [0-9] (alias_name_char)*
+alias_name_start_char <- [_A-Za-z]
+                      / [#xC0-#xD6] / [#xD8-#xF6] / [#xF8-#x2FF]
+                      / [#x370-#x37D] / [#x37F-#x1FFF]
+                      / [#x200C-#x200D] / [#x2070-#x218F]
+                      / [#x2C00-#x2FEF] / [#x3001-#xD7FF]
+                      / [#xF900-#xFDCF] / [#xFDF0-#xFFFD]
+                      / [#x10000-#xEFFFF]
+alias_name_char    <- alias_name_start_char / [0-9] / "-"
+                    / [#x0300-#x036F] / [#x203F-#x2040]
+                      # Combining marks permitted in non-first positions.
+
 style_name         <- [a-zA-Z_] [a-zA-Z0-9_ -]*
                       # Leading/trailing spaces stripped before matching
 

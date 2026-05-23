@@ -86,3 +86,4 @@ This also resolves the circular correction: pre-#15 styles used `.+` (accepting 
 - [#49](https://github.com/quadralay/markdown-plus-plus/issues/49) — Element interaction refinements (depends on embedded spaces being valid)
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` — The #15 learning that established the two-pattern system; subsequently updated to reference `STYLE_NAME_RE` as the #52 extension
 - `docs/solutions/documentation-gaps/formal-ebnf-peg-grammar-for-extensions-2026-04-08.md` — Now describes "three identifier productions" (`identifier`, `alias_name`, `style_name`) reflecting the #52 extension
+- `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` — Later (#108, 2026-05-22) widened the **alias-name** row of the three-pattern table to XML 1.0 NCName letters; the style/marker row introduced by #52 (this doc) remains ASCII

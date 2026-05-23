@@ -185,9 +185,14 @@ All named entities in Markdown++ (variables, styles, aliases, conditions, and ma
 
 ### Alias Name
 
-Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `#04499224`).
+Alias names use the XML 1.0 NCName `NameStartChar` letter class -- which includes ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!-- #04499224 -->`).
 
-**Regex:** `[a-zA-Z0-9_][a-zA-Z0-9_\-]*`
+- First character: an NCName-class letter, an underscore (`_`), or a digit
+- Subsequent characters: NCName-class letters, digits, underscores, or hyphens
+- Minimum length is 1 character
+- No whitespace, no punctuation other than `-` and `_`, no leading `.`
+
+See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The alias namespace is a strict superset of the prior ASCII-only grammar -- every alias valid under the previous grammar remains valid.
 
 **Applies to:** Aliases
 
@@ -217,6 +222,9 @@ Style and marker names allow embedded spaces to support processor-defined compou
 | `Table Cell Head` | Style | Multiple embedded spaces |
 | `introduction` | Alias | Lowercase alpha |
 | `316492` | Alias | Digit-first (alias exception) |
+| `インストール` | Alias | Japanese alias (NCName letter class) |
+| `установка` | Alias | Cyrillic alias (NCName letter class) |
+| `Café` | Alias | German alias with accent (NCName letter class) |
 | `web` | Condition | Single word |
 | `Keywords` | Marker key | PascalCase |
 | `Index Entry` | Marker key | Embedded space (style/marker name) |
@@ -231,10 +239,16 @@ Style and marker names allow embedded spaces to support processor-defined compou
 | ` Leading Space` | Leading space (style/marker) |
 | `Trailing Space ` | Trailing space (style/marker) |
 | `special!char` | Contains punctuation |
+| `foo.bar` | Period not in alias character class -- aliases permit only `-` and `_` punctuation |
+| `.hidden` | Period cannot start an alias name |
 
 ### Non-English Content
 
-For non-English content, the same structural rule applies using the language's UTF-8 letter values in place of `a-zA-Z`. Note: The validation script currently enforces ASCII names only; UTF-8 letter support is a future goal.
+**Aliases:** Alias names accept Unicode letters from non-Latin scripts via the XML 1.0 NCName letter class (see [Alias Name](#alias-name) above). Authors writing Japanese, German, Greek, Cyrillic, or other non-English documentation can use native-script identifiers for alias anchors -- for example, `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`.
+
+**Variables, conditions, styles, and marker keys:** These four naming patterns currently accept ASCII letters only (`a-zA-Z`). Extension to Unicode letters is a separate audit; authors with non-ASCII identifier requirements for these entities should track the follow-up issue referenced in `CHANGELOG.md`.
+
+**HTML5-id-legal vs. NCName:** HTML5 `id` attributes permit any non-whitespace character, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, URL fragments, and CSS selectors. Every alias valid under the NCName grammar lands cleanly in HTML `id=` output.
 
 ---
 
