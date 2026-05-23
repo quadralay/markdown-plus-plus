@@ -35,6 +35,18 @@ This is the home of the Markdown++ format standard -- its specification, example
 - **[Syntax reference](plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md)** -- Complete reference for all extensions, rules, and validation codes.
 - **[GLOSSARY.md](GLOSSARY.md)** -- Canonical definitions for Markdown++ terminology.
 
+## For AI agents
+
+If you're pointing an AI agent at this repo and want it to ingest Markdown++ for authoring or validation, follow the path that matches your agent's runtime.
+
+### If your agent runs in Claude Code
+
+Install the marketplace plugin using the two slash commands in the [Tools](#tools) section below. The `markdown-plus-plus` skill then auto-activates on `.md` files containing Markdown++ signals (HTML comment directives, `$variable;` tokens, `mdpp-version:` frontmatter); no further wiring is required.
+
+### If your agent runs in another harness
+
+Point the agent at [`plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md`](plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md) as the entry point. Its YAML frontmatter declares the trigger signals the skill should activate on, and the sibling [`references/`](plugins/markdown-plus-plus/skills/markdown-plus-plus/references/) directory contains the syntax reference, error-code reference, examples, and best-practices payload an agent should load to author or validate Markdown++ documents.
+
 ## Tools
 
 ### Claude Code plugin
