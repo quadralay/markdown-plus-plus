@@ -160,10 +160,10 @@ Markdown++ defines three identifier forms used across all named entities:
 | Form | Pattern | Used By | Spaces |
 |------|---------|---------|--------|
 | **Standard identifier** | `[a-zA-Z_][a-zA-Z0-9_-]*` | Variables, conditions | No |
-| **Alias name** | `[a-zA-Z0-9_][a-zA-Z0-9_-]*` | Aliases (digit-first permitted) | No |
+| **Alias name** | `[NCName-letter \| "_" \| digit][NCName-letter \| "_" \| digit \| "-"]*` (see [`formal-grammar.md`](formal-grammar.md) `alias_name`) | Aliases (digit-first permitted; Unicode letters from any script) | No |
 | **Style/marker name** | `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed | Styles, markers (embedded spaces permitted) | Yes, embedded |
 
-The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs like `#04499224`), and requiring a letter prefix would force unnatural naming. The style/marker name exception allows embedded spaces to support processor-defined compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems with space-embedded style names. Leading and trailing spaces are stripped before validation. Variables and conditions use the standard identifier to avoid ambiguity with numeric literals.
+The alias exception is an intentional design choice. Aliases frequently serve as numeric content identifiers (e.g., CMS record IDs like `#04499224`), and requiring a letter prefix would force unnatural naming. Alias letters additionally extend to the XML 1.0 NCName `NameStartChar` letter ranges so authors of non-English documentation can mint native-script alias identifiers (`<!-- #インストール -->`, `<!-- #установка -->`); see [`formal-grammar.md`](formal-grammar.md) `alias_name_start_char` for the complete enumeration. The standard and style/marker patterns remain ASCII-only pending a separate audit. The style/marker name exception allows embedded spaces to support processor-defined compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems with space-embedded style names. Leading and trailing spaces are stripped before validation. Variables and conditions use the standard identifier to avoid ambiguity with numeric literals.
 
 Names are case-sensitive. `$Product;` and `$product;` are distinct variable references. `style:Note` and `style:note` are distinct style names.
 
@@ -480,9 +480,9 @@ Custom aliases assign stable anchor identifiers to block-level elements. Unlike 
 <!-- #alias-name -->
 ```
 
-The alias name MUST match the alias name pattern: `[a-zA-Z0-9_][a-zA-Z0-9_-]*`. Aliases permit a leading digit, unlike other named entities. Alias names are case-sensitive.
+The alias name MUST match the `alias_name` production defined in [`formal-grammar.md`](formal-grammar.md). Alias names use the XML 1.0 NCName `NameStartChar` letter class (which covers ASCII letters and letters from non-Latin scripts -- Japanese, German with combining accents, Greek, Cyrillic, and others), together with digits, underscore, and hyphen. Aliases permit a leading digit, unlike other named entities. Alias names are case-sensitive at the acceptance surface; duplicate-alias detection (**MDPP008**) compares aliases under Unicode NFC + case-fold normalization.
 
-**Valid examples:** `<!-- #introduction -->`, `<!-- #getting-started -->`, `<!-- #316492 -->`, `<!-- #04499224 -->`
+**Valid examples:** `<!-- #introduction -->`, `<!-- #getting-started -->`, `<!-- #316492 -->`, `<!-- #04499224 -->`, `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`
 
 ### 10.3 Semantics
 
@@ -1214,7 +1214,7 @@ References from any file use the slug, which in this variant happens to equal th
 See [Installation][sh-ug-installation] for setup instructions.
 ```
 
-Both forms are conformant. The alias `sh-ug-installation` satisfies the alias-name rule enforced by **MDPP002** (`[a-zA-Z0-9_][a-zA-Z0-9_-]*`), and the alias namespace and the link-reference-label namespace are independent: a single string used as both an alias and as a link reference label on the same heading is not a duplicate. The choice between the two variants depends on whether the alias carries semantic meaning of its own; see [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug) *Choosing the slug* for guidance.
+Both forms are conformant. The alias `sh-ug-installation` satisfies the alias-name rule enforced by **MDPP002** (see the `alias_name` production in [`formal-grammar.md`](formal-grammar.md)), and the alias namespace and the link-reference-label namespace are independent: a single string used as both an alias and as a link reference label on the same heading is not a duplicate. When the alias uses non-ASCII letters -- for example `<!-- #インストール -->` -- the cross-reference form `[label][インストール]` resolves through CommonMark 0.30 link-reference label matching, which case-folds and Unicode-normalizes both sides. The choice between the two variants depends on whether the alias carries semantic meaning of its own; see [`plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md`](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/best-practices.md#choosing-the-slug) *Choosing the slug* for guidance.
 
 This pattern works in every context: standard Markdown viewers (slug matches heading anchor), publishing tools (alias ID resolves), and composite assemblies (cross-file resolution).
 
@@ -1234,13 +1234,13 @@ Implementations MAY define additional diagnostic codes for implementation-specif
 |------|------|----------|-------|-------------|---------------------|
 | **MDPP000** | File not found or cannot be read | Error | Pre-processing | The input file does not exist or cannot be read | Root document path is invalid or inaccessible |
 | **MDPP001** | Unclosed condition block | Error | Pre-processing | A condition block is missing its closing tag, or a closing tag has no matching opening tag | `<!-- condition:expr -->` without `<!-- /condition -->`, or vice versa |
-| **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard), `[a-zA-Z0-9_][a-zA-Z0-9_-]*` (alias), or `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed (style/marker) |
+| **MDPP002** | Invalid name | Error | Any | A named entity (variable, style, alias, or marker key) does not match its required identifier pattern | Name violates `[a-zA-Z_][a-zA-Z0-9_-]*` (standard), the `alias_name` production in [`formal-grammar.md`](formal-grammar.md) (alias; XML NCName letter class plus digit-first), or `[a-zA-Z_][a-zA-Z0-9_ -]*` trimmed (style/marker) |
 | **MDPP003** | Malformed marker JSON | Error | Phase 2 | The JSON content in a `markers:` command is not valid JSON | `markers:{invalid}` |
 | **MDPP004** | *(Reserved)* | Warning | — | Formerly "Invalid style placement" — covered by MDPP009 | — |
 | **MDPP005** | Circular include | Error | Phase 1, Step 1 | Include chain references itself (directly or transitively) | File A includes B which includes A |
 | **MDPP006** | Missing include file | Warning | Phase 1, Step 1 | An included file does not exist or cannot be read | `<!-- include:nonexistent.md -->` |
 | **MDPP007** | Invalid condition syntax | Error | Phase 1, Step 1 | A condition expression cannot be parsed | `<!-- condition: -->` (empty) or malformed expression |
-| **MDPP008** | Duplicate alias | Error | Phase 2 | Two alias commands in the same file use the same identifier | Two `<!-- #name -->` with the same name |
+| **MDPP008** | Duplicate alias | Error | Phase 2 | Two alias commands in the same file use the same identifier under Unicode NFC + case-fold normalization | Two `<!-- #name -->` with names that compare equal after NFC + case-fold (matches CommonMark 0.30 link-reference label matching) |
 | **MDPP009** | Orphaned comment tag | Warning | Phase 2 | A recognized tag fails attachment (blank line, end of file, stacked tags) | Tag with no attached target element |
 
 ### 18.2 Processing-Phase Codes

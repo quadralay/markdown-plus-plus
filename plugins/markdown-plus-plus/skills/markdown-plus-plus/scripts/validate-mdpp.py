@@ -25,6 +25,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from dataclasses import dataclass, asdict
 from enum import Enum
 from collections.abc import Iterator
@@ -72,8 +73,39 @@ PATTERNS = {
 }
 
 
+# XML 1.0 NCName NameStartChar letter ranges (issue #108).
+# See spec/formal-grammar.md alias_name_start_char production.
+# Spelled with \u / \U escapes -- literal Unicode in source is prone
+# to silent corruption in transit.
+_NCNAME_START_CHAR = (
+    "_A-Za-z"
+    "\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF"
+    "\u0370-\u037D\u037F-\u1FFF"
+    "\u200C-\u200D"
+    "\u2070-\u218F"
+    "\u2C00-\u2FEF"
+    "\u3001-\uD7FF"
+    "\uF900-\uFDCF"
+    "\uFDF0-\uFFFD"
+    "\U00010000-\U000EFFFF"
+)
+
+# Combining-mark ranges from XML 1.0 NCName NameChar production. Permitted
+# only in non-first positions of an alias name. Including these here lets
+# decomposed forms like U+0065 U+0301 ("e" + combining acute) accept under
+# MDPP002 at the raw-byte level; MDPP008 then normalizes for duplicate
+# detection. Combining marks are NOT in _NCNAME_START_CHAR -- they cannot
+# lead an alias.
+_NCNAME_COMBINING = (
+    "\u0300-\u036F"
+    "\u203F-\u2040"
+)
+
 STANDARD_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_-]*$')
-ALIAS_NAME_RE = re.compile(r'^[a-zA-Z0-9_][a-zA-Z0-9_-]*$')
+ALIAS_NAME_RE = re.compile(
+    f'^[{_NCNAME_START_CHAR}0-9]'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*$'
+)
 STYLE_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_ -]*$')
 
 
@@ -93,6 +125,17 @@ def validate_style_name(name: str) -> bool:
 def validate_alias_name(name: str) -> bool:
     """Check if an alias name is valid (digit-first allowed)."""
     return bool(ALIAS_NAME_RE.match(name))
+
+
+def _alias_dedup_key(name: str) -> str:
+    """Normalization key for MDPP008 duplicate detection.
+
+    Applies Unicode NFC + casefold so canonical-equivalent variants
+    (precomposed vs. decomposed accents; upper vs. lower case) compare
+    equal. Matches the equivalence relation used by CommonMark 0.30
+    link-reference-definition slug matching.
+    """
+    return unicodedata.normalize('NFC', name).casefold()
 
 
 def validate_marker_key(name: str) -> bool:
@@ -224,8 +267,11 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
     # Track open conditions for matching
     condition_stack = []
 
-    # Track aliases for uniqueness check
-    alias_locations: dict[str, int] = {}  # alias -> first line number
+    # Track aliases for uniqueness check (MDPP008).
+    # Keyed by NFC + casefold normalized form; values store the first-seen
+    # line and the original spelling for error messages.
+    alias_locations: dict[str, int] = {}  # normalized key -> first line
+    alias_display: dict[str, str] = {}    # normalized key -> original spelling
 
     for line_num, line in _iter_outside_fences(lines):
 
@@ -387,20 +433,50 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     file=filepath,
                     line=line_num,
                     context=match.group(0),
-                    suggestion="Alias names must start with a letter, digit, or underscore, followed by letters, digits, hyphens, or underscores"
+                    suggestion=(
+                        "Alias names may use letters from any script (XML "
+                        "NCName letter class), digits, underscore (_), and "
+                        "hyphen (-). Hyphen is permitted only in non-first "
+                        "positions."
+                    ),
                 ))
-            if alias_name in alias_locations:
+            key = _alias_dedup_key(alias_name)
+            if key in alias_locations:
+                first_line = alias_locations[key]
+                first_name = alias_display[key]
+                if first_name == alias_name:
+                    msg = f"Duplicate alias: #{alias_name}"
+                elif first_name.casefold() == alias_name.casefold():
+                    msg = (
+                        f"Duplicate alias: #{alias_name} "
+                        f"(case-insensitive match with #{first_name} on "
+                        f"line {first_line})"
+                    )
+                else:
+                    msg = (
+                        f"Duplicate alias: #{alias_name} "
+                        f"(matches #{first_name} on line {first_line}; "
+                        f"the two forms are visually identical but use "
+                        f"different Unicode byte sequences for an accented "
+                        f"character)"
+                    )
                 issues.append(ValidationIssue(
                     type=Severity.ERROR.value,
                     code="MDPP008",
-                    message=f"Duplicate alias: #{alias_name}",
+                    message=msg,
                     file=filepath,
                     line=line_num,
                     context=match.group(0),
-                    suggestion=f"First defined on line {alias_locations[alias_name]}. Use unique alias values."
+                    suggestion=(
+                        f"First defined on line {first_line} as "
+                        f"#{first_name}. Use a unique alias, or remove "
+                        "the duplicate. Comparison uses Unicode NFC + "
+                        "case-fold (CommonMark 0.30 slug matching)."
+                    ),
                 ))
             else:
-                alias_locations[alias_name] = line_num
+                alias_locations[key] = line_num
+                alias_display[key] = alias_name
                 if verbose:
                     print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Alias defined: #{alias_name}")
 

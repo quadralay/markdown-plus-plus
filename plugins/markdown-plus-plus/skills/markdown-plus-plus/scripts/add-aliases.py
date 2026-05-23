@@ -36,10 +36,32 @@ class Colors:
     NC = '\033[0m'  # No Color
 
 
+# XML 1.0 NCName NameStartChar letter ranges (issue #108).
+# Duplicated from validate-mdpp.py rather than imported -- the two scripts
+# are intentionally standalone so each can be vendored independently.
+# Spelled with \u / \U escapes; literal Unicode in source is prone to
+# silent corruption in transit.
+_NCNAME_START_CHAR = (
+    "_A-Za-z"
+    "\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF"
+    "\u0370-\u037D\u037F-\u1FFF"
+    "\u200C-\u200D"
+    "\u2070-\u218F"
+    "\u2C00-\u2FEF"
+    "\u3001-\uD7FF"
+    "\uF900-\uFDCF"
+    "\uFDF0-\uFFFD"
+    "\U00010000-\U000EFFFF"
+)
+
 # Regex patterns
 HEADING_PATTERN = re.compile(r'^(#{1,6})\s+(.+)$')
-ALIAS_PATTERN = re.compile(r'<!--\s*#([a-zA-Z0-9_-]+)')
-EXISTING_ALIAS_LINE = re.compile(r'^<!--\s*#[a-zA-Z0-9_-]+.*-->\s*$')
+ALIAS_PATTERN = re.compile(
+    f'<!--\\s*#([{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*)'
+)
+EXISTING_ALIAS_LINE = re.compile(
+    f'^<!--\\s*#[{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*.*-->\\s*$'
+)
 
 
 def slugify(text: str) -> str:

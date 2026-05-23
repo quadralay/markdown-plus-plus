@@ -450,13 +450,37 @@ command grammar (multiline, marker, marker order) -- consult
 ### Standalone anchor
 
 ```python
-r'<!--\s*(#[a-zA-Z0-9_-]+)\s*-->'
+# _NCNAME_START_CHAR enumerates the XML 1.0 NCName NameStartChar letter
+# ranges (ASCII letters + non-Latin-script letters). Mirror the constant
+# from validate-mdpp.py rather than reaching for re.UNICODE / \w, which
+# would conflate letters with digits and pull in characters NCName excludes.
+# Spelled with \u / \U escapes -- literal Unicode source is prone to
+# silent corruption in transit (see issue #108).
+_NCNAME_START_CHAR = (
+    "_A-Za-z"
+    "\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF"
+    "\u0370-\u037D\u037F-\u1FFF"
+    "\u200C-\u200D"
+    "\u2070-\u218F"
+    "\u2C00-\u2FEF"
+    "\u3001-\uD7FF"
+    "\uF900-\uFDCF"
+    "\uFDF0-\uFFFD"
+    "\U00010000-\U000EFFFF"
+)
+re.compile(
+    rf'<!--\s*(#[{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*)\s*-->'
+)
 ```
 
 Matches anchors that appear on their own (not combined with a style).
 Companion logic must verify the match is not inside an unclosed style
 comment -- a substring `<!--#name-->` inside a longer `<!--style:Foo ;
 #name-->` would otherwise match incorrectly.
+
+Aliases follow the XML NCName-derived letter class defined in
+[`syntax-reference.md`](syntax-reference.md#alias-name); update both this
+pattern and any downstream tooling in lockstep when the grammar changes.
 
 ### Companion logic checklist
 

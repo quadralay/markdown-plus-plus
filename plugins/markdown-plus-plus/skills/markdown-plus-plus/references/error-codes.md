@@ -41,7 +41,7 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 | Form | Regex | Used By | Spaces |
 |------|-------|---------|--------|
 | **Standard identifier** | `^[a-zA-Z_][a-zA-Z0-9_\-]*$` | Variables, conditions | No |
-| **Alias name** | `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` | Aliases (digit-first permitted) | No |
+| **Alias name** | XML NCName letter class + digit + `_` + `-` (digit-first permitted); see [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name` | Aliases | No |
 | **Style/marker name** | `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` (trimmed) | Styles, marker keys (embedded spaces permitted) | Yes, embedded |
 
 ### Standard Identifier
@@ -56,9 +56,9 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 
 ### Alias Name
 
-Alias names may also begin with a digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`).
+Alias names use the XML 1.0 NCName `NameStartChar` letter class -- ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`). The alias grammar is a strict superset of the prior ASCII-only pattern -- every alias valid under the previous grammar remains valid.
 
-**Regex:** `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$`
+**Grammar:** See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The validator (`scripts/validate-mdpp.py`) builds the equivalent Python character class from explicit `\u`/`\U` escapes at module-level constant `_NCNAME_START_CHAR`.
 
 Used by: alias names (`<!--#name-->`).
 
@@ -73,7 +73,7 @@ Style names and marker key names permit embedded spaces to support compound name
 - Leading and trailing spaces are stripped before validation
 - Used by: style names (`<!--style:name-->`), marker key names (`<!--markers:{...}-->`, `<!--marker:key="value"-->`)
 
-For non-English content, the same structural rules apply using the language's UTF-8 letter values in place of `a-zA-Z`.
+**Non-English content.** Alias names accept Unicode letters from non-Latin scripts via the XML 1.0 NCName letter class -- for example, `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`. The standard identifier (variables, conditions) and style/marker name patterns remain ASCII-only pending a separate audit; authors with non-ASCII identifier requirements for those entities should track the follow-up issue referenced in `CHANGELOG.md`. HTML5 `id=` attributes permit a wider character set than NCName, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, URL fragments, and CSS selectors.
 
 ---
 
@@ -146,7 +146,7 @@ Nested content — not permitted.
 
 - **Variables:** The name portion of `$name;` references (standard identifier rule)
 - **Condition names:** Individual names within condition expressions (standard identifier rule; see also MDPP007)
-- **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed)
+- **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed; XML NCName letter class extends to non-ASCII scripts)
 - **Style names:** The name in `<!--style:name-->` (style/marker rule — embedded spaces allowed)
 - **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (style/marker rule — embedded spaces allowed)
 
@@ -171,6 +171,11 @@ $my variable;
 <!-- NOTE: alias may start with a digit — digit-first is valid for aliases -->
 <!--#04499224-->
 
+<!-- NOTE: aliases accept Unicode letters from non-Latin scripts (XML NCName letter class) -->
+<!--#インストール-->
+<!--#установка-->
+<!--#Café-->
+
 <!-- NOTE: embedded spaces in style/marker names are valid -->
 <!--style:Code Block-->
 <!--markers:{"Table Cell Head": "value"}-->
@@ -179,7 +184,7 @@ $my variable;
 **Suggested fix:** The required characters depend on the entity type:
 
 - **Variables and conditions (standard identifier rule):** Start with a letter or underscore; subsequent characters may be letters, digits, hyphens, or underscores. No spaces.
-- **Aliases (alias rule):** Same as standard, but may also start with a digit.
+- **Aliases (alias rule):** Permit letters from any script (XML NCName letter class), digits, underscores, and hyphens. Aliases may start with a digit. Subsequent characters may include hyphen in addition to the start-character set. No whitespace, no period, no punctuation outside `-` and `_`.
 - **Style names and marker keys (style/marker rule):** Start with a letter or underscore; subsequent characters may include embedded spaces as well as letters, digits, hyphens, and underscores. Leading/trailing spaces are stripped.
 
 ---
@@ -285,21 +290,45 @@ $my variable;
 
 **Description:** The same alias name appears more than once in a single file. Alias names must be unique within a file to allow unambiguous cross-referencing.
 
-**Detection logic:** A dictionary tracks alias names to their first-seen line number. When an alias is encountered, it is looked up in the dictionary. If already present, emit MDPP008 referencing the first occurrence. Otherwise, record the alias and its line number.
+**Detection logic:** A dictionary tracks aliases to their first-seen line number, keyed by a normalized form -- Unicode NFC followed by case-fold -- so canonical-equivalent variants are detected as duplicates. When an alias is encountered, it is normalized and looked up; if already present, emit MDPP008 referencing the first occurrence. Otherwise, record the alias (with its original spelling for the error message) and its line number. The normalization matches the equivalence relation used by CommonMark 0.30 link-reference-definition slug matching, so cross-reference resolution and duplicate detection agree.
+
+The MDPP008 emission distinguishes three sub-states so authors can self-diagnose:
+
+1. **Byte-exact duplicate** -- the two raw alias strings are identical.
+2. **Case-fold duplicate** -- the two strings differ only in letter case (e.g., `#FOO` and `#foo`). The error message names both forms so authors who minted them expecting distinctness see the new behavior explicitly.
+3. **NFC-equivalent duplicate** -- the two strings encode the same character sequence using different Unicode byte sequences (e.g., precomposed `é` vs. decomposed `e` + combining acute). The error message includes a plain-English gloss noting the strings are visually identical but use different Unicode byte sequences.
 
 **Trigger examples:**
+
+The two `Café` aliases below are visually identical but use different Unicode byte sequences for the accented `é` -- the first uses precomposed U+00E9, the second uses decomposed `e` (U+0065) plus combining acute (U+0301). Both forms accept under MDPP002, but MDPP008 collapses them under NFC normalization:
 
 ```markdown
 <!-- First definition: OK -->
 <!--#introduction-->
 ## Introduction
 
-<!-- ERROR: same alias defined again -->
+<!-- ERROR: same alias defined again (byte-exact match) -->
 <!--#introduction-->
 ## Another Section
+
+<!-- First definition: OK -->
+<!--#Café-->  <!-- precomposed: bytes c3 a9 for é (U+00E9) -->
+## Café Module
+
+<!-- ERROR: NFC-equivalent duplicate of #Café above -->
+<!--#Café-->  <!-- decomposed: bytes 65 cc 81 for é (U+0065 + U+0301) -->
+## Another Section
+
+<!-- First definition: OK -->
+<!--#FOO-->
+## Uppercase Foo
+
+<!-- ERROR: case-fold duplicate of #FOO above -->
+<!--#foo-->
+## Lowercase Foo
 ```
 
-**Suggested fix:** Use a unique alias name for each element. The error message includes the line number of the first definition.
+**Suggested fix:** Use a unique alias name for each element. If the duplicate is a casefold collision, choose a distinct alias (or accept the merge by removing one of the duplicate sites). If the duplicate is NFC-equivalent, normalize the source bytes for the alias -- editors can normalize to NFC on save. The error message names both occurrences and identifies the sub-state (byte-exact, case-fold, or NFC-equivalent).
 
 **Note:** MDPP008 applies only to custom aliases (`<!-- #name -->`). Auto-generated heading aliases that collide with each other are silently disambiguated with a counter suffix (`-2`, `-3`, etc.) rather than triggering an error. When a custom alias and an auto-generated alias share the same identifier, both exist independently in separate namespaces -- the custom alias takes resolution priority (no suffix is applied to the auto-generated alias). See [Duplicate Alias Resolution](../../../../../spec/element-interactions.md#duplicate-alias-resolution) and [Custom Alias Priority](../../../../../spec/element-interactions.md#custom-alias-priority).
 

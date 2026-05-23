@@ -13,6 +13,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.7.0] - 2026-05-22
+
+### Spec
+
+- Extended the custom-alias letter class from ASCII (`[a-zA-Z]`) to the XML 1.0 NCName `NameStartChar` letter ranges so authors of non-English documentation can mint native-script alias identifiers (e.g., `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`). Non-first positions additionally accept the NCName combining-mark ranges (`#x0300-#x036F`, `#x203F-#x2040`) so decomposed accented forms (e.g., `e` + U+0301) parse the same as their precomposed counterparts. The standard, style, and marker-key patterns remain ASCII pending a separate audit. Updated `spec/specification.md` § 4.2, § 10.2, § 17.3.1, § 18.1; `spec/formal-grammar.md` adds `alias_name_start_char` and `alias_name_char` productions (EBNF + PEG) and updates the regex summary. Every alias valid under the previous ASCII-only grammar remains valid -- the new grammar is a strict superset for MDPP002 acceptance ([#108](https://github.com/quadralay/markdown-plus-plus/issues/108)).
+
+### Tooling
+
+- `validate-mdpp.py` accepts Unicode-letter aliases under the new grammar and continues to reject the same invalid forms that were previously rejected (punctuation outside `-_`, whitespace, period-first). MDPP008 (duplicate alias) now compares aliases under Unicode NFC + case-fold normalization so canonical-equivalent variants (precomposed vs. decomposed accented letters, upper vs. lower case) are flagged as duplicates -- matching the equivalence relation used by CommonMark 0.30 link-reference-definition slug matching. The MDPP008 error message distinguishes three sub-states (byte-exact, case-fold, NFC-equivalent) so authors can self-diagnose ([#108](https://github.com/quadralay/markdown-plus-plus/issues/108)).
+- `add-aliases.py` recognizes Unicode-letter aliases when scanning a file for existing aliases, so the script does not generate a colliding ASCII slug above a heading whose sibling already has a Unicode alias. Slug *generation* remains ASCII-only -- a Japanese-titled heading still gets a placeholder slug from `slugify()` ([#108](https://github.com/quadralay/markdown-plus-plus/issues/108)).
+- Updated `references/syntax-reference.md` § Naming Rules § Alias Name and § Non-English Content; `references/error-codes.md` § Naming Rule table, § Alias Name, and the MDPP002/MDPP008 entries; `references/comment-manipulation.md` standalone-anchor example. Added `tests/sample-unicode-aliases.md` (positive: Japanese, German precomposed, Greek, Cyrillic, ZWJ; negative: whitespace, punctuation outside `-_`, leading `.`) and `tests/sample-unicode-duplicate-aliases.md` (MDPP008 byte-exact, case-fold, NFC-equivalent sub-state coverage) ([#108](https://github.com/quadralay/markdown-plus-plus/issues/108)).
+
+A follow-up audit will consider extending Unicode-letter support to the variable, condition, style, and marker-key naming patterns.
+
 ## [1.6.3] - 2026-05-22
 
 ### Tooling
