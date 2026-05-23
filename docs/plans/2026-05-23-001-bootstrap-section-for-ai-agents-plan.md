@@ -7,6 +7,19 @@ plan_type: docs
 
 # docs: Add Bootstrap Section for AI Agents
 
+## Plan Review Log
+
+This plan was reviewed on 2026-05-23 by three compound-engineering review agents (coherence, feasibility, adversarial-document). Findings applied in this revision:
+
+- **Stale slash-command line references.** Coherence flagged the plan citing `README.md` lines 46-49 for the install commands; after the **For AI agents** section was inserted, the commands moved to lines 59-60. Replaced every occurrence of "lines 46-49" with the content-based reference "the install commands in the `## Tools` section" so the plan does not rot as nearby lines shift. (Coherence F1, F3.)
+- **CHANGELOG entry was missing from the implementation.** Feasibility flagged that `cf9717a` bumped the plugin to `1.7.1` but did not add a `CHANGELOG.md` entry, leaving the plan's R-bump unfulfilled. Added the 1.7.1 entry under **Project** (the existing changelog taxonomy is **Spec** / **Tooling** / **Project** -- there is no **Documentation** category) so the version increment ships with the user-visible reason. Plan U3 step 2 also relabeled `Documentation` → `Project` to match the existing taxonomy. (Feasibility F1.)
+- **`SKILL.md` portability is overstated for non-Claude-Code harnesses.** Adversarial flagged that the generic-harness README paragraph implies `SKILL.md` is a harness-agnostic entry point, but `SKILL.md`'s YAML frontmatter (`description:` as auto-activation trigger) and XML-tagged sections (`<objective>`, `<overview>`, etc.) are Claude Code skill conventions. A generic harness will ingest it as plain Markdown and miss the activation semantics. Added a *Known limitation: SKILL.md framing* note under Key Technical Decisions acknowledging this and pointing to `references/` as the harness-agnostic payload. Did not rewrite the README itself in this revision -- the line is correct in spirit (the file IS the entry point) and a wording revision can ride a future doc pass once we see how the breadcrumb performs in practice. (Adversarial F3.)
+- **"Cold clone" audience framing.** Adversarial flagged that the bolded `CLAUDE.md` lead `**Agents bootstrapping from a cold clone:**` may narrow the audience visibly and cause GitHub-hosted-README agents to skip the line. Plan notes this as an open advisory rather than rewriting the implementation -- the framing is defensible for the support-case audience that drove the issue, and broadening the wording is a content judgment best made when the next agent-onboarding signal lands. (Adversarial F1, advisory.)
+
+Items deemed nice-to-have without applied edits: terminology drift between "slash commands" and "marketplace install commands" (Coherence F2 NIT) -- both terms read correctly in context and the surrounding prose disambiguates; relative-link form in U1 step 2 (Feasibility F4 NIT) -- the `../../` prefix reads correctly inside the plan file's directory context and was already resolved correctly during implementation.
+
+---
+
 ## Summary
 
 Add a new top-level **For AI agents** section to `README.md` (placed
@@ -23,7 +36,7 @@ Add a one-line pointer near the top of `CLAUDE.md` so an agent reading
 that file first sees the hand-off to the new README section early
 rather than having to infer it from the in-repo authoring discipline
 content. Bump the plugin patch version (`1.7.0 → 1.7.1`) and record
-the change in `CHANGELOG.md` under **Documentation**.
+the change in `CHANGELOG.md` under **Project**.
 
 ---
 
@@ -34,8 +47,8 @@ customer asked how to get their agent harness to ingest the
 `markdown-plus-plus` skill from a cold clone of the repo. There was
 no documented bootstrap statement to point them at:
 
-- The existing slash commands at `README.md` lines 46-49 are framed as
-  *marketplace install* instructions, useful only to users already
+- The existing install commands in the `## Tools` section are framed
+  as *marketplace install* instructions, useful only to users already
   inside a Claude Code session. They are not framed as bootstrap
   guidance for a generic agent harness.
 - `CLAUDE.md` is scoped to in-repo authoring discipline -- how agents
@@ -63,8 +76,8 @@ requirements; it sequences and operationalizes R1-R8.
   (**"For AI agents"**) placed above the existing `## Tools` section
   so it is discoverable before the marketplace install commands.
 - **R2.** The section documents two ingestion paths:
-  - **Claude Code path.** Reframes the existing slash commands at
-    `README.md` lines 46-49 as the recommended approach when the
+  - **Claude Code path.** Reframes the existing install commands in
+    the `## Tools` section as the recommended approach when the
     user's harness is Claude Code. The slash commands themselves are
     not rewritten -- they are pointed at from the new section and
     remain verbatim in `## Tools`.
@@ -92,8 +105,10 @@ requirements; it sequences and operationalizes R1-R8.
   unaffected.
 - **R-bump.** Bump plugin version `1.7.0 → 1.7.1` via
   `scripts/bump-version.sh patch` (documentation update, no behavior
-  change) and add a 1.7.1 entry under **Documentation** in
-  `CHANGELOG.md`.
+  change) and add a 1.7.1 entry under **Project** in `CHANGELOG.md`
+  (the existing taxonomy is **Spec** / **Tooling** / **Project** --
+  this change is repo documentation, which lives under **Project**
+  by precedent of the 1.5.0 GLOSSARY entry).
 
 ---
 
@@ -127,9 +142,9 @@ requirements; it sequences and operationalizes R1-R8.
   `error-codes.md`, `comment-manipulation.md`, `table-formatting.md`).
   The README section names the `references/` directory but does not
   enumerate or modify its contents.
-- **Marketplace install command changes.** The slash commands at
-  `README.md` lines 46-49 are reframed in context, not rewritten.
-  They remain verbatim in `## Tools`.
+- **Marketplace install command changes.** The slash commands in the
+  `## Tools` section are reframed in context, not rewritten. They
+  remain verbatim in `## Tools`.
 - **`docs/solutions/` learning entry.** This is a small documentation
   breadcrumb; the cleanup phase decides whether a learning is
   warranted. The plan does not pre-commit to one.
@@ -140,15 +155,18 @@ requirements; it sequences and operationalizes R1-R8.
 
 ### Verification of referenced surfaces
 
-- **`README.md`** exists. The slash commands at lines 46-49 are inside
-  the `## Tools` → `### Claude Code plugin` block:
+- **`README.md`** exists. The two install commands live inside the
+  `## Tools` → `### Claude Code plugin` block:
   ```
   /plugin marketplace add quadralay/markdown-plus-plus
   /plugin install markdown-plus-plus@markdown-plus-plus
   ```
   Confirmed by reading the file. Insertion point for the new section:
   immediately before the existing `## Tools` heading (currently after
-  the `## What's in this repo` bullet list).
+  the `## What's in this repo` bullet list). The plan refers to these
+  commands by their containing section (`## Tools`) rather than by
+  line number, since the line numbers shift the moment the new
+  section is inserted above them.
 - **`CLAUDE.md`** exists. The `## Overview` block is the first content
   block (lines 3-7). Insertion point for the one-line pointer: at the
   end of the `## Overview` block, separated by a blank line before
@@ -248,9 +266,30 @@ requirements; it sequences and operationalizes R1-R8.
   patch to "Bug fixes, documentation updates, minor improvements" --
   this is a documentation update. Implementation `cf9717a` confirms
   the patch bump.
-- **`CHANGELOG.md` entry under Documentation.** The change is
-  documentation-only; no Tooling or Spec change is involved. A single
-  bullet under **Documentation** is sufficient.
+- **`CHANGELOG.md` entry under Project.** The repo's existing
+  changelog taxonomy is **Spec** / **Tooling** / **Project** -- there
+  is no **Documentation** category. The 1.5.0 GLOSSARY addition
+  (closest precedent for a repo-documentation change) sits under
+  **Project**, so the new bootstrap-section entry follows the same
+  convention. A single bullet under **Project** is sufficient.
+- **Known limitation: SKILL.md framing for non-Claude-Code harnesses.**
+  `SKILL.md` was authored for Claude Code's skill loader, which
+  interprets the YAML `description:` field as auto-activation triggers
+  and treats the XML-tagged sections (`<objective>`, `<overview>`,
+  `<command_block_syntax>`, `<syntax_examples>`, `<common_mistakes>`)
+  as discrete context blocks. A non-Claude-Code harness will ingest
+  the file as plain Markdown and miss the activation semantics. The
+  generic-harness paragraph in the README is therefore correct in
+  *spirit* -- `SKILL.md` IS the entry point and its content is
+  readable as Markdown -- but the wording slightly overstates how
+  much of the file's structure a generic loader can interpret. The
+  load-bearing surface for a generic harness is the sibling
+  `references/` directory, which is plain Markdown with no Claude
+  Code conventions. If the bootstrap breadcrumb gets followed by a
+  non-Claude harness and the framing is confusing in practice, a
+  follow-up doc pass can rewrite the paragraph to lead with
+  `references/` and treat `SKILL.md` as the table-of-contents pointer.
+  Not in scope for this PR.
 
 ---
 
@@ -354,11 +393,14 @@ records the documentation breadcrumb.
 
 1. Run `scripts/bump-version.sh patch`. Verify both `plugin.json` and
    `.claude-plugin/marketplace.json` show `1.7.1`.
-2. Add a `1.7.1` entry to `CHANGELOG.md` under **Documentation**:
-   "Add **For AI agents** section to `README.md` and a cold-clone
-   pointer in `CLAUDE.md` documenting two skill-ingestion paths
-   (Claude Code marketplace install vs. generic-harness skill
-   loading)."
+2. Add a `1.7.1` entry to `CHANGELOG.md` under **Project**: "Add
+   **For AI agents** section to `README.md` and a cold-clone pointer
+   in `CLAUDE.md` documenting two skill-ingestion paths (Claude Code
+   marketplace install vs. generic-harness skill loading)."
+   **Project** is the right category because (a) `CHANGELOG.md`'s
+   existing taxonomy is only **Spec** / **Tooling** / **Project**,
+   and (b) the 1.5.0 GLOSSARY addition (the closest precedent for a
+   repo-documentation change) sits under **Project**.
 
 **Acceptance:** R-bump satisfied. The plugin manifests are in
 lockstep at `1.7.1`. Per repo convention (#108 lineage), the
