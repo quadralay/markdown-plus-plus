@@ -127,3 +127,4 @@ Future contributors investigating a "skill didn't fire" report should diagnose a
 - Work commit: `1d921c0` on `claude/issue-84`
 - `CLAUDE.md` § Version Management — the patch-bump convention applied here
 - `plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md` — the file whose description this convention governs
+- [`readme-bootstrap-section-for-cold-clone-agents-2026-05-23.md`](readme-bootstrap-section-for-cold-clone-agents-2026-05-23.md) — pre-routing analogue: how a cold-clone agent finds the skill in the first place, before the description field becomes relevant

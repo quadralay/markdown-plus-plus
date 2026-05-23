@@ -157,6 +157,7 @@ validating it would defeat the purpose of the case.
 ## Related
 
 - [`skill-activation-description-completeness-2026-05-09.md`](skill-activation-description-completeness-2026-05-09.md) — the routing-context principle this suite operationalizes
+- [`readme-bootstrap-section-for-cold-clone-agents-2026-05-23.md`](readme-bootstrap-section-for-cold-clone-agents-2026-05-23.md) — pre-routing analogue: cold-clone bootstrap discovery, a sibling skill-discovery surface that has no fixture suite of its own (the customer-support exchange that prompted #110 is the field signal in lieu of an automated check)
 - [`plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md`](../../../plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/auto-activation/cases.md) — the suite itself
 - GitHub issue #85 — the gap-investigation issue that produced the suite
 - GitHub issue #84 — the original failure case that prompted the description-completeness learning
