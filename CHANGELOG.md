@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.7.3] - 2026-05-23
+
+### Tooling
+
+- Clarified two documentation surfaces that overstated the scope of the 1.7.0 alias-grammar change. `references/error-codes.md` § *Alias Name* and `references/syntax-reference.md` § *Naming Rules > Alias Name* both characterized the new grammar as a "strict superset of the prior ASCII-only pattern." The claim is true for MDPP002 *acceptance* but misleading for *whole-document validation*, because MDPP008 (duplicate alias) tightened in 1.7.0 from byte-exact comparison to NFC + casefold -- documents with previously-distinct aliases like `<!--#FOO-->` and `<!--#foo-->` now fail MDPP008 as canonical-equivalent duplicates. Reframed both surfaces to scope the superset claim to MDPP002 and added an explicit *Migration note (1.7.0)* in `references/error-codes.md` cross-referencing the three MDPP008 sub-state messages. Also corrected the `_alias_dedup_key` docstring in `scripts/validate-mdpp.py`, which claimed CommonMark 0.30 equivalence -- CommonMark 0.30 §4.7 mandates casefold only; the Markdown++ implementation is stricter because it adds NFC. No syntax, semantics, or validator behavior changed (residual findings 3 and 5 from PR [#109](https://github.com/quadralay/markdown-plus-plus/pull/109) review).
+
 ## [1.7.2] - 2026-05-23
 
 ### Tooling

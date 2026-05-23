@@ -56,7 +56,9 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 
 ### Alias Name
 
-Alias names use the XML 1.0 NCName `NameStartChar` letter class -- ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`). The alias grammar is a strict superset of the prior ASCII-only pattern -- every alias valid under the previous grammar remains valid.
+Alias names use the XML 1.0 NCName `NameStartChar` letter class -- ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`). The alias **acceptance grammar** (MDPP002) is a strict superset of the prior ASCII-only pattern -- every alias valid under the previous grammar still passes MDPP002.
+
+**Migration note (1.7.0).** Whole-document validation is *not* a strict superset. MDPP008 (duplicate alias) tightened from byte-exact comparison to NFC + casefold, so documents that previously had distinct aliases like `<!--#FOO-->` and `<!--#foo-->`, or precomposed vs. decomposed accented forms, now fail MDPP008 as canonical-equivalent duplicates. See [MDPP008 -- Duplicate Alias](#mdpp008----duplicate-alias) for the three sub-state messages (byte-exact, case-fold, NFC-equivalent) and the diagnostic each one carries.
 
 **Grammar:** See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The validator (`scripts/validate-mdpp.py`) builds the equivalent Python character class from explicit `\u`/`\U` escapes at module-level constant `_NCNAME_START_CHAR`.
 
