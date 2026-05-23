@@ -475,9 +475,13 @@ _NCNAME_COMBINING = (
     "\u0300-\u036F"
     "\u203F-\u2040"
 )
+# _NCNAME_PUNCT (period and middle dot, NCName NameChar extras added in
+# issue #111). Permitted only in non-first positions so dotted-hierarchy
+# aliases like `#chapter.1.intro` match the validator's grammar.
+_NCNAME_PUNCT = ".\u00B7"
 re.compile(
     rf'<!--\s*(#[{_NCNAME_START_CHAR}0-9]'
-    rf'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*)\s*-->'
+    rf'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}{_NCNAME_PUNCT}-]*)\s*-->'
 )
 ```
 

@@ -49,6 +49,25 @@ class GetExistingAliasesTests(unittest.TestCase):
             {"Café"},
         )
 
+    def test_dotted_hierarchy_alias_compact(self):
+        # Issue #111: period accepted in non-first positions. Without the
+        # extension, the body class would stop capture at the first '.',
+        # and EXISTING_ALIAS_LINE would fail to match dotted-form aliases
+        # at all.
+        self.assertEqual(
+            add_aliases.get_existing_aliases("<!--#chapter.1.intro-->"),
+            {"chapter.1.intro"},
+        )
+
+    def test_leading_period_alias_is_not_captured(self):
+        # Issue #111: leading '.' is not in NameStartChar so the alias
+        # extraction regex must not match. The body class starts with
+        # NameStartChar | digit; '.' is neither, so no match.
+        self.assertEqual(
+            add_aliases.get_existing_aliases("<!--#.hidden-->"),
+            set(),
+        )
+
     def test_combined_command_alias_is_not_extracted(self):
         # ALIAS_PATTERN starts with '<!--\\s*#' and so only matches
         # standalone alias comments where '#' immediately follows the

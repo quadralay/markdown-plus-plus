@@ -74,15 +74,23 @@ alias_name_start_char ::= "_" | [A-Z] | [a-z]
                                accepts a leading digit -- see alias_name). */
 
 alias_name_char       ::= alias_name_start_char | digit | "-"
+                        | "." | #xB7
                         | [#x0300-#x036F] | [#x203F-#x2040]
                             /* Non-first-position characters of an alias name.
-                               Combining-mark ranges from XML 1.0 NCName
-                               NameChar are permitted so that decomposed
-                               forms (e.g., "e" + U+0301 combining acute)
-                               accept under MDPP002 at the raw-byte level;
-                               MDPP008 then normalizes (NFC + casefold) for
-                               duplicate detection. NCName extras "." and
-                               middle dot (#xB7) remain excluded. */
+                               Direct alias of the XML 1.0 NCName NameChar
+                               production -- aliases align with NCName
+                               end-to-end with one explicit deviation: the
+                               digit-first allowance in alias_name itself
+                               (NCName forbids digit-first identifiers; this
+                               grammar permits them because the existing
+                               numeric-identifier convention -- e.g.,
+                               <!-- #04499224 --> -- is load-bearing for
+                               documents that map aliases to numeric source
+                               IDs). The combining-mark ranges (#x0300-#x036F)
+                               let decomposed forms (e.g., "e" + U+0301
+                               combining acute) accept under MDPP002 at the
+                               raw-byte level; MDPP008 then normalizes
+                               (NFC + casefold) for duplicate detection. */
 
 ws             ::= (#x20 | #x9)+
                     /* One or more spaces or horizontal tabs.
@@ -108,7 +116,7 @@ These three forms are the complete set of Markdown++ syntactic extensions to Com
 Markdown++ defines three identifier forms:
 
 - The **standard identifier** is used for variables and conditions.
-- The **alias name** additionally permits a leading digit, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`), and extends its letter class to the XML 1.0 NCName `NameStartChar` ranges so authors of non-English documentation can mint native-script identifiers.
+- The **alias name** extends its letter class to the XML 1.0 NCName `NameStartChar` ranges so authors of non-English documentation can mint native-script identifiers, and its non-first character class is a direct alias of the XML NCName `NameChar` production (digit, hyphen, period, middle dot, combining marks, connector punctuation). The one intentional deviation from NCName is the leading-digit allowance, since aliases often map to numeric identifiers (e.g., `#04499224`, `#316492`).
 - The **style name** additionally permits embedded spaces, since styles and markers use compound names (e.g., `Blockquote Paragraph`, `Table Cell Head`) and legacy systems use space-embedded style names.
 
 ```ebnf
@@ -459,8 +467,12 @@ alias_name_start_char <- [_A-Za-z]
                       / [#xF900-#xFDCF] / [#xFDF0-#xFFFD]
                       / [#x10000-#xEFFFF]
 alias_name_char    <- alias_name_start_char / [0-9] / "-"
+                    / "." / [#xB7]
                     / [#x0300-#x036F] / [#x203F-#x2040]
-                      # Combining marks permitted in non-first positions.
+                      # Direct alias of XML 1.0 NCName NameChar in non-first
+                      # positions. Period (#x2E), middle dot (#xB7),
+                      # combining marks (#x0300-#x036F), and connector
+                      # punctuation (#x203F-#x2040) all permitted there.
 
 style_name         <- [a-zA-Z_] [a-zA-Z0-9_ -]*
                       # Leading/trailing spaces stripped before matching
@@ -548,7 +560,7 @@ The following invalid cases from `tests/sample-invalid-names.md` were verified:
 | 4 | `<!--#-bad-start-->` | `alias_name` -- hyphen-first |
 | 5 | `<!--marker:123Key="value"-->` | `identifier` -- digit-first |
 | 6 | `<!--markers:{"123Bad": "val"}-->` | `style_name` applied to JSON key -- digit-first |
-| 16 | `<!--#bad.alias-->` | `alias_name` -- period not in character set |
+| 16 | `<!--#.bad-->` | `alias_name` -- period not permitted in first position |
 | 17 | `<!--style:Bad!Style-->` | `identifier` -- exclamation not in character set |
 
 ### Valid Edge Cases Confirmed

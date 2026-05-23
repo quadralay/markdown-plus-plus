@@ -1,15 +1,20 @@
 ---
-date: 2026-05-22
+date: 2026-05-23
 status: active
 ---
 
 # Unicode alias acceptance and rejection test corpus
 
-Issue #108: the alias letter class extends to the XML 1.0 NCName
-`NameStartChar` ranges; non-first positions additionally accept the
-NCName combining-mark ranges so decomposed accented forms accept under
-MDPP002 at the raw-byte level. This fixture exercises positive samples
-per major script and negative samples that MUST still trip MDPP002.
+Issues #108 and #111: the alias letter class extends to the XML 1.0
+NCName `NameStartChar` ranges; non-first positions additionally accept
+the full XML NCName `NameChar` extras (combining marks, connector
+punctuation, period, middle dot) so aliases align with NCName end-to-end
+with one explicit deviation -- leading digit is still permitted because
+the existing numeric-identifier convention (`<!-- #04499224 -->`) is
+load-bearing for documents that map aliases to numeric source IDs.
+
+This fixture exercises positive samples per major script and negative
+samples that MUST still trip MDPP002.
 
 All positive aliases are chosen to be NFC-normalized + casefold-unique
 so MDPP008 does not fire between them.
@@ -48,21 +53,66 @@ test documents observed behavior under the current grammar.
 <!--#foo‍bar-->
 ## ZWJ joined alias
 
+### Case U11: Dotted-hierarchy alias -- EXPECT no error (issue #111)
+
+Period (`.`) is part of XML NCName `NameChar` in non-first positions.
+Dotted-hierarchy identifiers are idiomatic in XML-derived systems and
+this case anchors the new behavior under MDPP002.
+
+<!--#chapter.1.intro-->
+## Chapter 1 Intro (dotted hierarchy)
+
+### Case U12: Alias containing period in non-first position -- EXPECT no error (issue #111)
+
+Negative-flipped from the prior corpus -- a `foo` dot `bar` alias is
+now valid because `.` is permitted as a non-first NameChar.
+
+<!--#foo.bar-->
+## Period-Containing Heading
+
+### Case U13: Alias containing connector punctuation -- EXPECT no error (issue #111)
+
+Undertie (U+203F) is part of XML NCName `NameChar` (`#x203F-#x2040`) in
+non-first positions. This case verifies the validator accepts connector
+characters between alias letters.
+
+<!--#foo‿bar-->
+## Connector-Containing Heading
+
+### Case U14: Alias containing combining mark in non-first position -- EXPECT no error (issue #111)
+
+Combining grave accent (U+0300) is in NCName's combining-mark range
+(`#x0300-#x036F`). The `e` below carries the combining mark; the
+result is a decomposed `è`. MDPP002 accepts the raw bytes; MDPP008
+NFC-normalizes for duplicate detection.
+
+<!--#foè-bar-->
+## Combining-Mark Heading
+
+### Case U15: Alias containing middle dot -- EXPECT no error (issue #111)
+
+Middle dot (U+00B7) is part of XML NCName `NameChar` in non-first
+positions. Common in Catalan orthography (`l·l`) and other contexts.
+
+<!--#foo·bar-->
+## Middle-Dot Heading
+
 ---
 
 ## NEGATIVE CASES (should trigger MDPP002)
 
-### Case U6: Alias containing period -- EXPECT MDPP002
-
-<!--#foo.bar-->
-### Period-Containing Heading
-
 ### Case U7: Alias starting with period -- EXPECT MDPP002
+
+Period is permitted only in non-first positions (XML NCName excludes
+`.` from `NameStartChar`). A leading `.` therefore still trips MDPP002.
 
 <!--#.hidden-->
 ### Period-Leading Heading
 
 ### Case U8: Alias containing colon -- EXPECT MDPP002
+
+Colon is excluded from XML NCName by construction (NCName ::= NameChar
+- ':'). Aliases inherit that exclusion.
 
 <!--#foo:bar-->
 ### Colon-Containing Heading

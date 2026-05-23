@@ -41,7 +41,7 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 | Form | Regex | Used By | Spaces |
 |------|-------|---------|--------|
 | **Standard identifier** | `^[a-zA-Z_][a-zA-Z0-9_\-]*$` | Variables, conditions | No |
-| **Alias name** | XML NCName letter class + digit + `_` + `-` (digit-first permitted); see [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name` | Aliases | No |
+| **Alias name** | XML NCName `NameStartChar` letter class + digit + `_` in first position; full XML NCName `NameChar` (adds `-`, `.`, middle dot, combining marks, connectors) in non-first positions; digit-first permitted as the one deviation from NCName; see [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name` | Aliases | No |
 | **Style/marker name** | `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` (trimmed) | Styles, marker keys (embedded spaces permitted) | Yes, embedded |
 
 ### Standard Identifier
@@ -56,7 +56,7 @@ Markdown++ defines three naming patterns. The pattern applied depends on the ent
 
 ### Alias Name
 
-Alias names use the XML 1.0 NCName `NameStartChar` letter class -- ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`). The alias **acceptance grammar** (MDPP002) is a strict superset of the prior ASCII-only pattern -- every alias valid under the previous grammar still passes MDPP002.
+Alias names use the XML 1.0 NCName `NameStartChar` letter class -- ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits and underscore in the first position. Non-first positions accept the full XML NCName `NameChar` production, which adds hyphen, period, middle dot, combining marks, and connector punctuation. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!--#04499224-->`); this is the sole intentional deviation from XML NCName. The alias **acceptance grammar** (MDPP002) is a strict superset of the prior ASCII-only pattern -- every alias valid under the previous grammar still passes MDPP002.
 
 **Migration note (1.7.0).** Whole-document validation is *not* a strict superset. MDPP008 (duplicate alias) tightened from byte-exact comparison to NFC + casefold, so documents that previously had distinct aliases like `<!--#FOO-->` and `<!--#foo-->`, or precomposed vs. decomposed accented forms, now fail MDPP008 as canonical-equivalent duplicates. See [MDPP008 -- Duplicate Alias](#mdpp008----duplicate-alias) for the three sub-state messages (byte-exact, case-fold, NFC-equivalent) and the diagnostic each one carries.
 
@@ -75,7 +75,7 @@ Style names and marker key names permit embedded spaces to support compound name
 - Leading and trailing spaces are stripped before validation
 - Used by: style names (`<!--style:name-->`), marker key names (`<!--markers:{...}-->`, `<!--marker:key="value"-->`)
 
-**Non-English content.** Alias names accept Unicode letters from non-Latin scripts via the XML 1.0 NCName letter class -- for example, `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`. The standard identifier (variables, conditions) and style/marker name patterns remain ASCII-only pending a separate audit; authors with non-ASCII identifier requirements for those entities should track the follow-up issue referenced in `CHANGELOG.md`. HTML5 `id=` attributes permit a wider character set than NCName, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, URL fragments, and CSS selectors.
+**Non-English content.** Alias names accept Unicode letters from non-Latin scripts via the XML 1.0 NCName letter class -- for example, `<!-- #インストール -->`, `<!-- #Café -->`, `<!-- #установка -->`. The standard identifier (variables, conditions) and style/marker name patterns remain ASCII-only pending a separate audit; authors with non-ASCII identifier requirements for those entities should track the follow-up issue referenced in `CHANGELOG.md`. HTML5 `id=` attributes permit a wider character set than NCName, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, and URL fragments. CSS selectors are a partial exception -- aliases containing `.` require escaping (`#foo\.bar`) -- which is a downstream stylesheet concern, not a constraint on the upstream authoring grammar.
 
 ---
 
@@ -148,7 +148,7 @@ Nested content — not permitted.
 
 - **Variables:** The name portion of `$name;` references (standard identifier rule)
 - **Condition names:** Individual names within condition expressions (standard identifier rule; see also MDPP007)
-- **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed; XML NCName letter class extends to non-ASCII scripts)
+- **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed; XML NCName letter class in first position; full XML NCName `NameChar` -- including `.`, middle dot, combining marks, and connector punctuation -- in non-first positions)
 - **Style names:** The name in `<!--style:name-->` (style/marker rule — embedded spaces allowed)
 - **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (style/marker rule — embedded spaces allowed)
 
@@ -167,8 +167,11 @@ $my variable;
 <!-- ERROR: marker key starts with digit (style/marker rule still requires letter/underscore first) -->
 <!--markers:{"1key": "value"}-->
 
-<!-- ERROR: alias name contains invalid character (period not allowed) -->
-<!--#my.section-->
+<!-- ERROR: alias name starts with period (`.` not permitted in first position) -->
+<!--#.my-section-->
+
+<!-- NOTE: period is permitted in non-first positions (dotted-hierarchy aliases are valid) -->
+<!--#chapter.1.intro-->
 
 <!-- NOTE: alias may start with a digit — digit-first is valid for aliases -->
 <!--#04499224-->
@@ -186,7 +189,7 @@ $my variable;
 **Suggested fix:** The required characters depend on the entity type:
 
 - **Variables and conditions (standard identifier rule):** Start with a letter or underscore; subsequent characters may be letters, digits, hyphens, or underscores. No spaces.
-- **Aliases (alias rule):** Permit letters from any script (XML NCName letter class), digits, underscores, and hyphens. Aliases may start with a digit. Subsequent characters may include hyphen in addition to the start-character set. No whitespace, no period, no punctuation outside `-` and `_`.
+- **Aliases (alias rule):** Permit letters from any script (XML NCName letter class), digits, and underscore in the first position. Subsequent positions additionally accept hyphen (`-`), period (`.`), middle dot, combining marks, and connector punctuation -- the full XML NCName `NameChar` production. Aliases may start with a digit (the sole intentional deviation from XML NCName). No whitespace, no `.` in the first position, no punctuation outside the NCName `NameChar` set anywhere.
 - **Style names and marker keys (style/marker rule):** Start with a letter or underscore; subsequent characters may include embedded spaces as well as letters, digits, hyphens, and underscores. Leading/trailing spaces are stripped.
 
 **Whitespace inside alias names.** Non-ASCII whitespace (NO-BREAK SPACE U+00A0, NARROW NO-BREAK SPACE U+202F, IDEOGRAPHIC SPACE U+3000, and other Unicode whitespace code points) inside an alias name surfaces as MDPP002 the same way illegal punctuation does -- the alias extraction stops only at ASCII whitespace (space, tab, CR, LF), `;`, and `>`, so non-ASCII whitespace flows into the captured name and trips the alias `NameChar` check. Prior to 1.7.4 (issue [#115](https://github.com/quadralay/markdown-plus-plus/issues/115)), the extraction regex's body class used Python's Unicode-aware `\s` and silently failed to match any alias comment containing non-ASCII whitespace, so MDPP002 never fired. The new behavior is what authors would have expected.

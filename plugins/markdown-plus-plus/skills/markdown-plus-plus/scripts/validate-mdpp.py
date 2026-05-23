@@ -106,10 +106,20 @@ _NCNAME_COMBINING = (
     "\u203F-\u2040"
 )
 
+# Period and middle dot from XML 1.0 NCName NameChar production (issue #111).
+# Permitted only in non-first positions of an alias name. Period (`.`) enables
+# dotted-hierarchy identifiers (`#chapter.1.intro`, `#api.v1.users`) so
+# aliases align with XML NCName end-to-end. Middle dot (#xB7) is included
+# for the same reason -- NCName explicitly permits it as a non-first NameChar.
+# Middle dot uses \u escape per the source-hygiene convention applied to
+# every other non-ASCII range in this module (literal Unicode in source is
+# prone to silent corruption in transit).
+_NCNAME_PUNCT = ".\u00B7"
+
 STANDARD_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_-]*$')
 ALIAS_NAME_RE = re.compile(
     f'^[{_NCNAME_START_CHAR}0-9]'
-    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*$'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}{_NCNAME_PUNCT}-]*$'
 )
 STYLE_NAME_RE = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_ -]*$')
 
@@ -443,9 +453,10 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
                     context=match.group(0),
                     suggestion=(
                         "Alias names may use letters from any script (XML "
-                        "NCName letter class), digits, underscore (_), and "
-                        "hyphen (-). Hyphen is permitted only in non-first "
-                        "positions."
+                        "NCName letter class), digits, and underscore (_). "
+                        "Hyphen (-), period (.), middle dot, combining marks, "
+                        "and connector punctuation are permitted only in "
+                        "non-first positions."
                     ),
                 ))
             key = _alias_dedup_key(alias_name)

@@ -13,6 +13,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.8.0] - 2026-05-23
+
+### Spec
+
+- Extended the custom-alias non-first character class to the full XML 1.0 NCName `NameChar` production -- aliases now accept `.` (period), `#xB7` (middle dot), combining marks (`#x0300-#x036F`), and connector punctuation (`#x203F-#x2040`) in non-first positions. After this change Markdown++ aliases align with XML NCName end-to-end, with one explicit and documented deviation: aliases continue to permit a leading digit because the existing numeric-identifier convention (`<!-- #04499224 -->`) is load-bearing. Dotted-hierarchy identifiers like `<!-- #chapter.1.intro -->` and `<!-- #api.v1.users -->` are now valid under MDPP002. Leading `.` (e.g., `<!-- #.hidden -->`) remains rejected because NCName excludes `.` from `NameStartChar`. Updated `spec/specification.md` § 4.2, § 10.2, § 18.1; `spec/formal-grammar.md` `alias_name_char` production (EBNF + PEG) and the "Constructs Rejected" validation note. The architectural framing is that Markdown++ should not pre-filter for downstream CSS-selector stylistic preferences -- escaping is the responsibility of the stylesheet/JavaScript author, not the format specification ([#111](https://github.com/quadralay/markdown-plus-plus/issues/111)).
+
+### Tooling
+
+- `validate-mdpp.py` `ALIAS_NAME_RE` extended to accept `.` and middle dot via a new `_NCNAME_PUNCT` constant alongside the existing `_NCNAME_COMBINING`. The MDPP002 suggestion message updated to describe the new non-first-position permissions. `add-aliases.py` `ALIAS_PATTERN` and `EXISTING_ALIAS_LINE` mirror the validator's extension so the script recognizes dotted aliases when scanning for existing ones; without this update the script would silently truncate dotted aliases and could inject duplicates ([#111](https://github.com/quadralay/markdown-plus-plus/issues/111)).
+- Updated `references/syntax-reference.md` § Naming Rules § Alias Name (rewrote the rule statement so `.` is described as a position-dependent permission; removed the invalid example `foo.bar` since it is now valid; corrected the explanation for `.hidden` to "Period not permitted in first position"; added valid examples `chapter.1.intro` and `api.v1.users`); `references/error-codes.md` § Naming Rule table, § Alias Name, MDPP002 entry and triggering example, § Non-English content; `references/comment-manipulation.md` standalone-anchor example regex (adds the new `_NCNAME_PUNCT` constant alongside `_NCNAME_COMBINING`). Added positive samples for `<!--#chapter.1.intro-->`, `<!--#foo.bar-->`, connector punctuation, combining marks in non-first position, and middle dot to `tests/sample-unicode-aliases.md`; relocated the `<!--#foo.bar-->` case from the negative corpus. Updated `tests/sample-invalid-names.md` Case 16 from `#bad.alias` (now valid) to `#.bad-alias` (still invalid: leading period) ([#111](https://github.com/quadralay/markdown-plus-plus/issues/111)).
+
 ## [1.7.4] - 2026-05-23
 
 ### Tooling
