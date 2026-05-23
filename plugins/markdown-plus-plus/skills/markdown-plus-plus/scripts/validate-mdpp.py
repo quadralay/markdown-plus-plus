@@ -65,9 +65,9 @@ PATTERNS = {
     'style': re.compile(r'<!--\s*style:([^>]+?)(?:\s*;|\s*-->)'),
     # Body class excludes only ASCII whitespace so non-ASCII whitespace
     # (NBSP, narrow NBSP, ideographic space, etc.) flows into the capture
-    # and MDPP002 fires on it. The trailing lookahead remains Unicode-\s
-    # so non-ASCII whitespace between the alias and the terminator (a
-    # layout choice, not part of the name) is still tolerated.
+    # and MDPP002 fires on it. The trailing lookahead remains Unicode-aware
+    # (`\s*`) so non-ASCII whitespace between the alias and the terminator
+    # (a layout choice, not part of the name) is still tolerated.
     'alias': re.compile(r'<!--\s*#([^ \t\n\r;>]+?)(?=\s*;|\s*-->)'),
     'condition_open': re.compile(r'<!--\s*condition:([^>]+?)\s*-->'),
     'condition_close': re.compile(r'<!--\s*/condition\s*-->'),
