@@ -1,7 +1,7 @@
 ---
 title: Standalone error code reference for MDPP000-MDPP017
 date: 2026-04-08
-last_updated: 2026-04-11
+last_updated: 2026-05-22
 category: documentation-gaps
 module: plugins/markdown-plus-plus
 problem_type: documentation_gap
@@ -113,6 +113,22 @@ After the initial error-codes.md was created and the alias exception added durin
 | **Alias name** | `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` | Aliases (digit-first permitted) | No |
 | **Style/marker name** | `^[a-zA-Z_][a-zA-Z0-9_ \-]*$` (trimmed) | Styles, marker keys | Yes, embedded |
 
+### Follow-up Correction (2026-05-22): Unicode-letter alias name + MDPP008 normalization
+
+A grammar audit ([#108](https://github.com/quadralay/markdown-plus-plus/issues/108)) extended the alias name pattern to accept non-ASCII letters and tightened MDPP008 duplicate detection to compare under Unicode normalization. The standard identifier and style/marker patterns remain ASCII pending a separate audit.
+
+**What was corrected:**
+
+- `error-codes.md` naming rule table: the **Alias name** row regex changed from `^[a-zA-Z0-9_][a-zA-Z0-9_\-]*$` to a description citing `alias_name_start_char` from `spec/formal-grammar.md`. The new acceptance grammar admits XML 1.0 NCName `NameStartChar` letter ranges in the first position (plus underscore and digit) and adds combining-mark ranges (`#x0300-#x036F`, `#x203F-#x2040`) in non-first positions.
+- MDPP002 alias subsection: trigger examples now include non-ASCII letter aliases (Japanese, Greek, Cyrillic, German with combining accents); negative cases (whitespace, punctuation, leading `.`) still fail.
+- MDPP008 description: tightened from byte-exact comparison to NFC + case-fold comparison, with three sub-state messages (byte-exact, case-fold, NFC-equivalent). This is *stricter* than CommonMark 0.30 link-reference matching (which mandates case-fold but not NFC); the strictness is deliberate so visually identical aliases with different byte sequences (precomposed `é` vs. decomposed `e` + U+0301) are flagged.
+- Note on backward compatibility: every alias valid under the old ASCII-only pattern remains valid under the new pattern (acceptance grammar is a strict superset), but whole-document validation is *not* a strict superset because MDPP008 now flags duplicates like `#FOO` and `#foo` that the byte-exact comparison previously accepted. Surface this when characterizing the change.
+- Plugin version bumped 1.6.3 → 1.7.0 (minor)
+
+**Related solution doc:**
+
+- `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` — full design decision (why NCName over `\p{L}` and HTML-ID-legal), source-hygiene conventions (`\u`/`\U` escapes, never literal Unicode), and test-fixture byte-verification pattern
+
 ### Follow-up Addition (2026-04-11): MDPP010-MDPP017 added to plugin references
 
 A spec alignment audit ([#66](https://github.com/quadralay/markdown-plus-plus/issues/66)) found that the plugin reference documents were missing 8 processing-phase diagnostic codes defined in the normative spec (`spec/specification.md` §18 and `spec/processing-model.md`):
@@ -174,8 +190,10 @@ This also fulfills the principle established in the attachment rule solution doc
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md` -- MDPP002 scope expansion
 - `docs/solutions/documentation-gaps/attachment-rule-formal-spec-2026-04-07.md` -- Prevention principle fulfilled
 - `docs/solutions/documentation-gaps/processing-model-specification-2026-04-08.md` -- Diagnostic code registry
+- [#108](https://github.com/quadralay/markdown-plus-plus/issues/108) -- Extend alias letter class to Unicode (XML 1.0 NCName); MDPP002 alias grammar widened, MDPP008 tightened to NFC + casefold (resolved 2026-05-22; v1.7.0)
 - [#42](https://github.com/quadralay/markdown-plus-plus/issues/42) -- MDPP014 addition (resolved; MDPP014 detail entry added in follow-up above)
 - `docs/solutions/documentation-gaps/cross-file-link-resolution-semantics-2026-04-08.md` -- MDPP014 scope detail
 - `docs/solutions/documentation-gaps/utf8-encoding-specification-gap-2026-04-08.md` -- MDPP017 scope detail
 - `docs/solutions/documentation-gaps/format-versioning-mechanism-2026-04-08.md` -- MDPP015/016 scope detail
+- `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` -- 2026-05-22 alias-grammar extension and MDPP008 normalization change (see follow-up correction above)
 - [#7](https://github.com/quadralay/markdown-plus-plus/issues/7) -- Formal specification umbrella (parent initiative)
