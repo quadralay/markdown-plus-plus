@@ -192,7 +192,7 @@ Alias names use the XML 1.0 NCName `NameStartChar` letter class -- which include
 - Minimum length is 1 character
 - No whitespace, no punctuation other than `-` and `_`, no leading `.`
 
-See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The alias namespace is a strict superset of the prior ASCII-only grammar -- every alias valid under the previous grammar remains valid.
+See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The alias **acceptance grammar** (MDPP002) is a strict superset of the prior ASCII-only grammar -- every alias valid under the previous grammar still passes MDPP002. Whole-document validation is *not* a strict superset: MDPP008 (duplicate alias) tightened in 1.7.0 from byte-exact to NFC + casefold, so canonical-equivalent variants like `<!--#FOO-->` and `<!--#foo-->` now collide. See `references/error-codes.md` § MDPP008 for the migration detail.
 
 **Applies to:** Aliases
 

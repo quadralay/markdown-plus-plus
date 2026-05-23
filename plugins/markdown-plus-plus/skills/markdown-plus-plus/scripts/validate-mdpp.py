@@ -132,8 +132,11 @@ def _alias_dedup_key(name: str) -> str:
 
     Applies Unicode NFC + casefold so canonical-equivalent variants
     (precomposed vs. decomposed accents; upper vs. lower case) compare
-    equal. Matches the equivalence relation used by CommonMark 0.30
-    link-reference-definition slug matching.
+    equal. Stricter than CommonMark 0.30 link-reference-definition
+    slug matching, which mandates casefold only (no NFC). The NFC step
+    is added so decomposed-accent aliases collide with their
+    precomposed counterparts -- safer for cross-system alias stability
+    than CommonMark's looser equivalence.
     """
     return unicodedata.normalize('NFC', name).casefold()
 
