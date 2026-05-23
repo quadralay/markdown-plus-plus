@@ -69,6 +69,7 @@ HEADING_PATTERN = re.compile(r'^(#{1,6})\s+(.+)$')
 ALIAS_PATTERN = re.compile(
     f'<!--\\s*#([{_NCNAME_START_CHAR}0-9]'
     f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*)'
+    f'(?=\\s*(?:;|-->))'
 )
 EXISTING_ALIAS_LINE = re.compile(
     f'^<!--\\s*#[{_NCNAME_START_CHAR}0-9]'

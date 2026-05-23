@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.7.2] - 2026-05-23
+
+### Tooling
+
+- `add-aliases.py` `ALIAS_PATTERN` now stops capture at the comment terminator, so compact-form aliases like `<!--#intro-->` extract as `intro` rather than `intro--`. The body character class contained `-` without a terminating lookahead, causing `get_existing_aliases` to greedily consume the `-->` closing sequence for any alias without whitespace between the name and the closing `-->`. `validate-mdpp.py` was unaffected (its extraction regex already used a terminating lookahead), so MDPP002/MDPP008 detection has always been correct. The impact was on `add-aliases.py` deduplication: when running the script against a file already containing compact-form aliases, the script saw the existing alias under a different name (`intro--`) than the validator (`intro`) and could inject a duplicate. Added the first `test_add_aliases.py` unit-test file (stdlib `unittest`, no new dependencies) covering compact, spaced, hyphenated, digit-first, Unicode-letter, and combined-command alias extraction (PR review finding on [#108](https://github.com/quadralay/markdown-plus-plus/pull/109)).
+
 ## [1.7.1] - 2026-05-23
 
 ### Project
