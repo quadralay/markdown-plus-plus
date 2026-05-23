@@ -9,6 +9,25 @@ issue: 108
 
 # spec/tooling: Extend custom-alias letter class to Unicode (XML NCName NameStartChar)
 
+## Plan Review Log
+
+This plan was reviewed on 2026-05-22 by four compound-engineering review agents (adversarial document, coherence, design lens, feasibility). Findings applied in this revision:
+
+- **U6 constant spelling**: rewrote `_NCNAME_START_CHAR` from literal Unicode characters to explicit `\u`/`\U` escapes. The draft listing's `ﷰ-�` upper bound had already corrupted to a literal REPLACEMENT CHARACTER glyph by review time -- a concrete authoring landmine. (Adversarial F4, Feasibility F1, Coherence F2.)
+- **MDPP008 non-superset acknowledgment**: Scope Boundaries now explicitly states that MDPP008 is NOT a strict superset of byte-exact comparison for ASCII inputs (`#Foo` / `#foo` newly collide). U9 adds an explicit pre-scan for case-variant collisions in the existing corpus before claiming "zero new errors." (Adversarial F2.)
+- **NFC-decomposed authoring hazard in test fixtures**: U8 now mandates either post-save byte verification or fixture-generation script. Without this, the MDPP008 NFC test could pass trivially under editor-level NFC normalization. (Adversarial F6.)
+- **NFC-different example rendering in error-codes.md**: U4 now requires inline byte-annotation comments on the precomposed-vs-decomposed `Café` example so the rendered Markdown actually communicates the distinction. (Design F3.)
+- **MDPP008 message sub-states**: U6 now specifies three required message variants (byte-exact, casefold-only, NFC-equivalent) so authors can self-diagnose. Plain-English gloss replaces bare "NFC normalization" jargon. MDPP002 message body has a 120-char cap. (Design F1, F4, plus Coherence message-wording finding.)
+- **§ 17.3.1 cross-reference Unicode-target verification**: U1 acceptance now requires verifying that the cross-file reference grammar accepts Unicode slug targets (or surfaces an out-of-scope constraint if not). (Adversarial F3.)
+- **ZWJ/ZWNJ leading-character edge case**: U8 adds Case U10 covering U+200C/U+200D as `NameStartChar` leading characters. (Adversarial F1.)
+- **Multi-Japanese-heading slugify fallback**: U9 adds verification that `add-aliases.py` behaves sanely with multiple consecutive non-ASCII headings. (Adversarial F8.)
+- **PEG-EBNF correspondence acknowledgment**: Open Questions notes that PEG correspondence is reviewer-verified, not tool-verified, so reviewers must read EBNF + PEG productions in lockstep. (Adversarial F5.)
+- **error-codes.md grep-count correction**: Verification Scan Results now reports 8 matches (was 6) with corrected line numbers; the prior draft cited lines 22/149/182 that do not contain `a-zA-Z`. (Feasibility F5.)
+- **R18 follow-up structure**: Open Questions notes that R18 may split into two follow-up issues (variables+conditions vs. styles+marker-keys) at filing time. (Adversarial F7.)
+- **Link-path hedge removed**: U3's "verify the depth at implementation time" hedge replaced with verified-at-planning-time statement. (Design IA.)
+
+Items deemed nice-to-have without applied edits: prose-drift risk across the seven natural-language restatements of the letter-class description (Design F5) -- the canonical character-class string at line 117 covers the regex case; natural-language variation across audience surfaces is acceptable.
+
 ## Summary
 
 Replace the custom-alias letter class `[a-zA-Z]` with the XML 1.0 NCName `NameStartChar` ranges so authors of non-English documentation can mint native-script alias identifiers (`<!-- #インストール -->`, `<!-- #Café -->`, etc.). The standard, style, and marker-key patterns stay ASCII pending a separate audit. Update MDPP002's triggering condition and prose, add alias-specific productions to the formal grammar, rewrite the syntax-reference and error-codes naming-rule surfaces, update `validate-mdpp.py` (alias acceptance + MDPP008 NFC/case-fold normalization) and `add-aliases.py` (recognition only -- slug generation stays ASCII), add a positive/negative Unicode test corpus, bump the plugin minor version, and record the change in `CHANGELOG.md`.
@@ -60,7 +79,8 @@ Carried forward verbatim from the brainstorm. The plan does not introduce new re
 - **`slugify()` in `add-aliases.py` stays ASCII-only for generation.** R13 updates only the *recognition* regexes (`ALIAS_PATTERN`, `EXISTING_ALIAS_LINE`). Whether to extend slug generation to Unicode is a follow-up question.
 - **No third-party `regex` dependency.** Stdlib `re` with an explicit character-class string built from XML 1.0 NCName productions. The brainstorm explicitly rejected `\w`-based shortcuts and the third-party `regex` package.
 - **MDPP014 normalization stays out of scope.** Verified during planning that the current `validate-mdpp.py` does not implement MDPP014; the validator-vs-spec gap predates this issue. R11 covers MDPP008 only.
-- **No retrofit of existing alias values in `examples/` or `tests/`.** Today's ASCII aliases remain unchanged. Strict-superset preservation (R4) makes this load-bearing -- nothing breaks.
+- **No retrofit of existing alias values in `examples/` or `tests/`.** Today's ASCII aliases remain unchanged. Strict-superset preservation (R4) makes this load-bearing for *MDPP002*; see the next bullet for the MDPP008 caveat.
+- **MDPP008 is NOT a strict superset of byte-exact comparison for ASCII inputs.** Adding NFC + case-fold normalization (R11) catches NEW duplicates that byte-exact comparison missed -- specifically, ASCII pairs like `#Foo` / `#foo` and `#Sh-UG-Installation` / `#sh-ug-installation` collapse under case-fold. R4 (strict-superset preservation) applies only to MDPP002 *acceptance*, not to MDPP008 *duplicate detection*. U9's backward-compatibility verification must pre-scan the existing corpus for case-variant alias pairs that would newly trip MDPP008 and either (a) confirm no such pairs exist, or (b) update the affected files as a planned regression and call them out in the changelog.
 
 ---
 
@@ -75,7 +95,7 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 - **`spec/processing-model.md`** -- two `a-zA-Z` matches, both restating the standard identifier pattern for variable names (lines 22 and 316). Neither cites the alias pattern. No edit required.
 - **`spec/element-interactions.md`** -- one `a-zA-Z` match (line 551) restating the style/marker pattern in the *Compound Names and Identifier Validation* subsection. No alias citation. No edit required. The Heading Alias Auto-Generation algorithm (lines 199-210) references "ASCII letters (a-z)" but is explicitly out of scope per *Scope Boundaries*.
 - **`validate-mdpp.py` MDPP014** -- `grep "MDPP014"` in the script returns no match. The validator does not implement MDPP014 today. R12 is resolved: MDPP014 normalization stays out of scope.
-- **`references/error-codes.md` alias-pattern occurrences** -- six `a-zA-Z` matches: the Quick Reference table row (line 22 -- entity-agnostic prose, no edit needed), the *Naming Rule* table at line 44, the *Alias Name* subsection at line 61, the trailing non-English paragraph at line 76, the MDPP002 *Detection logic* at line 149, and the MDPP002 *Suggested fix* at line 182. All six are in scope for U4.
+- **`references/error-codes.md` alias-pattern occurrences** -- **eight** lines contain `a-zA-Z` (verified by re-grep on 2026-05-22): the *Naming Rule* table standard row at line 43, the alias row at line 44, the style/marker row at line 45, the *Standard identifier* subsection regex at line 49, the *Alias Name* subsection regex at line 61, the *Style/marker name* subsection regex at line 69, the trailing non-English paragraph at line 76, and the compound-name validation note at line 263. Of these, only the alias-relevant lines (44, 61, 76) are in scope for U4's prose updates; the standard/style/marker lines and the compound-name note remain ASCII per Scope Boundaries. The plan's earlier draft enumerated six lines including spurious line numbers (22, 149, 182) that do not contain `a-zA-Z` matches -- corrected here. The MDPP002/MDPP008 entry-prose updates in U4 are separate from this grep-count surface; U4 also updates MDPP002 detection-logic and suggested-fix prose by line content rather than by raw-pattern occurrence.
 - **`references/comment-manipulation.md` line 453 context** -- the surrounding text frames the snippet as "Standalone anchor" with companion-logic checklists for production cleanup tooling. The brainstorm flagged this as "authoritative pattern or illustrative example?" -- resolved by planning: the surrounding prose describes the pattern as for "production cleanup tooling," so it is authoritative for downstream agents. U5 updates the pattern to reflect the new grammar with a single anchored note pointing readers to the canonical syntax-reference surface.
 
 ### Relevant Code and Patterns
@@ -125,7 +145,7 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 
   Every surface uses this same enumeration. The validator's Python string is the same ranges spelled with `\u` and `\U` escapes (see U6 details).
 
-- **Validator implementation: explicit Python character class, no `\w`.** Per brainstorm. The Python ALIAS_NAME_RE is built by string-concatenating a module-level `_NCNAME_START_CHAR` constant. The constant is defined once and reused. This avoids `\w`-based shortcuts (which would conflate letters with digits) and avoids the third-party `regex` package.
+- **Validator implementation: explicit Python character class, no `\w`, escape-form only.** Per brainstorm. The Python `ALIAS_NAME_RE` is built by string-concatenating a module-level `_NCNAME_START_CHAR` constant. The constant is defined once and reused. **The constant MUST be spelled with `\u` and `\U` escapes, not literal Unicode characters** -- literals risk corruption in transit (a draft of this plan listed the constant with literal glyphs and U+FFFD had already corrupted to REPLACEMENT CHARACTER glyph by review time, defeating the intent). This avoids `\w`-based shortcuts (which would conflate letters with digits) and avoids the third-party `regex` package.
 
 - **MDPP008 normalization: NFC + casefold, applied as the dictionary key.** The plan implements this by introducing a helper `_alias_dedup_key(name: str) -> str` that returns `unicodedata.normalize('NFC', name).casefold()`. The `alias_locations` dictionary is keyed by the helper's return value; the *value* stored is `(line_num, original_name)` so error messages show the user-authored form. Both occurrences of the alias (the first definition and the duplicate detection site) call the helper.
 
@@ -156,10 +176,11 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 
 ### Deferred to Implementation
 
-- **Exact wording of the MDPP002 alias message string.** Plan defaults to the descriptive form (see *Key Technical Decisions*); implementer may shorten if the error reads better in a terminal. The constraint is that the message MUST NOT restate the full character class enumeration (too long for stderr).
+- **MDPP002 alias message wording is now fixed by the plan** (see U6 acceptance and the three-sub-state requirement). The remaining deferral: the implementer may rewrite the *message body* if a clearer wording exists under the 120-char cap, but the suggestion field is plan-fixed.
 - **Multi-section vs. single-bullet `CHANGELOG.md` entry.** Plan defaults to multi-section (Spec + Tooling) since the change touches both. Implementer may consolidate to a single bullet if the entry reads naturally that way.
 - **Whether to file the follow-up issue (R18) during this PR or after merge.** Plan defaults to "during" so the changelog entry can cite the issue number. If the windworker dispatches this issue before the follow-up is filed, the changelog entry uses a placeholder (`[#XXX]`) that the engineering phase resolves.
-- **PEG-rule formatting for the alias character class.** EBNF spelling (W3C `#xHHHH` form) and PEG spelling (typically `\uHHHH`-style) differ across PEG tool conventions. The PEG section in `formal-grammar.md` currently uses ASCII-only character classes `[a-zA-Z0-9_-]`. U2 chooses between (a) spelling the PEG ranges in the same W3C `#x...` form as the EBNF (uniform reading), or (b) using PEG-conventional `\u` escapes (matches typical PEG-tool input). Plan recommends (a) for surface symmetry with the EBNF; implementer may switch to (b) if the resulting PEG reads more naturally for tool-implementer audiences.
+- **Whether R18 files as one issue or two.** Variables + conditions share `STANDARD_NAME_RE`; styles + marker-keys share `STYLE_NAME_RE`. The audit shapes differ (embedded spaces and CSS-class semantics live in the second pattern). Adversarial review surfaced that two follow-ups may be cleaner than one. Plan defaults to one umbrella issue with two clearly-labeled sub-sections, but the implementer may split at filing time if the umbrella feels unwieldy.
+- **PEG-rule formatting for the alias character class.** EBNF spelling (W3C `#xHHHH` form) and PEG spelling (typically `\uHHHH`-style) differ across PEG tool conventions. The PEG section in `formal-grammar.md` currently uses ASCII-only character classes `[a-zA-Z0-9_-]`. U2 chooses between (a) spelling the PEG ranges in the same W3C `#x...` form as the EBNF (uniform reading), or (b) using PEG-conventional `\u` escapes (matches typical PEG-tool input). Plan recommends (a) for surface symmetry with the EBNF; implementer may switch to (b) if the resulting PEG reads more naturally for tool-implementer audiences. **The PEG-EBNF correspondence is reviewer-verified, not tool-verified** -- this repository has no PEG tool that consumes `formal-grammar.md` as input, so reviewers must read the two productions in lockstep to catch any divergence.
 
 ---
 
@@ -183,6 +204,7 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 - The four updated locations no longer state `[a-zA-Z0-9_]` for aliases.
 - The standard and style/marker forms in line 163, line 1237, and elsewhere are unchanged.
 - Every existing ASCII alias in this file's examples (`#sh-ug-installation`, `#04499224`, `#316492`, etc.) is still described as valid under the new grammar.
+- **Cross-reference syntax (§ 17.3.1) supports Unicode alias targets.** Read § 17.3.1 in full. Verify that the cross-file reference grammar permits Unicode-letter slug targets -- i.e., that `[label][インストール]` is a valid reference syntax under the spec, not just `[label][sh-ug-installation]`. If the cross-reference grammar in § 17.3.1 implicitly restricts the slug to the ASCII identifier pattern, U1 must either update § 17.3.1 to accept the broader alias grammar, or the plan must surface this as an out-of-scope constraint and warn that mintable Unicode aliases are not addressable from sibling documents. Adversarial review surfaced this as a load-bearing internal-consistency check: the brainstorm's success criterion (line 80) asserts `[label][ネイティブスクリプト]` resolves, but the plan never verified that § 17.3.1's grammar permits this.
 
 ---
 
@@ -243,7 +265,7 @@ The brainstorm flagged several surfaces as "needs verification during planning."
   >
   > **Applies to:** Aliases
 
-  (The relative-path link target is the same form used elsewhere in this file; verify the depth at implementation time.)
+  (The relative-path link target `../../../../../spec/formal-grammar.md` matches the five-level prefix already in use in `references/error-codes.md` line 304. Verified during planning; no implementation-time depth check needed.)
 
 - Lines 207-223 (*Valid Name Examples* table): add three new rows -- `<!-- #インストール -->`, `<!-- #установка -->`, `<!-- #Café -->` (precomposed `é`) -- with the "Why Valid" column reading "Japanese alias (NCName letter class)", "Cyrillic alias (NCName letter class)", "German alias with accent (NCName letter class)".
 - Lines 225-233 (*Invalid Name Examples* table): add two rows -- `<!-- #foo.bar -->` ("Period not in alias character class -- aliases permit only `-` and `_` punctuation"), `<!-- #.hidden -->` ("Period cannot start an alias name"). The existing `has space`, `special!char` etc. rows are unaffected; they document the cross-cutting whitespace and punctuation prohibitions.
@@ -280,7 +302,7 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 - Lines 145-152 (MDPP002 *Detection logic* bullets): the *Alias names* bullet currently reads `Alias names: The name in <!--#name--> (alias rule -- digit-first allowed)`. Update parenthetical to `(alias rule -- digit-first allowed; XML NCName letter class extends to non-ASCII scripts)`.
 - Line 168 (trigger example block): the comment `<!-- NOTE: alias may start with a digit -- digit-first is valid for aliases -->` gets an additional example after it: a Japanese, Greek, or Cyrillic alias annotated as `<!-- NOTE: aliases accept Unicode letters from non-Latin scripts (XML NCName letter class) -->`.
 - Lines 179-184 (*Suggested fix* paragraph): the *Aliases* bullet currently reads `Aliases (alias rule): Same as standard, but may also start with a digit.`. Update to `Aliases (alias rule): Permit letters from any script (XML NCName letter class), digits, underscores, and hyphens. Aliases may start with a digit. Subsequent characters may include hyphen in addition to the start-character set.`
-- Lines 282-298 (MDPP008 entry): the *Detection logic* paragraph currently reads "A dictionary tracks alias names to their first-seen line number. When an alias is encountered, it is looked up in the dictionary." Update to: "A dictionary tracks aliases to their first-seen line number, keyed by a normalized form -- Unicode NFC followed by case-fold -- so canonical-equivalent variants (precomposed vs. decomposed accented letters; uppercase vs. lowercase) are detected as duplicates. When an alias is encountered, it is normalized and looked up." Add a new *Trigger examples* entry showing two aliases on different headings that are NFC-different (precomposed `Café` vs decomposed `Café`) and are flagged.
+- Lines 282-298 (MDPP008 entry): the *Detection logic* paragraph currently reads "A dictionary tracks alias names to their first-seen line number. When an alias is encountered, it is looked up in the dictionary." Update to: "A dictionary tracks aliases to their first-seen line number, keyed by a normalized form -- Unicode NFC followed by case-fold -- so canonical-equivalent variants (precomposed vs. decomposed accented letters; uppercase vs. lowercase) are detected as duplicates. When an alias is encountered, it is normalized and looked up." Add a new *Trigger examples* entry. **Rendering hazard**: precomposed `Café` (U+00E9) and decomposed `Café` (U+0065 U+0301) render identically in fenced code blocks. The example MUST include inline byte-annotation comments to make the distinction visible, e.g. ``<!-- #Café -->  <!-- precomposed U+00E9 -->`` on one line and ``<!-- #Café -->  <!-- decomposed U+0065 U+0301 -->`` on the next, with prose above the code block explaining that the two strings use different byte sequences. Without annotation, the example teaches nothing about the actual duplicate condition.
 
 **Acceptance:**
 
@@ -319,21 +341,21 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 **Changes:**
 
 - Add `import unicodedata` near the existing imports (line 23-28 block).
-- Add a module-level constant near line 73:
+- Add a module-level constant near line 73. **The constant MUST be spelled entirely with `\u` and `\U` escapes, not literal Unicode characters.** This is non-negotiable: literal Unicode in source risks corruption in transit (the prior plan revision listed the constant with literals and the U+FFFD boundary character had already corrupted to REPLACEMENT CHARACTER glyph by the time the listing was reviewed, defeating the intent). Escapes are cross-platform-safe and self-documenting:
 
   ```python
   # XML 1.0 NCName NameStartChar letter ranges (issue #108).
   # See spec/formal-grammar.md alias_name_start_char production.
   _NCNAME_START_CHAR = (
       "_A-Za-z"
-      "À-ÖØ-öø-˿"
-      "Ͱ-ͽͿ-῿"
-      "‌‍"
-      "⁰-↏"
-      "Ⰰ-⿯"
-      "、-퟿"
-      "豈-﷏"
-      "ﷰ-�"
+      "\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF"
+      "\u0370-\u037D\u037F-\u1FFF"
+      "\u200C-\u200D"
+      "\u2070-\u218F"
+      "\u2C00-\u2FEF"
+      "\u3001-\uD7FF"
+      "\uF900-\uFDCF"
+      "\uFDF0-\uFFFD"
       "\U00010000-\U000EFFFF"
   )
   ```
@@ -369,20 +391,15 @@ The brainstorm flagged several surfaces as "needs verification during planning."
   alias_display: dict[str, str] = {}        # normalized alias key -> original alias text (display)
   ```
 
-- Lines 380-405 (alias-check block): update to use the normalization helper. The MDPP002 invalid-name check (lines 382-391) compares the *raw* alias against `ALIAS_NAME_RE` and is unchanged (the regex now accepts Unicode). The MDPP008 duplicate-check (lines 392-403) compares using `_alias_dedup_key(alias_name)` as the dictionary key. When emitting MDPP008, the message includes the original alias text via `alias_name`, and the "first defined on line X" suggestion references the original definition via `alias_display[key]` if the canonical form differs from the new raw form (e.g., one heading uses precomposed Café, another uses decomposed Café -- the message should help the author see the discrepancy). The MDPP008 message wording becomes:
+- Lines 380-405 (alias-check block): update to use the normalization helper. The MDPP002 invalid-name check (lines 382-391) compares the *raw* alias against `ALIAS_NAME_RE` and is unchanged (the regex now accepts Unicode). The MDPP008 duplicate-check (lines 392-403) compares using `_alias_dedup_key(alias_name)` as the dictionary key. **The MDPP008 emission MUST distinguish three sub-states** so the error message helps the author self-diagnose:
 
-  ```python
-  message=(
-      f"Duplicate alias: #{alias_name} "
-      f"(matches #{alias_display[key]} under Unicode NFC + case-fold normalization)"
-      if alias_display[key] != alias_name
-      else f"Duplicate alias: #{alias_name}"
-  )
-  ```
+  1. **Byte-exact duplicate** (`alias_display[key] == alias_name`): message is `Duplicate alias: #{alias_name}` -- today's wording.
+  2. **Casefold-only duplicate** (`alias_display[key].lower() == alias_name.lower()` after stripping accents) -- the raw forms differ only in letter case: message is `Duplicate alias: #{alias_name} (case-insensitive match with #{alias_display[key]} on line {first_line})`. This is critical because authors who intentionally minted `#FOO` and `#foo` expecting them to be distinct need an explicit signal that the validator now treats them as the same.
+  3. **NFC-equivalent duplicate** (other normalization-equivalent case): message is `Duplicate alias: #{alias_name} (matches #{alias_display[key]} on line {first_line}; the two forms are visually identical but use different Unicode byte sequences for an accented character)`. The plain-English gloss is REQUIRED because non-Unicode-expert authors cannot self-diagnose from "NFC normalization" alone.
 
-  -- alternatively, the implementer may use a fixed-form message and rely on the suggestion field to call out the normalization. Plan defers exact wording to implementation.
+  Implementer may compose these three branches differently in code (a single `match`-on-sub-state, or three separate `if` arms), but the **message text for each sub-state is fixed by the plan**. The 2026-05-22 design review surfaced that under-specifying these three states is the most likely cause of author confusion in production.
 
-- Lines 384-391 (MDPP002 alias suggestion): update the suggestion field to reflect the broader class:
+- Lines 384-391 (MDPP002 alias suggestion): update the suggestion field to reflect the broader class. The suggestion text below is fixed by the plan (no implementer wordsmithing); the suggestion is short enough for terminal output and does not restate the full character class:
 
   ```python
   suggestion=(
@@ -391,6 +408,8 @@ The brainstorm flagged several surfaces as "needs verification during planning."
       "permitted only in non-first positions."
   )
   ```
+
+  The MDPP002 *message* (not suggestion) MUST stay under 120 characters of body text -- terminal-readable. The message reports what was found and where; the suggestion field carries the explanation.
 
 **Acceptance:**
 
@@ -464,6 +483,15 @@ The brainstorm flagged several surfaces as "needs verification during planning."
   - EXPECT MDPP008 on the second occurrence under NFC + casefold normalization.
   - Add a third case: two headings with `<!-- #FOO -->` and `<!-- #foo -->` -- EXPECT MDPP008 on the second under casefold normalization.
 
+  **NFC-decomposed authoring hazard.** Many editors and filesystems silently NFC-normalize text on save, collapsing the decomposed form back to precomposed and defeating the NFC equivalence test. The engineer creating this file MUST either:
+
+  1. **Verify byte content after saving.** Run a one-liner that checks both `c3 a9` (precomposed e-acute) and `65 cc 81` (decomposed e + combining acute) appear in the file bytes. Suggested check: `python -c "d=open('PATH','rb').read(); print('precomposed:', b'\xc3\xa9' in d, 'decomposed:', b'e\xcc\x81' in d)"`. Both must report True. If only precomposed is True, the editor silently normalized the file and the test does not exercise NFC.
+  2. **OR construct the file via a generation script** that writes UTF-8 bytes directly. A one-shot Python helper that emits the decomposed sequence U+0065 U+0301 explicitly and writes the file bypasses the editor entirely. This is the safer path on macOS HFS+/APFS where filesystem-level normalization can be involved.
+
+  This guidance is non-optional. Without verification, the MDPP008 NFC acceptance test could pass trivially while still failing to exercise the NFC code path -- a false-positive test the validator would not catch.
+
+  **Add Case U10: ZWJ/ZWNJ leading-character edge case.** Per NCName, U+200C (ZWNJ) and U+200D (ZWJ) are valid in `NameStartChar`. Add an annotated case showing a leading ZWJ does not crash the validator and either is accepted (matching the formal grammar) or is explicitly rejected by a downstream design decision (with the rejection documented in the test annotation). The goal is that the implementer make and document the choice rather than discover it on first user complaint.
+
 **Acceptance:**
 
 - Running `validate-mdpp.py sample-unicode-aliases.md` emits MDPP002 for each negative case and emits no errors for the positive cases.
@@ -479,14 +507,18 @@ The brainstorm flagged several surfaces as "needs verification during planning."
 
 **Changes:**
 
-- Run `validate-mdpp.py` against every existing file in `plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/` -- particularly `sample-basic.md`, `sample-full.md`, `sample-custom-alias-priority.md`, `sample-duplicate-aliases.md`, `sample-invalid-names.md`, `sample-orphaned-tags.md`. Each file's diagnostic output before and after the change must match.
+- **Pre-scan for MDPP008 case-variant collisions.** Before running the post-change validator, grep the existing corpus (`tests/`, `examples/`, `spec/`) for alias-comment occurrences and lowercase-fold their captured names. Any pair that collapses under casefold within a single document is a NEW MDPP008 hit under the updated normalization. Expected result: zero collisions (the existing corpus uses single-case slug-style aliases). If a collision is found, this unit's plan stops and the engineering phase decides whether to (a) rename the offending alias as part of this PR or (b) defer MDPP008 normalization to a follow-up. The plan defaults to (a).
+- Run `validate-mdpp.py` against every existing file in `plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/` -- particularly `sample-basic.md`, `sample-full.md`, `sample-custom-alias-priority.md`, `sample-duplicate-aliases.md`, `sample-invalid-names.md`, `sample-orphaned-tags.md`. Each file's diagnostic output before and after the change must match (modulo any planned MDPP008 hits surfaced by the pre-scan).
 - Run `validate-mdpp.py` against every file in `examples/` (`semantic-cross-references.md`, `styles-and-variables.md`, etc.). Each must validate the same way it did before the change.
 - Run `add-aliases.py --dry-run` against `sample-full.md` and any file in `examples/` that has headings without aliases. Output must match the pre-change dry-run output.
+- **Multi-Japanese-heading slugify fallback verification.** Construct a temporary fixture with two consecutive Japanese-titled H2 headings (no existing aliases). Run `add-aliases.py --dry-run` and verify the script's behavior: it should fall back to the existing `heading` placeholder path (line 145 of `add-aliases.py`) and either (a) generate `heading-N` numeric variants for each occurrence, or (b) reproduce whatever today's pre-change behavior is for two empty-slug headings in a row. Document the observed behavior; if it is a bug (two headings get colliding `heading` slugs), file as a follow-up issue separate from R18.
 
 **Acceptance:**
 
-- Zero new errors, warnings, or info messages on any file that validated before the change.
+- Pre-scan finds zero pre-existing case-variant alias pairs (or any found are explicitly resolved in this PR and called out in the changelog).
+- Zero new errors, warnings, or info messages on any file that validated before the change (excluding pre-scan-surfaced MDPP008 cases).
 - Identical alias-generation behavior on ASCII-only inputs.
+- The multi-Japanese-heading fixture exhibits documented (not surprising) behavior.
 
 ---
 
