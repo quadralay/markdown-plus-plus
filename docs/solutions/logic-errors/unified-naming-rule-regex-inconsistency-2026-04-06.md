@@ -1,6 +1,7 @@
 ---
 title: Unified naming rule for Markdown++ named entities
 date: 2026-04-06
+last_refreshed: 2026-05-23
 category: logic-errors
 module: markdown-plus-plus-spec
 problem_type: logic_error
@@ -106,7 +107,7 @@ Unifying the grammar in one spec section, compiling shared regex constants in th
 
 3. **Capture regex review checklist.** When writing `[^...]` character classes in capture groups, verify that each excluded character is intentional. In particular, `-` inside `[^...]` should almost never appear in a name-capture regex — it indicates the regex is doing double duty (capturing and boundary-detecting) and should be split.
 
-4. **Widen capture before narrowing validation.** The alias fix demonstrates the pattern: capture liberally (`[^\s;>]+?`) so violations land in the validator's hands, then apply the strict name regex to report them. A capture regex that is too strict causes silent pass-through of invalid input.
+4. **Widen capture before narrowing validation, but enumerate the capture boundary when the grammar is ASCII-defined.** The alias fix demonstrates the pattern: capture liberally so violations land in the validator's hands, then apply the strict name regex to report them. A capture regex that is too strict causes silent pass-through of invalid input. The original #15 example used `[^\s;>]+?`; #115 later tightened this to `[^ \t\n\r;>]+?` because Python 3's `\s` is Unicode-aware and was *excluding* non-ASCII whitespace from the body, causing aliases with NBSP/U+202F/U+3000 to silently bypass extraction. The current authoritative form is the enumerated ASCII class — see `docs/solutions/logic-errors/unicode-whitespace-leak-in-alias-capture-regex-2026-05-23.md`.
 
 5. **Test file as regression guard.** `sample-invalid-names.md` with its explicit positive/negative split should be run against the validator after any naming rule change. The expected output (8 MDPP002 on positives, 0 on negatives) provides a concrete regression baseline.
 
@@ -118,5 +119,7 @@ Unifying the grammar in one spec section, compiling shared regex constants in th
 - [#27](https://github.com/quadralay/markdown-plus-plus/issues/27) — ePublisher adapter regex updates (downstream, separate repo)
 - [#52](https://github.com/quadralay/markdown-plus-plus/issues/52) — Extended the two-pattern system to three patterns, adding `STYLE_NAME_RE` for styles and markers with embedded spaces
 - [#108](https://github.com/quadralay/markdown-plus-plus/issues/108) — Widened the **alias-name** letter class to XML 1.0 NCName ranges (Unicode letters) and tightened MDPP008 to NFC + case-fold. The `STANDARD_NAME_RE` and `STYLE_NAME_RE` letter classes remain ASCII pending a separate audit.
+- [#115](https://github.com/quadralay/markdown-plus-plus/issues/115) — Tightened the alias-extraction body class from `[^\s;>]+?` to `[^ \t\n\r;>]+?` so non-ASCII whitespace inside alias names surfaces MDPP002 instead of silently bypassing extraction. Refines Prevention rule #4: capture-then-validate is still correct, but the capture boundary must be enumerated when the grammar is ASCII-defined.
 - `docs/solutions/logic-errors/embedded-spaces-in-style-marker-names-2026-04-08.md` — Follow-up learning documenting the #52 correction
 - `docs/solutions/tooling-decisions/unicode-alias-letter-class-via-ncname.md` — Follow-up learning documenting the #108 alias extension; supersedes the alias regex shown on line 54 above, which captures the April 2026 state
+- `docs/solutions/logic-errors/unicode-whitespace-leak-in-alias-capture-regex-2026-05-23.md` — Follow-up learning documenting the #115 alias-extraction tightening; supersedes the alias regex shown on line 88 above (and the `[^\s;>]+?` example previously embedded in Prevention rule #4)
