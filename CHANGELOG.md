@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.7.4] - 2026-05-23
+
+### Tooling
+
+- Tightened `validate-mdpp.py` alias extraction so Unicode whitespace inside alias names is caught by MDPP002 instead of silently bypassing validation. The `PATTERNS['alias']` body character class previously used `[^\s;>]+?`, and because Python 3 `\s` is Unicode-aware, it excluded not only ASCII whitespace but also U+00A0 (NO-BREAK SPACE), U+202F (NARROW NO-BREAK SPACE), U+3000 (IDEOGRAPHIC SPACE), and other Unicode whitespace code points. Any alias comment containing one of those characters caused the regex to fail entirely -- the alias was never extracted and MDPP002 (invalid alias name) and MDPP008 (duplicate alias) never fired on it. The fix replaces the body class with `[^ \t\n\r;>]+?` so non-ASCII whitespace flows into the capture and trips the alias `NameChar` check. The trailing `(?=\s*;|\s*-->)` lookahead stays Unicode-permissive on purpose -- after the capture stops at the first ASCII whitespace, trailing Unicode whitespace before the terminator (a layout choice, not part of the name) is still tolerated. Added `tests/sample-unicode-whitespace-aliases.md` with NBSP / NARROW NBSP / IDEOGRAPHIC SPACE cases and a plain-ASCII positive control; updated Case U9 of `tests/sample-unicode-aliases.md` to cross-reference the new fixture and clarify that ASCII-whitespace-in-name remains a separate follow-up. Audit of the other `PATTERNS` entries: `variable`/`variable_invalid`/`condition_open`/`condition_close`/`include`/`markers_json`/`marker_simple`/`multiline`/`style` all use enumerated character classes (`[a-zA-Z_…]`, `[^>]+?`, `[^=]+`, `[^}]+`, `[^;]*`, etc.) or pure whitespace skipping -- none use `\s` inside an extracting body class. `add-aliases.py` `ALIAS_PATTERN` uses the enumerated NCName-based class and never used `\s` for body matching, so it was also unaffected ([#115](https://github.com/quadralay/markdown-plus-plus/issues/115)).
+
 ## [1.7.3] - 2026-05-23
 
 ### Tooling

@@ -189,6 +189,8 @@ $my variable;
 - **Aliases (alias rule):** Permit letters from any script (XML NCName letter class), digits, underscores, and hyphens. Aliases may start with a digit. Subsequent characters may include hyphen in addition to the start-character set. No whitespace, no period, no punctuation outside `-` and `_`.
 - **Style names and marker keys (style/marker rule):** Start with a letter or underscore; subsequent characters may include embedded spaces as well as letters, digits, hyphens, and underscores. Leading/trailing spaces are stripped.
 
+**Whitespace inside alias names.** Non-ASCII whitespace (NO-BREAK SPACE U+00A0, NARROW NO-BREAK SPACE U+202F, IDEOGRAPHIC SPACE U+3000, and other Unicode whitespace code points) inside an alias name surfaces as MDPP002 the same way illegal punctuation does -- the alias extraction stops only at ASCII whitespace (space, tab, CR, LF), `;`, and `>`, so non-ASCII whitespace flows into the captured name and trips the alias `NameChar` check. Prior to 1.7.4 (issue [#115](https://github.com/quadralay/markdown-plus-plus/issues/115)), the extraction regex's body class used Python's Unicode-aware `\s` and silently failed to match any alias comment containing non-ASCII whitespace, so MDPP002 never fired. The new behavior is what authors would have expected.
+
 ---
 
 ## MDPP003 -- Malformed Marker JSON

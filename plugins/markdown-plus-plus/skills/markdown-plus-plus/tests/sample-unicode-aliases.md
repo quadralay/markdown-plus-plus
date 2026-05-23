@@ -67,14 +67,21 @@ test documents observed behavior under the current grammar.
 <!--#foo:bar-->
 ### Colon-Containing Heading
 
-### Case U9: Alias containing whitespace -- KNOWN edge case (no error fired)
+### Case U9: Alias containing ASCII whitespace -- KNOWN edge case (no error fired)
 
-The alias extraction regex stops at whitespace, so the alias here parses
-as `foo` (valid). The remaining ` bar-->` text is treated as a comment
-suffix and the tag attaches to the heading below, so neither MDPP002 nor
-MDPP009 fires under the current parser. Documenting this as observed
-behavior; tightening the extraction to flag whitespace inside alias
-comments is a separate follow-up (the behavior predates issue #108).
+The alias extraction regex stops at ASCII whitespace and requires the
+match to be terminated by `;` or `-->`. With ASCII space inside the
+alias body, neither end-of-name condition is satisfied at any prefix of
+`foo bar`, so the regex fails entirely and the alias is never extracted.
+MDPP002 does not fire because no alias is registered. MDPP009 does not
+fire because the line attaches to the heading below.
+
+Non-ASCII whitespace inside alias names IS now caught by MDPP002 (issue
+#115) -- see `sample-unicode-whitespace-aliases.md` for the NBSP /
+narrow NBSP / ideographic space cases. The ASCII case below remains a
+separate follow-up: a robust fix would require either replacing the
+lookahead-anchored extraction with a comment-tokenizer pass or relaxing
+the alias body class to ASCII space and then flagging it.
 
 <!--#foo bar-->
 ### Whitespace-Containing Heading
