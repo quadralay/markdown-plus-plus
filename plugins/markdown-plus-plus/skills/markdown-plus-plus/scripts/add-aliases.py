@@ -54,13 +54,25 @@ _NCNAME_START_CHAR = (
     "\U00010000-\U000EFFFF"
 )
 
+# Combining-mark ranges from XML 1.0 NCName NameChar. Permitted only in
+# non-first positions, matching validate-mdpp.py so this script
+# recognizes the same decomposed-accent aliases the validator accepts
+# (e.g., "Cafe" + U+0301). Without these ranges, get_existing_aliases
+# would silently truncate decomposed aliases and could regenerate them.
+_NCNAME_COMBINING = (
+    "\u0300-\u036F"
+    "\u203F-\u2040"
+)
+
 # Regex patterns
 HEADING_PATTERN = re.compile(r'^(#{1,6})\s+(.+)$')
 ALIAS_PATTERN = re.compile(
-    f'<!--\\s*#([{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*)'
+    f'<!--\\s*#([{_NCNAME_START_CHAR}0-9]'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*)'
 )
 EXISTING_ALIAS_LINE = re.compile(
-    f'^<!--\\s*#[{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*.*-->\\s*$'
+    f'^<!--\\s*#[{_NCNAME_START_CHAR}0-9]'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*.*-->\\s*$'
 )
 
 

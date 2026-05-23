@@ -468,8 +468,16 @@ _NCNAME_START_CHAR = (
     "\uFDF0-\uFFFD"
     "\U00010000-\U000EFFFF"
 )
+# _NCNAME_COMBINING ranges (NCName NameChar combining marks). Permitted
+# only in non-first positions so decomposed forms like "e" + U+0301
+# match the validator's grammar.
+_NCNAME_COMBINING = (
+    "\u0300-\u036F"
+    "\u203F-\u2040"
+)
 re.compile(
-    rf'<!--\s*(#[{_NCNAME_START_CHAR}0-9][{_NCNAME_START_CHAR}0-9-]*)\s*-->'
+    rf'<!--\s*(#[{_NCNAME_START_CHAR}0-9]'
+    rf'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*)\s*-->'
 )
 ```
 
