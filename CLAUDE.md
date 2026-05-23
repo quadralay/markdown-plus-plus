@@ -6,6 +6,8 @@
 
 This is a specification and tooling repo -- no application code.
 
+**Agents bootstrapping from a cold clone:** see the [For AI agents](README.md#for-ai-agents) section of `README.md` for ingestion paths into the Markdown++ skill. The remainder of this file documents in-repo authoring discipline, not first-time discovery.
+
 ## Directory structure
 
 ```

@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.7.1] - 2026-05-23
+
+### Project
+
+- Added a **For AI agents** section to `README.md` (above `## Tools`) and a one-line cold-clone pointer to `CLAUDE.md`'s Overview block documenting two skill-ingestion paths for AI agents arriving at the repo: the Claude Code marketplace install (the existing slash commands, reframed in context) and a generic-harness path pointing at `plugins/markdown-plus-plus/skills/markdown-plus-plus/SKILL.md` as the entry point and the sibling `references/` directory as the payload. Documentation breadcrumb only -- no spec, skill, script, or test changes ([#110](https://github.com/quadralay/markdown-plus-plus/issues/110)).
+
 ## [1.7.0] - 2026-05-22
 
 ### Spec
