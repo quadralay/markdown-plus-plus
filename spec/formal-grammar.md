@@ -560,7 +560,7 @@ The following invalid cases from `tests/sample-invalid-names.md` were verified:
 | 4 | `<!--#-bad-start-->` | `alias_name` -- hyphen-first |
 | 5 | `<!--marker:123Key="value"-->` | `identifier` -- digit-first |
 | 6 | `<!--markers:{"123Bad": "val"}-->` | `style_name` applied to JSON key -- digit-first |
-| 16 | `<!--#.bad-->` | `alias_name` -- period not permitted in first position |
+| 16 | `<!--#.bad-alias-->` | `alias_name` -- period not permitted in first position |
 | 17 | `<!--style:Bad!Style-->` | `identifier` -- exclamation not in character set |
 
 ### Valid Edge Cases Confirmed

@@ -86,7 +86,7 @@ Combining grave accent (U+0300) is in NCName's combining-mark range
 result is a decomposed `è`. MDPP002 accepts the raw bytes; MDPP008
 NFC-normalizes for duplicate detection.
 
-<!--#foè-bar-->
+<!--#foè-bar-->
 ## Combining-Mark Heading
 
 ### Case U15: Alias containing middle dot -- EXPECT no error (issue #111)
