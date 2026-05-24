@@ -64,16 +64,23 @@ _NCNAME_COMBINING = (
     "\u203F-\u2040"
 )
 
+# Period and middle dot from XML 1.0 NCName NameChar (issue #111). Permitted
+# only in non-first positions, matching validate-mdpp.py so this script
+# recognizes the same dotted-hierarchy aliases the validator accepts (e.g.,
+# `#chapter.1.intro`). Without these characters, get_existing_aliases would
+# silently truncate dotted aliases and could regenerate them.
+_NCNAME_PUNCT = ".\u00B7"
+
 # Regex patterns
 HEADING_PATTERN = re.compile(r'^(#{1,6})\s+(.+)$')
 ALIAS_PATTERN = re.compile(
     f'<!--\\s*#([{_NCNAME_START_CHAR}0-9]'
-    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*)'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}{_NCNAME_PUNCT}-]*)'
     f'(?=\\s*(?:;|-->))'
 )
 EXISTING_ALIAS_LINE = re.compile(
     f'^<!--\\s*#[{_NCNAME_START_CHAR}0-9]'
-    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*.*-->\\s*$'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}{_NCNAME_PUNCT}-]*.*-->\\s*$'
 )
 
 

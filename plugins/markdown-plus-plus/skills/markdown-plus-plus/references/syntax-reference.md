@@ -185,14 +185,16 @@ All named entities in Markdown++ (variables, styles, aliases, conditions, and ma
 
 ### Alias Name
 
-Alias names use the XML 1.0 NCName `NameStartChar` letter class -- which includes ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- plus digits, underscore, and hyphen. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!-- #04499224 -->`).
+Alias names use the XML 1.0 NCName `NameStartChar` letter class -- which includes ASCII letters and letters from non-Latin scripts (Japanese, German with combining accents, Greek, Cyrillic, and others) -- in the first position, and the full XML NCName `NameChar` production in subsequent positions. Aliases additionally permit a leading digit, since aliases often map to numeric identifiers (e.g., `<!-- #04499224 -->`); that is the sole intentional deviation from XML NCName.
 
 - First character: an NCName-class letter, an underscore (`_`), or a digit
-- Subsequent characters: NCName-class letters, digits, underscores, or hyphens
+- Subsequent characters: NCName-class letters, digits, underscore, hyphen (`-`), period (`.`), middle dot (`·`), combining marks, or connector punctuation
 - Minimum length is 1 character
-- No whitespace, no punctuation other than `-` and `_`, no leading `.`
+- No whitespace; `-`, `.`, `_`, middle dot, combining marks, and connector punctuation permitted in non-first positions; no `.` (or any other non-`_`, non-NCName-letter character) in the first position
 
 See [`spec/formal-grammar.md`](../../../../../spec/formal-grammar.md) `alias_name_start_char` and `alias_name_char` productions for the complete character enumeration. The alias **acceptance grammar** (MDPP002) is a strict superset of the prior ASCII-only grammar -- every alias valid under the previous grammar still passes MDPP002. Whole-document validation is *not* a strict superset: MDPP008 (duplicate alias) tightened in 1.7.0 from byte-exact to NFC + casefold, so canonical-equivalent variants like `<!--#FOO-->` and `<!--#foo-->` now collide. See `references/error-codes.md` § MDPP008 for the migration detail.
+
+**CSS-selector friction note.** Aliases containing `.` (e.g., `#foo.bar`) require escaping in CSS selectors (`#foo\.bar`) and `document.querySelector` calls. The Markdown++ grammar does not pre-filter for downstream stylesheet preferences -- escaping is the responsibility of the stylesheet/JavaScript author. If your project uses aliases as CSS selectors directly, your CSS/JS conventions should govern whether dotted aliases are appropriate; the format specification does not.
 
 **Applies to:** Aliases
 
@@ -225,6 +227,7 @@ Style and marker names allow embedded spaces to support processor-defined compou
 | `インストール` | Alias | Japanese alias (NCName letter class) |
 | `установка` | Alias | Cyrillic alias (NCName letter class) |
 | `Café` | Alias | German alias with accent (NCName letter class) |
+| `chapter.1.intro` | Alias | Dotted hierarchy (period permitted in non-first position) |
 | `web` | Condition | Single word |
 | `Keywords` | Marker key | PascalCase |
 | `Index Entry` | Marker key | Embedded space (style/marker name) |
@@ -238,9 +241,8 @@ Style and marker names allow embedded spaces to support processor-defined compou
 | `has space` | Contains whitespace (variable/condition) |
 | ` Leading Space` | Leading space (style/marker) |
 | `Trailing Space ` | Trailing space (style/marker) |
-| `special!char` | Contains punctuation |
-| `foo.bar` | Period not in alias character class -- aliases permit only `-` and `_` punctuation |
-| `.hidden` | Period cannot start an alias name |
+| `special!char` | Contains punctuation outside the alias `NameChar` set |
+| `.hidden` | Period not permitted in first position of an alias name (NCName excludes `.` from `NameStartChar`) |
 
 ### Non-English Content
 
@@ -248,7 +250,7 @@ Style and marker names allow embedded spaces to support processor-defined compou
 
 **Variables, conditions, styles, and marker keys:** These four naming patterns currently accept ASCII letters only (`a-zA-Z`). Extension to Unicode letters is a separate audit; authors with non-ASCII identifier requirements for these entities should track the follow-up issue referenced in `CHANGELOG.md`.
 
-**HTML5-id-legal vs. NCName:** HTML5 `id` attributes permit any non-whitespace character, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, URL fragments, and CSS selectors. Every alias valid under the NCName grammar lands cleanly in HTML `id=` output.
+**HTML5-id-legal vs. NCName:** HTML5 `id` attributes permit any non-whitespace character, but Markdown++ aliases follow the stricter NCName grammar so an alias round-trips cleanly across XML, XSLT, JavaScript, and URL fragments. Every alias valid under the NCName grammar lands cleanly in HTML `id=` output. CSS selectors are a partial exception: an alias containing `.` (e.g., `#foo.bar`) is a valid CSS ID selector only when the `.` is escaped (`#foo\.bar`). This is a downstream stylesheet concern, not a constraint on the upstream authoring grammar -- see the *CSS-selector friction note* under [Alias Name](#alias-name).
 
 ---
 

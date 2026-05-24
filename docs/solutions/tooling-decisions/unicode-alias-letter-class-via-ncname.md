@@ -1,6 +1,7 @@
 ---
 title: "Adopt XML NCName as the Markdown++ alias letter class"
 date: 2026-05-22
+last_updated: 2026-05-23
 category: tooling-decisions
 module: markdown-plus-plus-spec
 problem_type: tooling_decision
@@ -80,9 +81,14 @@ The XML 1.0 `NameStartChar` letter ranges are (W3C `#xHHHH` form):
 ```
 
 These define `alias_name_start_char`. The body production
-`alias_name_char` adds digit, `-`, and the NCName combining-mark ranges
-(`#x0300-#x036F`, `#x203F-#x2040`) so decomposed accented forms parse
-the same as their precomposed counterparts.
+`alias_name_char` is the full XML NCName `NameChar` production:
+`alias_name_start_char | digit | "-" | "." | #xB7 | [#x0300-#x036F] |
+[#x203F-#x2040]`. The original #108 work added digit, `-`, and the
+combining-mark ranges; issue #111 closed the gap to full `NameChar` by
+admitting `.`, middle dot, and connector punctuation in non-first
+positions. See
+[`upstream-grammar-vs-downstream-stylistic-preferences-2026-05-23.md`](upstream-grammar-vs-downstream-stylistic-preferences-2026-05-23.md)
+for the architectural rationale behind that extension.
 
 ### Use explicit `\u` / `\U` escapes, never literal Unicode, when defining the character class in source
 
@@ -276,7 +282,7 @@ alias_name_start_char ::= "_" | [A-Z] | [a-z]
                         | [#xF900-#xFDCF] | [#xFDF0-#xFFFD]
                         | [#x10000-#xEFFFF]
 
-alias_name_char       ::= alias_name_start_char | digit | "-"
+alias_name_char       ::= alias_name_start_char | digit | "-" | "." | #xB7
                         | [#x0300-#x036F] | [#x203F-#x2040]
 
 alias_name            ::= (alias_name_start_char | digit) (alias_name_char)*
@@ -305,9 +311,11 @@ _NCNAME_COMBINING = (
     "\u203F-\u2040"
 )
 
+_NCNAME_PUNCT = ".\u00B7"  # NameChar non-letter punctuation: ".", middle dot
+
 ALIAS_NAME_RE = re.compile(
     f'^[{_NCNAME_START_CHAR}0-9]'
-    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}-]*$'
+    f'[{_NCNAME_START_CHAR}0-9{_NCNAME_COMBINING}{_NCNAME_PUNCT}-]*$'
 )
 
 def _alias_dedup_key(name: str) -> str:
@@ -337,10 +345,15 @@ be a normalization risk without serving the doc's purpose.
 
 ### Aliases that still fail MDPP002
 
+Note: `.` is permitted in non-first positions after the #111 NameChar
+extension. The `.hidden` case is rejected because `.` is forbidden in
+the *first* position, not because `.` is forbidden generally.
+
 ```markdown
 <!-- #invalid name -->     <!-- whitespace -->
-<!-- #invalid.name -->     <!-- period -->
+<!-- #.hidden -->          <!-- period in first position -->
 <!-- #-leading-hyphen -->  <!-- hyphen in first position -->
+<!-- #foo:bar -->          <!-- colon never permitted in NCName -->
 ```
 
 ### Duplicate aliases caught by MDPP008 (NFC + casefold)
@@ -373,6 +386,13 @@ with open("tests/sample-unicode-alias-duplicates.md", "w", encoding="utf-8") as 
 
 ## Related
 
+- [`upstream-grammar-vs-downstream-stylistic-preferences-2026-05-23.md`](upstream-grammar-vs-downstream-stylistic-preferences-2026-05-23.md)
+  -- the follow-up decision (issue #111) that extended `alias_name_char`
+  to the full XML NCName `NameChar` production. Captures the
+  architectural framing ("don't pre-filter the upstream grammar for
+  downstream stylistic preferences") and the spec-paired-update
+  discipline used to keep prose, table sketch, EBNF, PEG, and validator
+  in sync.
 - `docs/solutions/logic-errors/unified-naming-rule-regex-inconsistency-2026-04-06.md`
   -- the originating naming-rule unification that this work extends.
   Moderate overlap; consolidation review candidate if a follow-up

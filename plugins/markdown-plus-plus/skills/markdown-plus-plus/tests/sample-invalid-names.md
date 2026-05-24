@@ -50,9 +50,14 @@ $123start;
 <!--markers:{"123Bad": "val"}-->
 ### Marker Heading Case 6
 
-### Case 16: Alias with special characters -- EXPECT MDPP002
+### Case 16: Alias with leading period -- EXPECT MDPP002
 
-<!--#bad.alias-->
+Period is permitted only in non-first positions of an alias name (XML
+NCName excludes `.` from `NameStartChar`); a leading `.` therefore
+trips MDPP002. The prior fixture `<!--#bad.alias-->` flipped to a
+valid alias under issue #111 (period accepted in non-first position).
+
+<!--#.bad-alias-->
 ### Aliased Heading Case 16
 
 ### Case 17: Style with special characters -- EXPECT MDPP002
