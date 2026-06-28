@@ -208,6 +208,21 @@ MDPP_TAG_PATTERN = re.compile(
 CODE_FENCE_PATTERN = re.compile(r'^\s{0,3}(`{3,}|~{3,})')
 
 
+# --- Multiline-table row-merge detection (MDPP018) ---------------------------
+# A pipe-table row: optional indent, a leading pipe, a trailing pipe.
+TABLE_ROW_RE = re.compile(r'^\s*\|.*\|\s*$')
+# GFM delimiter row: interior cells contain only whitespace, dashes, colons.
+TABLE_DELIMITER_RE = re.compile(r'^\s*\|[\s:|\-]+\|\s*$')
+# A line whose only content is a multiline directive -- bare
+# (`<!-- multiline -->`) or combined-commands form
+# (`<!-- style:X ; multiline ; #y -->`). Mirrors format-tables.py.
+MULTILINE_DIRECTIVE_LINE_RE = re.compile(
+    r'^\s*<!--\s*[^>]*?\bmultiline\b[^>]*?-->\s*$'
+)
+# Split a row on unescaped pipes (a `\|` is a literal pipe inside a cell).
+TABLE_CELL_SPLIT_RE = re.compile(r'(?<!\\)\|')
+
+
 def _is_mdpp_tag_line(line: str) -> bool:
     """True if line's only non-whitespace content is an MDPP comment tag."""
     stripped = line.strip()
@@ -248,6 +263,140 @@ def _iter_outside_fences(lines: list[str]) -> Iterator[tuple[int, str]]:
                 continue
         if not in_fence:
             yield line_num, line
+
+
+def _split_table_cells(row: str) -> list[str]:
+    """Split a pipe-table row into its interior cell contents.
+
+    Splits on unescaped `|`, drops the empty strings produced by the leading
+    and trailing border pipes, and trims incidental whitespace around each
+    cell. Mirrors format-tables.py split_cells() so the two tools agree on
+    what counts as a cell.
+    """
+    stripped = row.rstrip('\n').rstrip('\r')
+    parts = TABLE_CELL_SPLIT_RE.split(stripped)
+    if parts and parts[0].strip() == '':
+        parts = parts[1:]
+    if parts and parts[-1].strip() == '':
+        parts = parts[:-1]
+    return [c.strip() for c in parts]
+
+
+def _scan_multiline_row_merge(
+    lines: list[str], filepath: str
+) -> list[ValidationIssue]:
+    """Detect multiline tables whose data rows will all merge (MDPP018).
+
+    Under `<!-- multiline -->`, logical rows are separated only by a
+    whitespace-only separator row; every other pipe-bearing row continues
+    the current logical row. A table written with regular-table semantics --
+    one record per pipe line, no separator rows -- therefore collapses every
+    data row into a single logical row, with no error from any other check.
+
+    The smoking-gun pattern (issue #118) is a multiline table whose body has
+    >= 2 rows with a non-blank first cell, zero whitespace-only separator
+    rows, and zero continuation rows (blank first cell). That exact gate
+    guarantees no false positives: a single data row cannot merge, a present
+    separator row proves the author knows the mechanism, and a present
+    continuation row likewise demonstrates awareness. (The row-continuation
+    mechanism itself keys on whole-row whitespace, not the first cell; the
+    first-cell test here is only a heuristic for author intent.)
+
+    The diagnostic anchors to the directive line, where the fix applies.
+    """
+    issues: list[ValidationIssue] = []
+    in_fence = False
+    fence_char: str | None = None
+    fence_count = 0
+
+    i = 0
+    n = len(lines)
+    while i < n:
+        line = lines[i]
+
+        # Track fenced code blocks so directives/tables inside them are skipped.
+        m = CODE_FENCE_PATTERN.match(line)
+        if m:
+            char = m.group(1)[0]
+            count = len(m.group(1))
+            if not in_fence:
+                in_fence = True
+                fence_char = char
+                fence_count = count
+                i += 1
+                continue
+            elif char == fence_char and count >= fence_count:
+                in_fence = False
+                fence_char = None
+                fence_count = 0
+                i += 1
+                continue
+        if in_fence:
+            i += 1
+            continue
+
+        # A multiline directive immediately above a header row that is
+        # immediately above a GFM delimiter row marks a multiline table.
+        if (
+            MULTILINE_DIRECTIVE_LINE_RE.match(line)
+            and i + 2 < n
+            and TABLE_ROW_RE.match(lines[i + 1])
+            and not TABLE_DELIMITER_RE.match(lines[i + 1])
+            and TABLE_DELIMITER_RE.match(lines[i + 2])
+        ):
+            directive_line_num = i + 1  # 1-based line number of the directive
+
+            separator_rows = 0
+            continuation_rows = 0
+            content_first_rows = 0
+
+            j = i + 3
+            while (
+                j < n
+                and TABLE_ROW_RE.match(lines[j])
+                and not CODE_FENCE_PATTERN.match(lines[j])
+            ):
+                cells = _split_table_cells(lines[j])
+                if not cells or all(c == '' for c in cells):
+                    separator_rows += 1
+                elif cells[0] == '':
+                    continuation_rows += 1
+                else:
+                    content_first_rows += 1
+                j += 1
+
+            if (
+                content_first_rows >= 2
+                and separator_rows == 0
+                and continuation_rows == 0
+            ):
+                issues.append(ValidationIssue(
+                    type=Severity.WARNING.value,
+                    code="MDPP018",
+                    message=(
+                        "Multiline table has no separator rows; all "
+                        f"{content_first_rows} data rows will merge into one "
+                        "logical row"
+                    ),
+                    file=filepath,
+                    line=directive_line_num,
+                    context=line.strip()[:60],
+                    suggestion=(
+                        "Under <!-- multiline --> every pipe-bearing row "
+                        "continues the current logical row; only a "
+                        "whitespace-only separator row (e.g. `|  |  |`) starts "
+                        "a new one. Add separator rows between records, or -- "
+                        "if the cells are single-line -- drop the multiline "
+                        "directive and use a plain table."
+                    ),
+                ))
+
+            i = j
+            continue
+
+        i += 1
+
+    return issues
 
 
 def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]:
@@ -521,6 +670,9 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
             if verbose:
                 print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: "
                       f"Orphaned tag detected")
+
+    # MDPP018: Multiline tables with no separator rows (silent row merge).
+    issues.extend(_scan_multiline_row_merge(lines, filepath))
 
     # Check for unclosed conditions
     for opened_line, opened_expr in condition_stack:

@@ -279,6 +279,8 @@ Available in print and tablet editions.
 - Row separator: a pipe-bearing row whose cells are all whitespace -- this is the only way to start a new logical row
 - A no-pipe blank line ends the table entirely (it does **not** separate rows)
 
+**Don't add `multiline` cosmetically.** A `<!-- multiline -->` table whose rows are all single-line and have no whitespace-only separator rows merges every data row into one logical row -- silently, with no error. The validator flags this as MDPP018 (warning). Use `multiline` only when a cell needs block content or wraps across lines; for single-line rows, drop the directive and use a plain table. If the rows genuinely need multiline cells, put a whitespace-only separator row (e.g. `|  |  |`) between records. See [MDPP018](error-codes.md#mdpp018----multiline-table-row-merge).
+
 ### Table Formatting
 
 **Tables in Markdown++ documents follow a fixed-width, vertically aligned shape** -- columns are padded to uniform width, pipes line up across every row, separator dashes span the full column width, and (for `<!-- multiline -->` tables) long content wraps to continuation rows. The full rule set is documented in [`table-formatting.md`](table-formatting.md); the canonical enforcement tool is `scripts/format-tables.py --in-place`.

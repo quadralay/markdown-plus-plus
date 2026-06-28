@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.9.0] - 2026-06-27
+
+### Tooling
+
+- Added MDPP018 (warning) to `validate-mdpp.py`: a `<!-- multiline -->` table written with regular-table semantics -- one record per pipe line, no whitespace-only separator rows -- silently collapses every data row into a single logical row. The syntax is valid, so no other check fires; the failure surfaces only in rendered output. The validator now detects this smoking-gun pattern by identifying multiline tables (a multiline directive line, bare or combined-commands form, immediately above a header row, immediately above a GFM delimiter row) and classifying body rows into separator (all cells whitespace), continuation (blank first cell, content elsewhere), and content-first (non-blank first cell) buckets. MDPP018 fires only when the body has ≥2 content-first rows AND zero separator rows AND zero continuation rows -- a gate that guarantees no false positives on single-row or correctly-separated tables and leaves tables that already use continuation rows untouched. The diagnostic anchors to the directive line, where the fix applies. Added test fixture `tests/sample-multiline-row-merge.md` (positive case plus four negative cases) ([#118](https://github.com/quadralay/markdown-plus-plus/issues/118)).
+- Documented the mistake across the skill surfaces: a new Common Mistakes entry #4 in `SKILL.md` ("Use `multiline` only when a cell needs block content or wraps across lines; single-line cells should use a plain table.") with wrong/right examples, MDPP018 added to the "Common errors detected" list; a full MDPP018 section in `references/error-codes.md` (quick-reference table row, description, detection logic, trigger examples, fix); and a do/don't note in the `references/best-practices.md` Multiline Tables section ([#118](https://github.com/quadralay/markdown-plus-plus/issues/118)).
+
 ## [1.8.0] - 2026-05-23
 
 ### Spec
