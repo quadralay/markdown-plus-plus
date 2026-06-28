@@ -318,6 +318,7 @@ python scripts/validate-mdpp.py document.md
 - Duplicate alias values within a file
 - Orphaned comment tags (tag not attached to element)
 - Duplicate link reference slugs across included files (MDPP014)
+- Multiline tables with no separator rows that silently merge data rows (MDPP018)
 
 ## Alias Generation
 
@@ -391,6 +392,39 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 ### 3. Missing Semicolon on Variables
 
 **Variables without a trailing semicolon are not recognized.** `$product_name` is literal text; `$product_name;` is a variable reference. The semicolon is required.
+
+### 4. Cosmetic `multiline` Directive Silently Merges Rows
+
+**Use `multiline` only when a cell needs block content or wraps across lines; single-line cells should use a plain table.** Under `<!-- multiline -->`, every pipe-bearing row continues the current logical row -- a new logical row begins only on a whitespace-only separator row. Add the directive cosmetically to a table of single-line rows and every data row silently collapses into one logical row. The syntax is valid, so no error is raised; the failure shows up only in the rendered output. The validator flags this pattern as MDPP018 (warning).
+
+**Wrong -- no separator rows (renders as ONE row):**
+```markdown
+<!-- multiline -->
+| Setting             | Default |
+|---------------------|---------|
+| Generate Assistant  | true    |
+| Hide AI Tab         | true    |
+```
+
+**Right -- single-line cells, so drop the directive (plain table):**
+```markdown
+| Setting             | Default |
+|---------------------|---------|
+| Generate Assistant  | true    |
+| Hide AI Tab         | true    |
+```
+
+**Right -- keep `multiline` and add a whitespace-only separator row between records:**
+```markdown
+<!-- multiline -->
+| Setting             | Default |
+|---------------------|---------|
+| Generate Assistant  | true    |
+|                     |         |
+| Hide AI Tab         | true    |
+```
+
+See [MDPP018 -- Multiline Table Row Merge](references/error-codes.md#mdpp018----multiline-table-row-merge) for the detection logic.
 
 </common_mistakes>
 

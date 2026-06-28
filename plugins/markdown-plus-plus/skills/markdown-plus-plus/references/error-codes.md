@@ -29,6 +29,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP015 | Newer minor version in document | Warning | Document's `mdpp-version` minor version exceeds processor's supported minor version |
 | MDPP016 | Different major version in document | Warning | Document's `mdpp-version` major version differs from processor's supported major version |
 | MDPP017 | Invalid UTF-8 encoding | Error | File contains an invalid UTF-8 byte sequence |
+| MDPP018 | Multiline table row merge | Warning | `<!-- multiline -->` table has no separator rows; all data rows merge into one logical row |
 
 ## General Rules
 
@@ -546,3 +547,57 @@ python validate-mdpp.py document.md
 ```
 
 **Suggested fix:** Save the file with UTF-8 encoding. In most editors: File > Save As > Encoding > UTF-8 (without BOM). Verify the encoding with a tool such as `file -i filename` (Unix) or a hex editor. Ensure include directives reference only text files, not binary assets.
+
+---
+
+## MDPP018 -- Multiline Table Row Merge
+
+**Severity:** Warning
+
+**Description:** A `<!-- multiline -->` table is written with regular-table semantics -- one record per pipe line, with no whitespace-only separator rows -- so every data row silently collapses into a single logical row. The syntax is valid, so no other check fires; the failure surfaces only in the rendered output, where every record runs together. This is the multiline-table analogue of the [attachment rule](../../../../../spec/attachment-rule.md) silent failures: a valid-but-wrong construct that produces no error on its own.
+
+Under `<!-- multiline -->`, every pipe-bearing row *continues* the current logical row; a new logical row begins only on a whitespace-only separator row. Authors who add the directive cosmetically and then write single-line rows get the opposite of what they expect. (See [Multiline Tables](syntax-reference.md) for the full row-continuation mechanism, which keys on whole-row whitespace, not on any single cell.)
+
+**Detection logic:** Second pass over lines outside fenced code blocks. A multiline table is identified by a multiline directive line -- bare (`<!-- multiline -->`) or combined-commands form (`<!-- style:X ; multiline ; #y -->`) -- immediately above a header row, immediately above a GFM delimiter row. Each body row (after the delimiter, up to the first non-pipe line) is classified by cell content into one of three buckets:
+
+- **Separator row** -- every cell is whitespace-only. Starts a new logical row.
+- **Continuation row** -- the first cell is blank but at least one other cell has content. The hallmark of a deliberate continuation in the label-column idiom.
+- **Content-first row** -- the first cell has content.
+
+MDPP018 is emitted **only** when the body has **≥2 content-first rows AND zero separator rows AND zero continuation rows**. That exact gate is the issue's "smoking gun" and guarantees no false positives:
+
+- A table with a single data row cannot merge anything.
+- A table that contains even one separator row proves the author knows the mechanism.
+- A table that contains a continuation row likewise demonstrates awareness of multiline semantics.
+
+The first-cell test that distinguishes continuation rows from content-first rows is a heuristic for *author intent*, not a model of the row-continuation mechanism itself (which classifies a row as a separator only when *every* cell is whitespace). The diagnostic anchors to the directive line, where the fix is applied. Detection is intentionally narrow: a multiline table that mixes continuation rows with a missing separator could also merge some rows, but is not flagged, to keep the false-positive rate at zero.
+
+**Trigger examples:**
+
+```markdown
+<!-- WARNING: no separator rows; all four data rows merge into one logical row -->
+<!-- multiline -->
+| Setting             | Default |
+|---------------------|---------|
+| Generate Assistant  | true    |
+| Hide AI Tab         | true    |
+| Enable Telemetry    | false   |
+| Verbose Logging     | false   |
+
+<!-- OK: whitespace-only separator rows mark logical-row boundaries -->
+<!-- multiline -->
+| Setting             | Default |
+|---------------------|---------|
+| Generate Assistant  | true    |
+|                     |         |
+| Hide AI Tab         | true    |
+
+<!-- OK: genuine continuation rows (blank first cell) show author awareness -->
+<!-- multiline -->
+| Name | Details          |
+|------|------------------|
+| Bob  | Lives in Dallas. |
+|      | - Enjoys cycling |
+```
+
+**Suggested fix:** Use `<!-- multiline -->` only when a cell needs block content or wraps across lines. If the cells are single-line, drop the directive and use a plain table. If the rows genuinely need multiline cells, insert a whitespace-only separator row (e.g. `|  |  |`) between records so each renders as its own logical row.
