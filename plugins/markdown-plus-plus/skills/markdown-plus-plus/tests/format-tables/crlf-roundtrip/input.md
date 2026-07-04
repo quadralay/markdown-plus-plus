@@ -7,4 +7,5 @@ status: active
 | Key | Value |
 | --- | ----- |
 | A | First value that wraps across several continuation rows here. |
+| | |
 | B | Short. |

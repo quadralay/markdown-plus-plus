@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.10.0] - 2026-07-03
+
+### Tooling
+
+- Added an automated golden-file test framework: `tests/run-tests.py` (Python 3 stdlib only, Windows and Linux) discovers suites via `suite.json`, runs each case as a subprocess against the real CLI, and asserts stdout byte-for-byte (`expected.md`), exit code (`expected-exit-code.txt`), and stderr substrings (`expected-stderr-contains.txt`). `KNOWN_FAIL.txt` marks expected failures without gating the run; a known-fail that unexpectedly passes fails the run loudly so fixes get promoted to green. Supports `--filter`, `--list`, `--verbose`, and an `--idempotency` sweep that formats every `examples/`, `spec/`, and green-case file twice and byte-compares, honoring an allowlist for documented non-idempotency. Seeded the first suite, `tests/format-tables/`, with 30 cases: 13 green (AE1-AE7 regression conversions from the manual protocol with tool-generated goldens, a CRLF round-trip case, three real-world specimen ports from epublisher-docs, a runner smoke case) and 17 known-fail encoding the desired behavior for [#120](https://github.com/quadralay/markdown-plus-plus/issues/120), [#121](https://github.com/quadralay/markdown-plus-plus/issues/121), and [#122](https://github.com/quadralay/markdown-plus-plus/issues/122) plus four design-doc known limitations. Added `.gitattributes` marking the fixture tree `-text` so line endings, BOMs, and missing trailing newlines survive clone/checkout as part of each case's byte-exact contract. `tests/format-tables-cases.md` now points to the automated runner and remains the human-readable case reference ([#123](https://github.com/quadralay/markdown-plus-plus/issues/123)).
+
 ## [1.9.0] - 2026-06-27
 
 ### Tooling

@@ -9,4 +9,5 @@ status: active
 | Enable  | Run                                |
 |         | `Set-ExecutionPolicy-RemoteSigned` |
 |         | now.                               |
+|         |                                    |
 | Check   | Verify the policy applies.         |

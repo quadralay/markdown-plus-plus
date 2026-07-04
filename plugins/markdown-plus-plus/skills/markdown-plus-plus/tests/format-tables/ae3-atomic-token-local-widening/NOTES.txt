@@ -4,3 +4,5 @@ mdpp-version frontmatter). AE3 / R8 at --max-cell-width 20.
 Golden encodes current R8 local row widening. Issue #120's soft width rule intentionally
 replaces this behavior - the #120 PR must regenerate this golden (whole-column widening,
 full alignment) rather than treat a mismatch as a regression.
+
+MDPP018 note: this input inherits the multiline row-merge anti-pattern (multiple logical rows, no whitespace-only separator rows) verbatim from the pre-existing repo fixture it copies; the new validate-mdpp.py MDPP018 check (PR #119) flags it. Kept byte-parity with the manual AE protocol on purpose; fixing the source fixtures, the AE copies, and the reference-doc examples together is follow-up work.

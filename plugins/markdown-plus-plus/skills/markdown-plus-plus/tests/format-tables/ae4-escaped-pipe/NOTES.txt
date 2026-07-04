@@ -2,3 +2,5 @@ AE4 / R9: an escaped pipe (\|) inside cell content is preserved as a literal pip
 is not treated as a column delimiter. Table content mirrors the AE4 section of
 tests/sample-tables-multiline.md, isolated into a focused fixture with standard
 repo frontmatter. Default args.
+
+MDPP018 note: this input inherits the multiline row-merge anti-pattern (multiple logical rows, no whitespace-only separator rows) verbatim from the pre-existing repo fixture it copies; the new validate-mdpp.py MDPP018 check (PR #119) flags it. Kept byte-parity with the manual AE protocol on purpose; fixing the source fixtures, the AE copies, and the reference-doc examples together is follow-up work.

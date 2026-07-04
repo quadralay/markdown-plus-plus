@@ -7,4 +7,5 @@ status: active
 | Command | Notes |
 | ------- | ----- |
 | Enable | Run `Set-ExecutionPolicy-RemoteSigned` now. |
+| | |
 | Check | Verify the policy applies. |

@@ -7,6 +7,8 @@ status: active
 | Feature | Description |
 | ------- | ----------- |
 | Core | See [the setup documentation](https://example.com/docs/setup/complete-guide) for details. |
+| | |
 <!--condition:enterprise-->
 | Enterprise | Premium features included here. |
+| | |
 <!--/condition-->

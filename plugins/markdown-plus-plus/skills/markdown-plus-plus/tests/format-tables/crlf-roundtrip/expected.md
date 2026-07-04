@@ -10,4 +10,5 @@ status: active
 |     | wraps across several |
 |     | continuation rows    |
 |     | here.                |
+|     |                      |
 | B   | Short.               |
