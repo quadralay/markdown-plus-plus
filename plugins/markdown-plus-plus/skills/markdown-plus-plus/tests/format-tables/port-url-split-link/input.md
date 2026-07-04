@@ -17,6 +17,7 @@
 |      | information, see [Merging Top-level Groups (Multivolume Help)](../legacy/epublisher-interface/producing-output-based-on-stationery.md#1488252 |
 |      | "Producing Output from Stationery") and Opening Context-Sensitive Help   |
 |      | in WebWorks Help using Standard URLs.                                    |
+|      |                                                                          |
 | $H;  | Includes the heading text or title of the topic in the name.             |
 |      |                                                                          |
 | $D;  | Includes the name of the source document that the topic came                                                                                                                                                 |
