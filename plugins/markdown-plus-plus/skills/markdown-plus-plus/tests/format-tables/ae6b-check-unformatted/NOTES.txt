@@ -1,0 +1,4 @@
+AE6b: --check on an unformatted table exits 4 and writes a unified diff to stdout. No
+expected.md - the diff embeds an absolute temp-file path (the runner passes the case
+input by absolute path), so stdout is intentionally not byte-matched; only the exit
+code (4) is asserted.

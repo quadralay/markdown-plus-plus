@@ -1,0 +1,13 @@
+Ported verbatim (raw bytes, CRLF preserved) from
+C:\Projects\epublisher-docs\test\table-with-link-ref.md.
+
+Ported ahead of the epublisher-docs cleanup so the specimen lives in this suite before it
+is archived. No frontmatter was added - it is a messy real-world specimen used as test data.
+Golden = whatever format-tables.py outputs TODAY (single pass, default args), documenting
+current behavior so #120/#121 changes surface as reviewable golden diffs.
+
+The specimen carries its own annotation, "Link reference inside multiline table fails,"
+which suggests reference links may not resolve from inside multiline cells in at least one
+downstream processor. Confirming current processor behavior is a verification prerequisite
+for #120's link-reference rewrite (item 1) and is recorded on #120; the fixture ports
+regardless of that outcome.

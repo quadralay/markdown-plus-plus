@@ -1,0 +1,15 @@
+#121 red fixture: over-width no-space directive (case 2 in #121).
+
+args.txt sets --max-cell-width 20. The directive
+'<!--markers:{"Keywords":"api,rest,http"}-->' has no interior whitespace and is 43 chars,
+well over the cap.
+
+Today: with no comment token class the directive is a single plain (non-atomic) token longer
+than the width, so wrap_tokens() hard-breaks it at exactly the column width (observed:
+'<!--markers:{"Keywor' / 'ds":"api,rest,http"}' / '-->Application ...'), destroying the
+directive.
+
+Desired (encoded in expected.md): the directive is an atomic HTML-comment token, never
+broken. The Definition column floors at the 43-char directive under the soft width rule and
+widens; every row aligns at 43. The following prose ("Application interface.") stays on its
+own continuation row.

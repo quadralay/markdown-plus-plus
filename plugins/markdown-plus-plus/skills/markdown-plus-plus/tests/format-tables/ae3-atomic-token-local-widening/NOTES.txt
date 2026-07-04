@@ -1,0 +1,6 @@
+Input copied verbatim from tests/sample-tables-multiline.md (carries its own
+mdpp-version frontmatter). AE3 / R8 at --max-cell-width 20.
+
+Golden encodes current R8 local row widening. Issue #120's soft width rule intentionally
+replaces this behavior - the #120 PR must regenerate this golden (whole-column widening,
+full alignment) rather than treat a mismatch as a regression.

@@ -1,0 +1,16 @@
+Known limitation from docs/solutions/tooling-decisions/markdown-table-formatter-design-2026-05-09.md
+("Row with more cells than the header (IndexError in the renderer)").
+
+Today: plan_widths() computes n_cols from the header row (2), but a data row with 3
+cells is passed unwidened to _render_row(), which indexes widths[2] and raises
+IndexError -> exit 1, empty stdout.
+
+Desired (encoded in expected.md): the formatter treats the maximum column count across
+all rows as the table's column count, pads the header and separator to that width, and
+renders every row aligned. This is the benign "pad/render" repair analogous to the
+existing "pad shorter rows" logic.
+
+Assumption for the golden: the widened header/separator third column carries an empty
+header label and a min_col_width-floored width sized to its widest data cell ("extra" = 5).
+The implementing PR may choose a different repair (e.g. dropping the surplus cell); if so,
+regenerate this golden deliberately.

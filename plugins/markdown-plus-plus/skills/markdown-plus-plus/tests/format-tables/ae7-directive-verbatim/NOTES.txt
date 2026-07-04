@@ -1,0 +1,4 @@
+AE7 / R4: a combined-commands directive line (<!-- style:DataTable ; multiline ; #my-table -->)
+above a table is preserved byte-identical through formatting. Table content mirrors the
+AE7 section of tests/sample-tables-multiline.md, isolated into a focused fixture with
+standard repo frontmatter. Default args.

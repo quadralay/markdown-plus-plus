@@ -1,0 +1,25 @@
+#120 red fixture: link-reference definition placement with a condition-wrapped table tail.
+Exercises the #120<->#122 interaction (#122 is a soft prerequisite).
+
+The long link lives in the UNCONDITIONED "Core" row. The table's final logical row
+("Enterprise") is wrapped in <!--condition:enterprise-->...<!--/condition-->. If the
+definition for the Core link were placed naively after the last table row, it would land
+INSIDE the condition span and vanish whenever "enterprise" is Hidden -- silently breaking a
+reference from a still-visible row.
+
+Today: the scanner closes the table at the <!--condition:enterprise--> line (fails
+TABLE_ROW_RE), so the Enterprise row is emitted as unformatted prose, no rewrite happens,
+and the Core link is split across rows.
+
+Desired (encoded in expected.md):
+  1. Condition tag lines (<!--condition:enterprise--> and <!--/condition-->) are preserved
+     verbatim in place as in-table pass-through lines (the #122 scanner behavior), and all
+     rows -- above and below them -- are planned to one aligned width (Feature=10,
+     Description=58).
+  2. The Core link is rewritten to "[the setup documentation][table-config-1]".
+  3. The definition line is emitted AFTER the <!--/condition--> close tag (outside the
+     condition span), separated by one blank line.
+
+ASSUMPTIONS: reference ID "table-config-1" from the table alias "#config" (see
+i120-linkref-rewrite-basic NOTES for the shared ID/definition assumptions). Definition
+placement after the close tag is the load-bearing behavior this case pins.

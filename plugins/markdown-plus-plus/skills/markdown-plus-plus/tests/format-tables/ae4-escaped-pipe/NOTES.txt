@@ -1,0 +1,4 @@
+AE4 / R9: an escaped pipe (\|) inside cell content is preserved as a literal pipe and
+is not treated as a column delimiter. Table content mirrors the AE4 section of
+tests/sample-tables-multiline.md, isolated into a focused fixture with standard
+repo frontmatter. Default args.

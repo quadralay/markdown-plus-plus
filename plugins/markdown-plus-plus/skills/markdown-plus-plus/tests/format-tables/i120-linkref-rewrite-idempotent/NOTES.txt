@@ -1,0 +1,15 @@
+#120 fixture: link-reference rewrite idempotency.
+
+Input is ALREADY in the rewritten + aligned form: the cell holds the short reference form
+"[the guide][table-config-1]" and the definition "[table-config-1]: https://..." already
+sits after the table. Desired behavior: pass through unchanged (expected.md == input.md).
+
+STATUS: THIS CASE PASSES TODAY. Verified: running format-tables.py on input.md produces
+stdout byte-identical to input.md (exit 0), and a second pass is byte-identical (idempotent).
+The reason it passes now is that the current formatter has no rewrite logic to trigger and
+the reference-form cell/definition are already in canonical aligned shape, so it is a no-op.
+
+Because it passes today, NO KNOWN_FAIL.txt marker is present (per the assignment: "keep
+KNOWN_FAIL only if it fails"). It functions as a green guard: when #120's rewrite lands, the
+rewrite MUST NOT re-rewrite an already-rewritten link (no double-suffixing, no duplicate
+definitions), and this case pins that invariant.

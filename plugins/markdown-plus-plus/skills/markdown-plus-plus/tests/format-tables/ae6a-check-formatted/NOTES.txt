@@ -1,0 +1,3 @@
+Input copied verbatim from tests/sample-tables-already-formatted.md. AE6a happy path:
+--check on an already-formatted file exits 0 with empty stdout. No expected.md - the
+runner only asserts the (default 0) exit code here.

@@ -1,0 +1,16 @@
+#120 red fixture: link-reference rewrite ID-collision uniqueness.
+
+Both rows carry a long inline link. Both derive the same base ID from the table alias
+"#config" (base "table-config"). The uniqueness counter must disambiguate them:
+  row 1 -> table-config-1
+  row 2 -> table-config-2
+
+Today: no rewrite; both links overflow and wrap/split.
+
+Desired (encoded in expected.md): each link rewritten to its reference form with a distinct
+suffix, and the two definitions emitted after the table in row order, one per line, after a
+single blank line.
+
+ASSUMPTIONS (see i120-linkref-rewrite-basic NOTES for the shared set): sequential -1/-2
+suffixing by document order of occurrence; definitions grouped after the table separated by
+one blank line; link text preserved verbatim; no titles present so no trailing "title".

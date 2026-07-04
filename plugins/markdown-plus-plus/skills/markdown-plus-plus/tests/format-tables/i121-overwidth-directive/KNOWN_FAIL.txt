@@ -1,0 +1,2 @@
+#121
+A no-space directive comment longer than the column is hard-broken mid-comment by the non-atomic hard-break path; it should stay intact on its own row with the column widened to fit.

@@ -1,0 +1,23 @@
+#121 red fixture: inline-style glue rule (case 3 in #121).
+
+args.txt sets --max-cell-width 22 so the glued pair (34 chars) exceeds the cap and lands at
+a wrap boundary.
+
+The cell holds "This is <!--style:Emphasis-->**important** text here.". Per the inline
+attachment rule (spec/attachment-rule.md), an inline style needs "-->" immediately adjacent
+to the styled element on the SAME line -- there is no whitespace between the directive and
+"**important**".
+
+Today: the directive tokenizes as a plain-ish token and "**important**" as a separate atomic
+bold token; the wrapper flushes the directive at the end of one row and emits "**important**"
+on the next (observed: "<!--style:Emphasis-->" alone, then "**important** text"), breaking
+the adjacency and silently losing the style.
+
+Desired (encoded in expected.md): the glue rule keeps the directive and its immediately
+adjacent styled element together as one wrap unit -- "<!--style:Emphasis-->**important**"
+stays on one continuation row. The Description column floors at that 34-char glued unit under
+the soft width rule and widens; every row aligns at 34. "This is" wraps before the pair,
+"text here." after it.
+
+Atomicity alone would not fix this (the directive and target are two tokens); the load-
+bearing behavior is the adjacency-preserving glue.

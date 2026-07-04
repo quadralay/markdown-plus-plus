@@ -1,0 +1,17 @@
+#121 red fixture: block directive comment atomicity (case 1 in #121).
+
+args.txt sets --max-cell-width 10 so the 22-char directive is far wider than the requested
+cap.
+
+The cell line "<!-- style:Hobbies -->" is a full-line block style directive (following the
+spec's Block Styles-in-cells example). It attaches to the "- Enjoys cycling" list on the
+next continuation row.
+
+Today: _TOKEN_PATTERNS has no comment class, so the directive tokenizes as "<!--",
+"style:Hobbies", "-->" and the wrapper breaks between them at width 10 (observed:
+"<!--" / "style:Hobb" / "ies -->"), destroying the directive.
+
+Desired (encoded in expected.md): the directive is an atomic HTML-comment token, emitted
+intact on its own continuation row. Per the soft width rule the Details column floors at the
+directive length (22) and widens; every row aligns at 22. The directive's position (directly
+above its list target) is preserved.

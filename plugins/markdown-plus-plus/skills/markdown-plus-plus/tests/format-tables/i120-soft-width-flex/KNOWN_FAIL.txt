@@ -1,0 +1,2 @@
+#120
+A column whose widest atomic token exceeds max-cell-width must widen the WHOLE column (every row aligned), but today R8 widens only the single overflowing continuation row, leaving the separator and other rows at the narrower planned width with misaligned pipes.

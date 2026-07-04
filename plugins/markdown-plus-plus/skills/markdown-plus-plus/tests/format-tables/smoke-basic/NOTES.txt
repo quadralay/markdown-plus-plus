@@ -1,0 +1,11 @@
+Smoke test for the runner itself, not for any specific formatter behavior.
+
+A small standard table with unaligned columns; the formatter realigns the
+pipes and dashes. Standard repo frontmatter is included and passes through
+byte-for-byte. input.md and expected.md are written with LF line endings
+via Python open(path, 'wb') so the golden is byte-exact and portable across
+Windows and Linux. Default flags (no args.txt), exit code 0, no stderr
+expectations.
+
+If this case ever fails, suspect the runner or the environment before
+suspecting the formatter.

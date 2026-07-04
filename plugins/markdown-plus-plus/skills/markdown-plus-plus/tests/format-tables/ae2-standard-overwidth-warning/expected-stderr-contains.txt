@@ -1,0 +1,1 @@
+cell exceeds max_cell_width (153 chars > 78) at row 3, column 2 ("Description")

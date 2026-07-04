@@ -1,0 +1,20 @@
+#120 red fixture: soft width rule replaces R8 local row widening.
+
+args.txt sets --max-cell-width 20. The Notes column's widest atomic token is the code span
+`Set-ExecutionPolicy-RemoteSigned` (34 chars), which exceeds the cap.
+
+Today (R8 local widening): plan_widths caps the Notes column at 20; render_multiline()
+applies a per-row effective_width = max(20, len(cell_text)), so ONLY the continuation row
+holding the code span is widened to 34. The header, separator, "Run"/"now." rows, and the
+entire "Check" row stay at width 20 -> the pipes do NOT line up across the table (the code
+span row juts out).
+
+Desired (encoded in expected.md): the Notes column floors at its widest atomic token (34)
+and the WHOLE column renders at 34 -- header, separator, and every data/continuation row
+aligned at width 34. The per-row effective_width special case is gone. The Command column
+stays at its planned width (7). This is the exact behavior #120 Proposal item 4 specifies:
+"the column itself widens, so pipes align on every row of the table."
+
+This case is the load-bearing regression that distinguishes the new soft width rule from the
+old R8 behavior; #123 notes AE3's golden encodes the OLD R8 widening and is regenerated in
+the #120 PR.

@@ -1,0 +1,4 @@
+# Golden-file test fixtures are byte-exact: line endings (CRLF vs LF),
+# BOMs, and missing trailing newlines are part of each case's contract.
+# Never eol-convert anything under a test suite directory.
+plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/format-tables/** -text
