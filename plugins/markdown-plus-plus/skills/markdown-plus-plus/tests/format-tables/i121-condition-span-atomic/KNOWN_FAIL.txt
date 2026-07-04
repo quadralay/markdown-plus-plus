@@ -1,0 +1,6 @@
+#121
+An inline condition span (open + close on one line) must wrap as a single
+atomic unit; today the whitespace tokenizer splits the tags across
+continuation rows, creating a cross-line raw-text span whose Hidden-state
+Phase 1 removal consumes the intervening newline and pipes, corrupting the
+table (see #126).

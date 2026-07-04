@@ -1,0 +1,3 @@
+Standard-table twin of condition-inline-span-multiline: in-cell condition
+tags are ordinary cell text to the formatter and must survive alignment
+byte-for-byte. See #126 for the spec granularity discussion.

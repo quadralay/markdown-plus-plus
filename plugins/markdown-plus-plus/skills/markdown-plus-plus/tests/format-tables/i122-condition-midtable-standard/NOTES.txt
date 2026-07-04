@@ -1,0 +1,4 @@
+Standard-table twin of i122-condition-midtable. Complete-physical-row
+wrapping is the supported granularity for standard tables per the #126
+proposal (Phase 1 sees lines); no whitespace-only separator rows are
+needed here because standard tables are one record per line.
