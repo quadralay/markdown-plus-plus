@@ -132,12 +132,15 @@ python scripts/format-tables.py tests/sample-tables-multiline.md --max-cell-widt
 |        | **`Set-ExecutionPolicy`** |
 |        | cmdlet to enable     |
 |        | scripts.             |
+|        |                      |
 | Save   | Click the            |
 |        | **Save and Continue** |
 |        | button to commit.    |
+|        |                      |
 | Run    | Run                  |
 |        | `npm install --save-dev` |
 |        | first.               |
+|        |                      |
 | Italic | Note the _emphasis_  |
 |        | form.                |
 ```
@@ -170,6 +173,7 @@ python scripts/format-tables.py tests/sample-tables-multiline.md
 | Symbol            | Description                   |
 | ----------------- | ----------------------------- |
 | pipe \| character | A literal pipe inside a cell. |
+|                   |                               |
 | Other             | Plain content.                |
 ```
 
@@ -223,6 +227,7 @@ python scripts/format-tables.py tests/sample-tables-multiline.md
 | Name  | Description                                              |
 | ----- | -------------------------------------------------------- |
 | Alpha | First entry.                                             |
+|       |                                                          |
 | Beta  | Second entry, with longer content that fits on one line. |
 ```
 

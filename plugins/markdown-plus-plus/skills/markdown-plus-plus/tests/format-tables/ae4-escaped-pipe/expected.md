@@ -7,4 +7,5 @@ status: active
 | Symbol            | Description                   |
 | ----------------- | ----------------------------- |
 | pipe \| character | A literal pipe inside a cell. |
+|                   |                               |
 | Other             | Plain content.                |

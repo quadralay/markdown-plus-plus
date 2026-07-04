@@ -1,5 +1,3 @@
 Input copied verbatim from tests/sample-tables-already-formatted.md. AE6a happy path:
 --check on an already-formatted file exits 0 with empty stdout. No expected.md - the
 runner only asserts the (default 0) exit code here.
-
-MDPP018 note: this input inherits the multiline row-merge anti-pattern (multiple logical rows, no whitespace-only separator rows) verbatim from the pre-existing repo fixture it copies; the new validate-mdpp.py MDPP018 check (PR #119) flags it. Kept byte-parity with the manual AE protocol on purpose; fixing the source fixtures, the AE copies, and the reference-doc examples together is follow-up work.

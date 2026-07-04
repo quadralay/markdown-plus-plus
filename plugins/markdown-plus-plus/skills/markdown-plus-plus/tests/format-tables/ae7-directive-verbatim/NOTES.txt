@@ -2,5 +2,3 @@ AE7 / R4: a combined-commands directive line (<!-- style:DataTable ; multiline ;
 above a table is preserved byte-identical through formatting. Table content mirrors the
 AE7 section of tests/sample-tables-multiline.md, isolated into a focused fixture with
 standard repo frontmatter. Default args.
-
-MDPP018 note: this input inherits the multiline row-merge anti-pattern (multiple logical rows, no whitespace-only separator rows) verbatim from the pre-existing repo fixture it copies; the new validate-mdpp.py MDPP018 check (PR #119) flags it. Kept byte-parity with the manual AE protocol on purpose; fixing the source fixtures, the AE copies, and the reference-doc examples together is follow-up work.
