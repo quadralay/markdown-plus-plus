@@ -177,6 +177,63 @@ output across both runs. This is the property that makes the
 a "would reformat" diagnostic is reliable evidence the file is not yet
 formatted.
 
+### R17 -- Full-line HTML comments inside a table are pass-through members
+
+> The prose rules are numbered R1-R10; R11-R16 are internal
+> requirement numbers the script uses in its own comments (config
+> defaults, `--check` exit codes, non-table pass-through, and so on).
+> This rule takes the next free number, R17.
+
+A full-line HTML comment encountered while accumulating a table's rows --
+a line matching `^\s*<!--.*-->\s*$` -- no longer terminates the table.
+It becomes a **pass-through member** of the block: preserved
+byte-verbatim in place (no re-indent, no re-pad), with row accumulation
+continuing on the line after it. Column widths are planned across the
+genuine data rows on **both** sides of the comment, so one aligned grid
+spans the whole block; the comment line itself contributes nothing to
+the widths.
+
+This covers two authoring patterns:
+
+1. **Condition tags wrapping complete rows.** Full-line
+   `<!--condition:name-->` / `<!--/condition-->` tags between logical
+   rows of a `<!-- multiline -->` table -- the spec-sanctioned *Wrapping
+   Complete Rows* pattern (`spec/multiline-cell-extensions.md` §
+   Conditions). The rows inside the condition span align with the rows
+   outside it because widths are planned across the entire block.
+2. **A stray mid-table `<!-- multiline -->` (or any full-line)
+   comment.** The formatter is not a validator. Mid-table, an orphaned
+   directive comment is just a comment; it is passed through in place
+   rather than silently splitting the table (the resolution of the
+   former known limitation -- see *Known Limitations*).
+
+**New-table lookahead exception.** A mid-table comment that matches the
+multiline-directive form is *not* passed through when it is immediately
+followed by a header row and then a separator row (`<!-- multiline -->`
+then `| ... |` then `| --- |`). In that one case the directive is
+opening a fresh **adjacent** table, so the current block closes at the
+directive line and the directive becomes the leading directive of the
+next table. This preserves the existing adjacent-tables behavior: each
+table plans its widths from its own rows only.
+
+```markdown
+<!-- multiline -->
+| Feature    | Description             |
+| ---------- | ----------------------- |
+| Core       | Available on all plans. |
+|            | - Basic analytics       |
+<!--condition:enterprise-->
+| Enterprise | Premium features:       |
+|            | - SSO integration       |
+<!--/condition-->
+| Community  | Free tier features.     |
+```
+
+The `Feature` column is 10 wide because `Enterprise` -- a row *inside*
+the condition span -- is the widest cell in that column; the condition
+tags do not break width planning. A full worked example (including the
+lookahead exception) appears under *Worked Examples*.
+
 ## Configurable Parameters
 
 | Parameter             | Default | Description                                                                       |
@@ -329,6 +386,90 @@ that row.
 The blank middle row is preserved with whitespace-only cells padded to
 each column's full inner width.
 
+### Condition-wrapped rows and mid-table comments (R17)
+
+A `<!-- multiline -->` table with a condition-wrapped logical row (the
+spec's *Wrapping Complete Rows* pattern). The condition tags pass through
+verbatim in place, and widths are planned across the rows on both sides
+of them, so the whole table aligns as one grid.
+
+**Input:**
+
+```markdown
+<!-- multiline -->
+| Feature | Description |
+|-----|------------|
+| Core | Available on all plans. |
+|      | - Basic analytics |
+|   | - Email support |
+|  |  |
+<!--condition:enterprise-->
+| Enterprise | Premium features: |
+|     | - SSO integration |
+|         | - Dedicated support |
+|   |   |
+<!--/condition-->
+| Community | Free tier features. |
+|    | - Forum access |
+```
+
+**Output:**
+
+```markdown
+<!-- multiline -->
+| Feature    | Description             |
+| ---------- | ----------------------- |
+| Core       | Available on all plans. |
+|            | - Basic analytics       |
+|            | - Email support         |
+|            |                         |
+<!--condition:enterprise-->
+| Enterprise | Premium features:       |
+|            | - SSO integration       |
+|            | - Dedicated support     |
+|            |                         |
+<!--/condition-->
+| Community  | Free tier features.     |
+|            | - Forum access          |
+```
+
+The `Feature` column is padded to 10 characters because `Enterprise`,
+which lives inside the `<!--condition:enterprise-->` span, is the widest
+cell in that column -- width planning sees it despite the condition tags
+between it and the header.
+
+**New-table lookahead exception.** When a `<!-- multiline -->` comment is
+immediately followed by a header row and a separator row, it opens a new
+adjacent table instead of passing through:
+
+**Input:**
+
+```markdown
+| Term | Meaning |
+| ---- | ------- |
+| Alpha | First entry. |
+<!-- multiline -->
+| Feature | Description |
+| ------- | ----------- |
+| Beta | Second entry that runs a little longer. |
+```
+
+**Output:**
+
+```markdown
+| Term  | Meaning      |
+| ----- | ------------ |
+| Alpha | First entry. |
+<!-- multiline -->
+| Feature | Description                             |
+| ------- | --------------------------------------- |
+| Beta    | Second entry that runs a little longer. |
+```
+
+The `<!-- multiline -->` line closes the first (standard) table and
+becomes the directive of the second (multiline) table; each plans its
+widths from its own rows only.
+
 ## Known Limitations
 
 - **ASCII-dominant width measurement.** The formatter measures column
@@ -375,7 +516,14 @@ Run `python scripts/format-tables.py --help` for the full reference.
 - [`scripts/format-tables.py`](../scripts/format-tables.py) -- the
   conformance authority. The script's behavior is the rule set; this
   document trails the script when they disagree.
+- [`tests/format-tables/`](../tests/format-tables/) -- the golden-file
+  regression suite (run `python tests/run-tests.py` from the skill
+  root; add `--idempotency` for the R10 sweep). R17 is pinned by the
+  `i122-condition-midtable`, `i122-condition-midtable-standard`, and
+  `kl-midtable-multiline-directive` fixtures (pass-through members) and
+  by `adjacent-tables-directive-boundary` (the lookahead exception).
 - [`tests/format-tables-cases.md`](../tests/format-tables-cases.md) --
-  the manual-verification protocol covering AE1-AE7.
+  the human-readable AE1-AE7 protocol, superseded as the regression
+  gate by the golden-file suite above.
 - [`references/best-practices.md`](best-practices.md) -- the in-flow
   authoring guidance that points back to this document.

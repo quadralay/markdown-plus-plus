@@ -1,0 +1,19 @@
+#122 green regression: pins the new-table lookahead exception.
+
+The first table's last data row ("Alpha") is immediately followed -- with no blank line -- by a
+<!-- multiline --> directive line, then a second table's header, separator, and one data row.
+
+Because the comment line is a multiline-directive form AND the next line is a table row AND the
+line after that is a separator row, the lookahead exception fires: the first table CLOSES at the
+directive line rather than swallowing it as a pass-through comment. The directive then becomes the
+directive line of a SECOND, adjacent multiline table.
+
+Expected output (from the real formatter):
+  - Table 1 (Term / Meaning): a standalone STANDARD table; widths planned from its own rows only.
+  - <!-- multiline --> preserved verbatim as the directive line of table 2.
+  - Table 2 (Feature / Description): a MULTILINE table; the long "Beta" cell renders on one line
+    at full width because it fits, and widths are planned from table 2's rows only.
+
+This is the complement of kl-midtable-multiline-directive, where the same directive form appears
+mid-table (NOT above a following header+separator pair) and is therefore a pass-through comment
+inside a single standard table rather than a table boundary.

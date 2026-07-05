@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.12.0] - 2026-07-05
+
+### Tooling
+
+- `format-tables.py` no longer splits a table at a full-line HTML comment: comment lines inside a table run (condition open/close tags wrapping complete rows per the spec's Wrapping Complete Rows pattern, or any stray full-line comment including a mid-table `<!-- multiline -->` directive) are now **pass-through members** of the table block -- preserved byte-verbatim in place, with row accumulation continuing and column widths planned across the genuine data rows on both sides. Previously the scanner closed the block at the first non-pipe line, leaving every row below a condition tag unformatted and misaligned. One exception: a multiline-directive line immediately followed by a header row and separator row still opens a **new adjacent table** (lookahead), preserving existing adjacent-table behavior. This also resolves the design-doc known limitation "mid-table `<!-- multiline -->` directives silently split the table" as pass-through (the formatter is not a validator; mid-table, the directive is an orphaned comment). Documented as R17 in `references/table-formatting.md` with a generated worked example; design-doc limitation bullet updated. Flipped three `KNOWN_FAIL` suite fixtures to green (`i122-condition-midtable`, `i122-condition-midtable-standard`, `kl-midtable-multiline-directive` -- all matched their authored goldens byte-for-byte) and added the `adjacent-tables-directive-boundary` regression fixture pinning the lookahead. Suite: 19 pass / 16 known-fail / 0 unexpected-pass; idempotency sweep clean ([#122](https://github.com/quadralay/markdown-plus-plus/issues/122)).
+
 ## [1.11.0] - 2026-07-05
 
 ### Spec

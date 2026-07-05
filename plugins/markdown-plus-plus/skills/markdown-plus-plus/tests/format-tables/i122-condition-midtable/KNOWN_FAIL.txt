@@ -1,2 +1,0 @@
-#122
-A full-line condition tag inside a multiline table closes the block scan, so rows below are left unformatted and widths are planned from the top fragment only; condition tags should be in-table pass-through lines with widths planned across the whole table.
