@@ -1,10 +1,17 @@
-Golden assumptions (implementing PR may tune deliberately):
-- Soft width rule (#120 Proposal item 4): the Detail column is floored at
-  the span's full width; every row shares that width (no single-row local
-  widening).
-- The entire span sits alone on one continuation row; 'Contact' and 'now.'
-  wrap around it.
-- Desired behavior holds regardless of #126's authoring outcome: Unset
-  pass-through documents legitimately carry in-cell spans, and the
-  formatter must never convert a valid single-line span into a
-  table-corrupting cross-line span.
+#121 fixture: inline condition span atomicity (case 4 in #121).
+
+args.txt sets --max-cell-width 20. The span
+"<!--condition:web-->email<!--/condition-->" (43 chars) opens and closes on one physical
+line and is matched by the condition-span token class as a single atomic unit.
+
+Behavior encoded in expected.md:
+- The whole span is atomic: no wrap point is ever placed inside it (including between the
+  tags and the conditioned content). This prevents converting a valid single-line span into
+  a cross-line raw-text span whose Hidden-state Phase 1 removal would consume the intervening
+  newline and pipes and corrupt the table.
+- Soft width rule (#120 Proposal item 4): the Detail column is floored at the span's full
+  width (43); every row shares that one width (no single-row local widening).
+- The entire span sits alone on one continuation row; 'Contact' and 'now.' wrap around it.
+- This holds regardless of #126's authoring outcome: Unset pass-through documents
+  legitimately carry in-cell spans as literal text, and the formatter must never mangle a
+  valid single-line span.

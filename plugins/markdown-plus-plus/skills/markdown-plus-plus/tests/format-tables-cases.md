@@ -108,10 +108,13 @@ WARNING: cell exceeds max_cell_width (153 chars > 78) at row 3, column 2 ("Descr
 
 ## Case AE3 -- Atomic inline-formatting token outsizes the column
 
-Verifies R8: a `**\`Set-ExecutionPolicy\`**` token (28 chars) inside a
-cell with `--max-cell-width 20` appears alone on its own continuation row,
-with the column locally widened to fit the token. Other rows in the same
-column stay at their planned width.
+Verifies R8: the widest atomic token in a column floors the whole
+column. Here `**\`Set-ExecutionPolicy\`**` (25 chars) inside a cell with
+`--max-cell-width 20` widens the entire `Detail` column to 25 -- header,
+separator, and every data and continuation row aligned at that width, not
+just the row that holds the token. The old per-row local widening (one
+wide row, the rest at 20 with misaligned pipes) is gone: the soft width
+rule gives one width per column so pipes align on every row.
 
 **Fixture:** [`sample-tables-multiline.md`](sample-tables-multiline.md)
 (AE3 section).
@@ -126,28 +129,29 @@ python scripts/format-tables.py tests/sample-tables-multiline.md --max-cell-widt
 
 ```markdown
 <!-- multiline -->
-| Action | Detail               |
-| ------ | -------------------- |
-| Enable | Use the              |
+| Action | Detail                    |
+| ------ | ------------------------- |
+| Enable | Use the                   |
 |        | **`Set-ExecutionPolicy`** |
-|        | cmdlet to enable     |
-|        | scripts.             |
-|        |                      |
-| Save   | Click the            |
-|        | **Save and Continue** |
-|        | button to commit.    |
-|        |                      |
-| Run    | Run                  |
-|        | `npm install --save-dev` |
-|        | first.               |
-|        |                      |
-| Italic | Note the _emphasis_  |
-|        | form.                |
+|        | cmdlet to enable scripts. |
+|        |                           |
+| Save   | Click the                 |
+|        | **Save and Continue**     |
+|        | button to commit.         |
+|        |                           |
+| Run    | Run                       |
+|        | `npm install --save-dev`  |
+|        | first.                    |
+|        |                           |
+| Italic | Note the _emphasis_ form. |
 ```
 
 The compound `**\`Set-ExecutionPolicy\`**`, the bold `**Save and
 Continue**`, and the code span `` `npm install --save-dev` `` each
-appear on their own continuation row and are never split mid-token.
+appear on their own continuation row and are never split mid-token. With
+the column floored at 25, the surrounding prose ("cmdlet to enable
+scripts.", "Note the _emphasis_ form.") also fits on one continuation
+row.
 
 **Expected stderr:** empty.
 **Expected exit code:** 0.

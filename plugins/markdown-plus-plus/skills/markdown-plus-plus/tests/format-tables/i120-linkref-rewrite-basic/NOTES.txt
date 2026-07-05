@@ -1,13 +1,10 @@
-#120 red fixture: link-reference rewrite (basic).
+#120 fixture: link-reference rewrite (basic).
 
 The table directive carries an alias (<!-- #config ; multiline -->) so the ID slug source is
 DETERMINISTIC: slug = "config", giving reference ID "table-config-1" (pattern
 table-<slug>-<n> from #120 Proposal item 1).
 
-Today: no rewrite. The inline link is a plain wrapped token; with the default max-cell-width
-78 the long inline link overflows and gets split across continuation rows (link broken).
-
-Desired (encoded in expected.md):
+Behavior (implemented, encoded in expected.md):
   1. The inline link "[the complete configuration guide](https://.../complete-guide)" is
      rewritten in the cell to the reference form "[the complete configuration guide]
      [table-config-1]".
@@ -16,10 +13,14 @@ Desired (encoded in expected.md):
   3. With the short reference form the cell content (59 chars) fits within the default
      max-cell-width, so it renders on one line; col2 width = 59.
 
-ASSUMPTIONS (record so the implementing PR can adjust the golden deliberately):
+The rewrite fires because the source cell (98 chars) exceeds the default max-cell-width (78)
+AND rewriting the inline link brings it within budget (59 <= 78). Rewrite happens before
+width planning so the shortened cell drives the column floor.
+
+DESIGN NOTES (kept for the golden's provenance):
   - Reference ID = "table-<slug>-1" where slug comes from the table alias "#config". The
-    "-1" suffix is minted even for the first/only link (uniqueness counter starts at 1).
+    "-1" suffix is minted even for the first/only link (the per-table counter starts at 1).
   - The link title was absent in the source, so the definition has no trailing "title".
   - Definition placed after the table with exactly one blank line before it; multiple
-    definitions (see the collision case) would be consecutive lines.
+    definitions (see the collision case) are consecutive lines.
   - Original link text is preserved verbatim as the reference-link text.

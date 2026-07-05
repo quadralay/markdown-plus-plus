@@ -1,2 +1,0 @@
-#120
-A wrapped list-item cell drops the continuation indent, so the wrapped remainder no longer reads as part of the list item; continuation lines should be indented 2 spaces under the marker.

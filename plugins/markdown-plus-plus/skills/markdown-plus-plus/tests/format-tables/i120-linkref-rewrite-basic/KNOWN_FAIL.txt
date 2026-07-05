@@ -1,2 +1,0 @@
-#120
-A long inline link that exceeds the width budget should be rewritten to a short reference form with its definition emitted after the table; today no rewrite happens and the link is wrapped/split instead.

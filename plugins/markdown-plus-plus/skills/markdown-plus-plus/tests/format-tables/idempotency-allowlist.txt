@@ -21,7 +21,12 @@
 # `fixed` widths via its own golden; only the default-flags sweep is exempt.
 plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/format-tables/ae1-multiline-fixed-widths/input.md
 
-# Pre-#120 wrap behavior corrupts this messy real-world specimen on re-format
-# (links/blockquotes split; see the case NOTES.txt). The case golden pins
-# deterministic single-pass output; sweep exemption until #120 lands.
+# Documented `auto`-strategy fragment-shrink non-idempotency (same class as
+# the ae1 entry above): under default flags, pass 2 reads this specimen's
+# already-wrapped blockquote/list continuation fragments, so the "Use" column
+# shrinks by one and a `>   ` list-hang continuation collapses to `> `. The
+# #120 wrap fixes (atomic links, structure-preserving wrap) landed and the
+# earlier link/blockquote *corruption* is gone; the residual re-flow is the
+# auto-strategy limitation, not a fixture bug. The case golden pins the
+# deterministic single-pass output.
 plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/format-tables/port-blockquote-large-line/input.md

@@ -7,7 +7,14 @@ Golden = whatever format-tables.py outputs TODAY (single pass, default args), do
 current behavior so #120/#121 changes surface as reviewable golden diffs.
 
 The specimen carries its own annotation, "Link reference inside multiline table fails,"
-which suggests reference links may not resolve from inside multiline cells in at least one
-downstream processor. Confirming current processor behavior is a verification prerequisite
-for #120's link-reference rewrite (item 1) and is recorded on #120; the fixture ports
-regardless of that outcome.
+(preserved verbatim in input.md as the historical origin note) which suggested reference
+links may not resolve from inside multiline cells in at least one downstream processor.
+
+STALE (2026-07-05): that annotation is out of date. ePublisher was verified to resolve
+reference links from inside multiline cells correctly on 2026-07-05 -- the failure the note
+described is FIXED (recorded on #120). The origin note is kept in the ported specimen for
+provenance only; it no longer describes current processor behavior. This confirmation was
+the verification prerequisite for #120's link-reference rewrite (item 1); the rewrite emits
+reference links into exactly this shape, so a processor that can resolve them is required.
+The formatter leaves this already-reference-form specimen unchanged (its cell is within the
+width budget), so the golden is byte-stable across the #120 stage-2 rewrite.

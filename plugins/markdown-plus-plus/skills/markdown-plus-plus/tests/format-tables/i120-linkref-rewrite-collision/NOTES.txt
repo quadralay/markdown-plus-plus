@@ -1,16 +1,20 @@
-#120 red fixture: link-reference rewrite ID-collision uniqueness.
+#120 fixture: link-reference rewrite ID-uniqueness (per-table counter).
 
 Both rows carry a long inline link. Both derive the same base ID from the table alias
-"#config" (base "table-config"). The uniqueness counter must disambiguate them:
+"#config" (base "table-config"). The per-table uniqueness counter disambiguates them by
+document (row) order:
   row 1 -> table-config-1
   row 2 -> table-config-2
 
-Today: no rewrite; both links overflow and wrap/split.
+Behavior (implemented, encoded in expected.md): each link is rewritten to its reference form
+with a distinct suffix, and the two definitions are emitted after the table in row order, one
+per line, after a single blank line.
 
-Desired (encoded in expected.md): each link rewritten to its reference form with a distinct
-suffix, and the two definitions emitted after the table in row order, one per line, after a
-single blank line.
+Both cells exceed the default max-cell-width (88 and 91 chars > 78) and both rewrites bring
+their cells within budget (58 and 57 <= 78), so both fire. The counter starts at 1 per table
+and increments per rewritten link; it also skips any ID already defined in the file
+(collision -> next n), though no pre-existing definition collides here.
 
-ASSUMPTIONS (see i120-linkref-rewrite-basic NOTES for the shared set): sequential -1/-2
+DESIGN NOTES (see i120-linkref-rewrite-basic NOTES for the shared set): sequential -1/-2
 suffixing by document order of occurrence; definitions grouped after the table separated by
 one blank line; link text preserved verbatim; no titles present so no trailing "title".

@@ -1,14 +1,11 @@
-#120 red fixture: bare-URL atomicity + soft width rule.
+#120 fixture: bare-URL atomicity + soft width rule.
 
 args.txt sets --max-cell-width 15 so the 34-char URL exceeds the cap.
 
-Today: the URL is a plain (non-atomic) token longer than the column width, so wrap_tokens()
-takes the hard-break path and chops it at width boundaries mid-character (observed:
-"https://example" / ".com/very/long/" / "path now."), breaking the link.
+"https://example.com/very/long/path" is matched by the bare-URL token class and is atomic --
+never hard-broken. The Link column floors at the 34-char URL per the soft width rule and the
+whole column widens to fit; every row aligns at that width. "Visit" and "now." wrap around
+the intact URL.
 
-Desired (encoded in expected.md): the URL is atomic and never hard-broken. The Link column
-floors at the 34-char URL per the soft width rule and widens to fit; every row aligns at
-that width. "Visit" and "now." wrap around the intact URL.
-
-Continuation shape derived with the tool's own greedy wrap algorithm extended with a
+The continuation shape follows the tool's own greedy wrap algorithm, extended with the
 url-atomic token class.
