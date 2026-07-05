@@ -88,6 +88,12 @@ MULTILINE_DIRECTIVE_LINE_RE = re.compile(
     r'^\s*<!--\s*[^>]*?\bmultiline\b[^>]*?-->\s*$'
 )
 
+# A line that is *only* a full-line HTML comment (e.g. a condition open/close
+# tag or a stray directive). Inside a table run these are pass-through member
+# lines: preserved byte-verbatim in place with row accumulation continuing
+# past them (issue #122).
+COMMENT_LINE_RE = re.compile(r'^\s*<!--.*-->\s*$')
+
 # Cell splitter: split on `|` but not on `\|` (R9).
 # Use a regex that matches `|` not preceded by an odd number of backslashes.
 # We approximate the simple case: split on `|` not preceded by `\`.
@@ -96,13 +102,25 @@ CELL_SPLIT_RE = re.compile(r'(?<!\\)\|')
 
 @dataclass
 class TableBlock:
-    """A pipe-table block scanned from the source."""
+    """A pipe-table block scanned from the source.
+
+    `members` is the ordered body of the block: each entry is either
+    ('row', cells) for a genuine data row (header included) or
+    ('comment', raw_line) for a full-line HTML comment that is passed
+    through byte-verbatim in place (issue #122). Width planning considers
+    only the 'row' members; renderers walk `members` in order so comment
+    lines land at their original position.
+    """
     start_line: int = 0          # 1-based line number of header row
     directive_line: Optional[str] = None  # original directive line, if any
     is_multiline: bool = False
-    rows: list[list[str]] = field(default_factory=list)
+    members: list[tuple] = field(default_factory=list)
     separator_cells: list[str] = field(default_factory=list)  # raw separator cells
-    raw_lines: list[str] = field(default_factory=list)        # original block lines (for fall-back)
+
+    @property
+    def rows(self) -> list[list[str]]:
+        """The genuine data rows (header + data), comment members excluded."""
+        return [cells for kind, cells in self.members if kind == 'row']
 
 
 @dataclass
@@ -198,18 +216,33 @@ def _scan_blocks(lines: list[str]) -> list[object]:
                 directive_line=directive_line,
                 is_multiline=directive_line is not None,
             )
-            tb.raw_lines.append(line)
-            tb.rows.append(split_cells(line))
+            tb.members.append(('row', split_cells(line)))
 
             sep_line = lines[i + 1]
-            tb.raw_lines.append(sep_line)
             tb.separator_cells = split_cells(sep_line)
 
             j = i + 2
-            while j < n and TABLE_ROW_RE.match(lines[j]) and not CODE_FENCE_RE.match(lines[j]):
-                tb.raw_lines.append(lines[j])
-                tb.rows.append(split_cells(lines[j]))
-                j += 1
+            while j < n and not CODE_FENCE_RE.match(lines[j]):
+                if TABLE_ROW_RE.match(lines[j]):
+                    tb.members.append(('row', split_cells(lines[j])))
+                    j += 1
+                    continue
+                if COMMENT_LINE_RE.match(lines[j]):
+                    # A full-line comment mid-table is a pass-through member,
+                    # UNLESS it is a multiline directive that opens a brand-new
+                    # adjacent table (directive + header + separator ahead), in
+                    # which case the current table closes here (issue #122).
+                    if (
+                        MULTILINE_DIRECTIVE_LINE_RE.match(lines[j])
+                        and j + 2 < n
+                        and TABLE_ROW_RE.match(lines[j + 1])
+                        and SEPARATOR_RE.match(lines[j + 2])
+                    ):
+                        break
+                    tb.members.append(('comment', lines[j]))
+                    j += 1
+                    continue
+                break
             blocks.append(tb)
             i = j
             continue
@@ -546,29 +579,38 @@ def render_standard(
     out: list[str] = []
     warnings: list[str] = []
     n_cols = len(widths)
+    header_cells = table.rows[0]
 
-    # Header row.
-    header = list(table.rows[0])
-    while len(header) < n_cols:
-        header.append('')
-    out.append(_render_row(header, widths))
+    # Walk members in order: format data rows, pass comment lines through
+    # byte-verbatim in place (issue #122). The header is the first 'row'
+    # member; the separator is derived and emitted right after it.
+    r_idx = 0
+    header_emitted = False
+    for kind, member in table.members:
+        if kind == 'comment':
+            out.append(member)
+            continue
 
-    # Separator row: derive alignments from the original separator cells.
-    alignments = [_alignment_marker(c) for c in table.separator_cells]
-    while len(alignments) < n_cols:
-        alignments.append('none')
-    sep_cells = [
-        _format_separator_cell(widths[c], alignments[c])
-        for c in range(n_cols)
-    ]
-    out.append(_render_row(sep_cells, widths))
-
-    # Data rows.
-    for r_idx, row in enumerate(table.rows[1:], start=2):
-        # Pad row to column count.
-        cells = list(row)
+        # kind == 'row'
+        r_idx += 1
+        cells = list(member)
         while len(cells) < n_cols:
             cells.append('')
+
+        if not header_emitted:
+            # Header row.
+            out.append(_render_row(cells, widths))
+            # Separator row: derive alignments from the original separator cells.
+            alignments = [_alignment_marker(c) for c in table.separator_cells]
+            while len(alignments) < n_cols:
+                alignments.append('none')
+            sep_cells = [
+                _format_separator_cell(widths[c], alignments[c])
+                for c in range(n_cols)
+            ]
+            out.append(_render_row(sep_cells, widths))
+            header_emitted = True
+            continue
 
         if _is_blank_row(cells):
             # Preserve as whitespace-only padded row (R3).
@@ -578,7 +620,7 @@ def render_standard(
         # Standard-table over-width warning (R7).
         for c, cell in enumerate(cells):
             if len(cell) > config.max_cell_width:
-                header_label = table.rows[0][c] if c < len(table.rows[0]) else f'col {c+1}'
+                header_label = header_cells[c] if c < len(header_cells) else f'col {c+1}'
                 warnings.append(
                     f"WARNING: cell exceeds max_cell_width "
                     f"({len(cell)} chars > {config.max_cell_width}) "
@@ -610,27 +652,33 @@ def render_multiline(
     if table.directive_line is not None:
         out.append(table.directive_line)
 
-    # Header row (no wrapping for the header — headers should fit by design).
-    header = list(table.rows[0])
-    while len(header) < n_cols:
-        header.append('')
-    out.append(_render_row(header, widths))
+    # Walk members in order: format data rows (wrapping long cells), pass
+    # comment lines through byte-verbatim in place (issue #122).
+    header_emitted = False
+    for kind, member in table.members:
+        if kind == 'comment':
+            out.append(member)
+            continue
 
-    # Separator row.
-    alignments = [_alignment_marker(c) for c in table.separator_cells]
-    while len(alignments) < n_cols:
-        alignments.append('none')
-    sep_cells = [
-        _format_separator_cell(widths[c], alignments[c])
-        for c in range(n_cols)
-    ]
-    out.append(_render_row(sep_cells, widths))
-
-    # Data rows.
-    for row in table.rows[1:]:
-        cells = list(row)
+        # kind == 'row'
+        cells = list(member)
         while len(cells) < n_cols:
             cells.append('')
+
+        if not header_emitted:
+            # Header row (no wrapping for the header — headers fit by design).
+            out.append(_render_row(cells, widths))
+            # Separator row.
+            alignments = [_alignment_marker(c) for c in table.separator_cells]
+            while len(alignments) < n_cols:
+                alignments.append('none')
+            sep_cells = [
+                _format_separator_cell(widths[c], alignments[c])
+                for c in range(n_cols)
+            ]
+            out.append(_render_row(sep_cells, widths))
+            header_emitted = True
+            continue
 
         if _is_blank_row(cells):
             out.append(_render_row(['' for _ in widths], widths))

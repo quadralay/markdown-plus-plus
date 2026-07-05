@@ -240,7 +240,14 @@ doesn't re-discover them:
 - **Mid-table `<!-- multiline -->` directives silently split the
   table.** The block scanner closes the table at the directive line;
   rows below render as raw prose. Either reject mid-table directives
-  with a parse error or treat them as in-table comments.
+  with a parse error or treat them as in-table comments. **Resolved in
+  #122** as pass-through comment members: any full-line HTML comment
+  mid-table (a stray directive, or the spec's condition open/close tags
+  wrapping complete rows) is preserved byte-verbatim in place with row
+  accumulation continuing past it and widths planned across both sides,
+  except that a `<!-- multiline -->` line immediately followed by a
+  header row and a separator row still closes the block to open a new
+  adjacent table.
 - **UTF-8 BOM defeats table detection.** Open with `utf-8-sig` to strip
   on read, then preserve-or-not on write per a config flag.
 - **Atomic write does not preserve original file mode** (becomes 0600

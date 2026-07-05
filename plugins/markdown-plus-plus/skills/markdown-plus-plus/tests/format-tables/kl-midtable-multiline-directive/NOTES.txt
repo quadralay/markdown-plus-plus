@@ -1,23 +1,26 @@
 Known limitation ("Mid-table <!-- multiline --> directive silently splits the table"),
-whose resolution is decided in #122 (tracking ref #122, per the assignment).
+resolved by #122.
 
-Today: the row-accumulation loop stops at the first line failing TABLE_ROW_RE. The
-<!-- multiline --> line between "Alpha" and "Beta" closes the TableBlock: rows above are
-formatted, the directive line and the "Beta" row below are emitted verbatim as prose, so
-column widths are planned from the top fragment only and the Beta row is unaligned.
+Before #122: the row-accumulation loop stopped at the first line failing TABLE_ROW_RE. The
+<!-- multiline --> line between "Alpha" and "Beta" closed the TableBlock: rows above were
+formatted, the directive line and the "Beta" row below were emitted verbatim as prose, so
+column widths were planned from the top fragment only and the Beta row was left unaligned.
 
-#122 Proposal item 3 offers two acceptable resolutions for a mid-table multiline directive:
-(a) treat it as an in-table pass-through comment (preserve verbatim in place, keep
-accumulating rows), or (b) make it a parse error (exit 3). This golden encodes OPTION (a),
-the pass-through-comment option: the <!-- multiline --> line is preserved verbatim in place
-and every row above and below it is formatted as ONE aligned standard table (widths planned
-across the whole run).
+#122 DECIDED this as the pass-through-comment resolution (proposal item 3, option (a)): a
+full-line HTML comment mid-table -- including a stray <!-- multiline --> directive that is
+NOT the directive line directly above a header+separator pair -- is a pass-through member
+line, preserved byte-verbatim in place while row accumulation continues past it. The
+formatter is not a validator; mid-table the directive is just an orphaned comment and must
+not silently split the table. This golden encodes that behavior: the <!-- multiline --> line
+is preserved verbatim in place and every row above and below it is formatted as ONE aligned
+standard table (widths planned across the whole run).
 
-DESIRED BEHAVIOR PENDING #122. If #122 instead chooses the parse-error resolution, this
-case should be re-authored to expect exit code 3 (with expected-exit-code.txt = 3 and an
-expected-stderr-contains.txt), and this expected.md discarded. The implementing PR decides.
+The parse-error alternative (proposal item 3, option (b): exit 3) was NOT chosen; no
+expected-exit-code.txt / expected-stderr-contains.txt is authored here.
 
-Note: the table stays a *standard* (non-multiline) table here -- the mid-table directive is
-not on the line directly above the header, so it does not switch the table into multiline
-wrap mode; it is only a pass-through comment. The single long cell therefore renders on one
-line at its full width rather than wrapping.
+Note: the table stays a *standard* (non-multiline) table -- the mid-table directive is not on
+the line directly above the header, so it does not switch the table into multiline wrap mode;
+it is only a pass-through comment. The single long cell therefore renders on one line at its
+full width rather than wrapping. (A multiline directive that DOES sit directly above a
+following header+separator pair instead opens a new adjacent table; the lookahead exception
+is pinned by adjacent-tables-directive-boundary.)
