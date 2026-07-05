@@ -1,0 +1,20 @@
+#120 red fixture: blockquote continuation prefix (including one nested level).
+
+args.txt sets --max-cell-width 20 so both blockquote lines wrap.
+
+The cell is authored across two source continuation rows: logical row "Quote" whose Detail
+is "> This is a fairly long quoted line", and its continuation row (blank Note cell) whose
+Detail is ">> A nested inner quote line also long" (nested level).
+
+Today: wrap_tokens() drops leading whitespace / has no blockquote awareness, so continuation
+lines lose the "> " and ">> " prefixes -- the wrapped remainder starts bare and no longer
+renders as the blockquote.
+
+Desired (encoded in expected.md): every continuation line carries the blockquote marker of
+its source line -- "> " for the first line, ">> " for the nested line -- so the wrapped text
+stays inside the blockquote at the correct nesting depth.
+
+ASSUMPTION: the literal marker is preserved as authored with a single trailing space
+(">> " not "> > "); the nested marker is repeated verbatim on its continuation lines. The
+implementing PR may normalize marker spacing differently; if so, regenerate this golden.
+Continuation shapes derived by wrapping each blockquote body to (col_width - len(marker)).

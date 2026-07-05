@@ -1,0 +1,10 @@
+Golden assumptions (implementing PR may tune deliberately):
+- Soft width rule (#120 Proposal item 4): the Detail column is floored at
+  the span's full width; every row shares that width (no single-row local
+  widening).
+- The entire span sits alone on one continuation row; 'Contact' and 'now.'
+  wrap around it.
+- Desired behavior holds regardless of #126's authoring outcome: Unset
+  pass-through documents legitimately carry in-cell spans, and the
+  formatter must never convert a valid single-line span into a
+  table-corrupting cross-line span.

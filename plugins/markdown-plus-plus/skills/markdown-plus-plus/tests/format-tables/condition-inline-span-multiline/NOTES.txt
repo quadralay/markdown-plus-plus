@@ -1,0 +1,5 @@
+Pins that an inline condition span inside a multiline cell passes through the
+formatter unmangled and aligned when no wrapping is needed. The Unset
+pass-through state means real documents carry in-cell condition tags as
+literal cell text, so this is current-reality coverage regardless of the
+authoring guidance decided in #126 (rows-only proposal).

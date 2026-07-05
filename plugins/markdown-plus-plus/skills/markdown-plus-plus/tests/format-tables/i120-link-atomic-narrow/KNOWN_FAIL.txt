@@ -1,0 +1,2 @@
+#120
+An inline [text](url) link is split at internal whitespace when the column is narrower than the link; the tokenizer has no link class so the link is wrapped as plain words.

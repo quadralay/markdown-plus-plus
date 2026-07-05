@@ -1,0 +1,22 @@
+#122 red fixture: the spec's 'enterprise' condition example
+(spec/multiline-cell-extensions.md, Conditions -> Wrapping Complete Rows), with ragged input
+widths.
+
+The input reproduces the spec's Core / Enterprise / Community example but with intentionally
+inconsistent pipe alignment in the source (ragged widths) to prove width planning spans the
+whole table, not just the top fragment.
+
+Today: the row-accumulation loop stops at the first line failing TABLE_ROW_RE. The
+<!--condition:enterprise--> line closes the TableBlock; the fragment below is re-scanned and
+mis-detected (observed: a spurious separator row is synthesized inside the Enterprise
+fragment, and rows below the condition are emitted unaligned). Column widths come from the
+Core fragment only.
+
+Desired (encoded in expected.md): full-line condition tags (<!--condition:enterprise--> and
+<!--/condition-->) are treated as in-table pass-through member lines -- preserved verbatim
+in place, row accumulation continuing past them -- and widths are planned across ALL rows on
+both sides of the tags, so the entire example renders as ONE aligned grid
+(Feature=10, Description=23). Blank logical-separator rows are preserved as whitespace-only
+padded rows (R3). All cell content is short enough that no wrapping occurs.
+
+This also serves the #122 idempotency requirement (R10): the aligned output is a fixed point.

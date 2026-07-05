@@ -5,11 +5,18 @@ status: active
 
 # Format-Tables Verification Cases (AE1-AE7)
 
-Manual-verification protocol for `format-tables.py`. There is no
-automated test runner in this repo; each case below is a `bash` invocation
-with an expected outcome (stdout / stderr / exit code). A human can step
-through every case in under five minutes to verify the formatter ships
-correctly.
+Manual-verification protocol for `format-tables.py`. Each case below is a
+`bash` invocation with an expected outcome (stdout / stderr / exit code).
+A human can step through every case in under five minutes to verify the
+formatter ships correctly.
+
+**These cases are now automated.** Every AE case is converted to a
+golden-file fixture under [`format-tables/`](format-tables/) and executed
+by [`run-tests.py`](run-tests.py) — run `python tests/run-tests.py` from
+the skill root (see the suite [README](format-tables/README.md)). AE5
+(idempotency) is the runner's `--idempotency` sweep mode. This document
+remains the human-readable explanation of what each case verifies; the
+golden fixtures are the regression gate.
 
 The cases are organized by the Acceptance Examples (AE1-AE7) carried over
 from the issue and the planning brainstorm. AE5 (idempotency) is the last
@@ -125,12 +132,15 @@ python scripts/format-tables.py tests/sample-tables-multiline.md --max-cell-widt
 |        | **`Set-ExecutionPolicy`** |
 |        | cmdlet to enable     |
 |        | scripts.             |
+|        |                      |
 | Save   | Click the            |
 |        | **Save and Continue** |
 |        | button to commit.    |
+|        |                      |
 | Run    | Run                  |
 |        | `npm install --save-dev` |
 |        | first.               |
+|        |                      |
 | Italic | Note the _emphasis_  |
 |        | form.                |
 ```
@@ -163,6 +173,7 @@ python scripts/format-tables.py tests/sample-tables-multiline.md
 | Symbol            | Description                   |
 | ----------------- | ----------------------------- |
 | pipe \| character | A literal pipe inside a cell. |
+|                   |                               |
 | Other             | Plain content.                |
 ```
 
@@ -216,6 +227,7 @@ python scripts/format-tables.py tests/sample-tables-multiline.md
 | Name  | Description                                              |
 | ----- | -------------------------------------------------------- |
 | Alpha | First entry.                                             |
+|       |                                                          |
 | Beta  | Second entry, with longer content that fits on one line. |
 ```
 

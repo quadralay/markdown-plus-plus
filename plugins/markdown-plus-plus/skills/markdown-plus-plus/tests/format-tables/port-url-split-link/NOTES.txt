@@ -1,0 +1,15 @@
+Ported verbatim (raw bytes, CRLF preserved, no trailing newline - matching the source) from
+C:\Projects\epublisher-docs\test\table-with-url.md.
+
+Ported ahead of the epublisher-docs cleanup so the specimen lives in this suite before it
+is archived. No frontmatter was added - it is a messy real-world specimen used as test data.
+Golden = whatever format-tables.py outputs TODAY (single pass, default args). The specimen
+contains a link already split across continuation rows by a past wrap (the exact corruption
+#120 describes), ragged ~200-char columns, and $var; tokens in cells; the golden documents
+current behavior so #120/#121 changes surface as reviewable golden diffs.
+
+Deviation from source (2026-07-04, maintainer review): one whitespace-only
+separator row added between the $C; and $H; records. The original specimen
+omitted it by accident (every other record boundary in the file has one),
+so the two records silently merged under multiline semantics. All other
+content remains byte-verbatim to the archived epublisher-docs source.

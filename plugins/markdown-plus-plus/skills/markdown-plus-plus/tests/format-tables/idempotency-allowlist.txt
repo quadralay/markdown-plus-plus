@@ -1,0 +1,27 @@
+# idempotency-allowlist.txt
+#
+# Paths listed here are SKIPPED by `run-tests.py --idempotency`.
+# One repo-relative path per line (forward slashes). Blank lines and lines
+# beginning with '#' are ignored. Paths are matched against each sweep
+# target's path relative to the repository root.
+#
+# The idempotency sweep formats every .md under examples/ and spec/, plus
+# every non-KNOWN_FAIL case's input.md, twice, and requires the two passes
+# to be byte-identical. A file belongs here ONLY when its non-idempotency
+# is a known, tracked limitation of the formatter (e.g. the documented
+# `auto`-strategy non-idempotency) rather than a fixture bug -- add a
+# comment naming the tracking issue next to any entry you add.
+#
+# Example (do not uncomment unless the limitation is real):
+# examples/some-file.md    # non-idempotent under auto strategy, tracked in #NNN
+
+# Documented `auto`-strategy non-idempotency (design-doc Known Limitations):
+# under default flags, plan_widths reads wrapped cell fragments on the second
+# pass and shrinks the column. The AE1 case itself pins behavior under
+# `fixed` widths via its own golden; only the default-flags sweep is exempt.
+plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/format-tables/ae1-multiline-fixed-widths/input.md
+
+# Pre-#120 wrap behavior corrupts this messy real-world specimen on re-format
+# (links/blockquotes split; see the case NOTES.txt). The case golden pins
+# deterministic single-pass output; sweep exemption until #120 lands.
+plugins/markdown-plus-plus/skills/markdown-plus-plus/tests/format-tables/port-blockquote-large-line/input.md

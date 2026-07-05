@@ -1,0 +1,18 @@
+#120 red fixture: list-marker continuation indentation.
+
+args.txt sets --max-cell-width 22 so the list item wraps.
+
+Today: wrap_tokens() drops leading whitespace on continuation lines, so the wrapped
+remainder ("analytics feature in" / "settings") starts at column 0 with no indent -- it no
+longer reads or renders as part of the "- ..." list item.
+
+Desired (encoded in expected.md): continuation lines are indented 2 spaces (the width of the
+"- " marker) so the wrapped text aligns under the item body. First line keeps the marker;
+continuation lines carry the indent:
+    - Enable the optional
+      analytics feature in
+      settings
+
+This mirrors the prior-art detect_content_prefix() behavior offered in #120. The
+continuation shape was derived by wrapping the item body to (col_width - len("- ")) and
+prefixing each continuation line with two spaces.

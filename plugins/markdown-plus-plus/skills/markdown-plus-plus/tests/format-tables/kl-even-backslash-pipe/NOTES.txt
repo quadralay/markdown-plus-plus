@@ -1,0 +1,18 @@
+Known limitation: "Escaped pipes after even backslash counts (C:\\path\\|\\thing)".
+
+Byte-sensitive case: input.md and expected.md are written with Python open(...,'wb') to
+guarantee the exact backslash bytes. Frontmatter is included (it does not interfere).
+
+The data field is (in on-disk characters):  C:\\path\\|\\thing
+The pipe sits after exactly two backslashes. In CommonMark the first backslash escapes the
+second, so the backslash is a literal and the pipe is UNESCAPED -> it is a genuine cell
+delimiter. R9 only guarantees that a pipe after an ODD backslash count (\|) is literal.
+
+Today: CELL_SPLIT_RE = (?<!\\)\| looks back only one character, so it refuses to split any
+pipe preceded by a backslash, including the even-count case. The whole field stays in one
+cell and the row is rendered as two columns.
+
+Desired (encoded in expected.md): split on the even-backslash pipe, yielding cells
+'C:\\path\\' and '\\thing'. With the 3-column header the row's third cell is 'note' and the
+table renders as a fully aligned three-column table. Cell content is preserved verbatim;
+the formatter does not unescape backslashes.

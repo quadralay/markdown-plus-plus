@@ -1,0 +1,5 @@
+#122
+Full-line condition tags between rows of a standard (non-multiline) table
+close the block scan today, so rows at and below the open tag pass through
+unformatted. Desired: tags preserved verbatim in place, one aligned table
+with widths planned across all rows.

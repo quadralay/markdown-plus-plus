@@ -1,0 +1,6 @@
+Input copied verbatim from tests/sample-tables-standard-warn.md (carries its own
+mdpp-version frontmatter). AE2 / R7: a standard (non-multiline) table with a cell wider
+than the default max_cell_width (78) still aligns at the actual cell width and emits a
+stderr WARNING naming the row/column. expected-stderr-contains.txt matches the stable
+core of the warning; the live warning is wrapped in ANSI color codes, which do not break
+the substring match.

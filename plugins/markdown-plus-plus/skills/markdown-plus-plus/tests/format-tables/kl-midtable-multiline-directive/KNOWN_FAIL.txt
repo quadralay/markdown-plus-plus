@@ -1,0 +1,2 @@
+#122
+A mid-table <!-- multiline --> directive line fails TABLE_ROW_RE and closes the block, so rows below it are passed through as unformatted prose; the resolution (pass-through comment vs parse error) is pending #122.

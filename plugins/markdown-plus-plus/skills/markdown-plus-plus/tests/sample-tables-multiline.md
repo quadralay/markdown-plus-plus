@@ -19,8 +19,11 @@ invocation that doesn't match the column counts of the other fixtures.
 | Action | Detail |
 | ------ | ------ |
 | Enable | Use the **`Set-ExecutionPolicy`** cmdlet to enable scripts. |
+| | |
 | Save | Click the **Save and Continue** button to commit. |
+| | |
 | Run | Run `npm install --save-dev` first. |
+| | |
 | Italic | Note the _emphasis_ form. |
 
 ## AE4 -- escaped pipe in a cell round-trips
@@ -29,6 +32,7 @@ invocation that doesn't match the column counts of the other fixtures.
 | Symbol | Description |
 | ------ | ----------- |
 | pipe \| character | A literal pipe inside a cell. |
+| | |
 | Other | Plain content. |
 
 ## AE7 -- combined-commands directive line is preserved verbatim
@@ -37,4 +41,5 @@ invocation that doesn't match the column counts of the other fixtures.
 | Name | Description |
 | ---- | ----------- |
 | Alpha | First entry. |
+| | |
 | Beta | Second entry, with longer content that fits on one line. |

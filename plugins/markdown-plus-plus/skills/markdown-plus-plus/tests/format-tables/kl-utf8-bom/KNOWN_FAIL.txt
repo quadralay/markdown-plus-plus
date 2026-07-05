@@ -1,0 +1,2 @@
+design-doc known limitation
+A UTF-8 BOM at file start attaches to the first header cell so TABLE_ROW_RE never matches the header row, defeating table detection; the table passes through unformatted today.

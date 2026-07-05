@@ -1,0 +1,20 @@
+Known limitation: "UTF-8 BOM at file start (defeats table detection)".
+
+Byte-sensitive case: input.md and expected.md are written with Python open(...,'wb'). The
+first three bytes are the UTF-8 BOM (0xEF 0xBB 0xBF). FRONTMATTER IS DELIBERATELY OMITTED
+(exempt per the contract): the BOM must be the very first bytes of the file, and a
+frontmatter block would move the table off the top and mask the detection failure.
+
+Today: the header line is "﻿| Term | Meaning |". TABLE_ROW_RE = ^\s*\|.*\|\s*$ does
+not match because the line starts with the BOM character, not whitespace-then-pipe. The
+header+separator pair is never recognized, so the whole table is emitted verbatim (columns
+unaligned).
+
+Desired (encoded in expected.md): the formatter strips the BOM for detection/width purposes
+and re-emits it as the leading bytes of the output, with the table formatted normally. The
+header cell label is "Term" (the BOM is not counted toward column width). Widths: Term=5,
+Meaning=27.
+
+Assumption for the golden: the BOM is preserved at file start (not dropped). The
+implementing PR could alternatively choose to strip the BOM entirely; if so, regenerate this
+golden deliberately.

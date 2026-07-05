@@ -1,0 +1,2 @@
+design-doc known limitation
+A pipe preceded by an even number of backslashes is a real CommonMark cell delimiter, but CELL_SPLIT_RE only checks a single preceding backslash, so the row is not split on it today.
