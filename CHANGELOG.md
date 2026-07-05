@@ -13,6 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.11.0] - 2026-07-05
+
+### Spec
+
+- Defined condition granularity within tables: **conditional rows are the supported granularity**. A condition block MAY wrap complete physical rows (standard table), complete logical rows including the trailing whitespace-only separator row (multiline table), or an entire table. A **conditional cell** (a span containing an unescaped `|` delimiter) MUST NOT be authored -- hiding it removes cell boundaries and corrupts the row's column count. An **in-cell condition span** (opening and closing within one cell on one line) SHOULD NOT be authored -- behavior is mechanically determined by Phase 1 raw-text evaluation, but the span resists line wrapping and corrupts the table if split across lines; prefer conditional row variants for structure and variables for value substitution. Because Phase 1 is table-blind, these are authoring requirements surfaced by validation, not processor behavior. `spec/multiline-cell-extensions.md` gains "Inline Conditions Within a Cell" and "Conditional Cells" subsections plus an explicit standard-table statement; `spec/specification.md` § 11.4 reworked to "Conditions and Tables" (was the looser "Condition blocks MAY appear within multiline table cells"), § 14.4 mirror paragraph tightened to match, MDPP019 added to the § 11.6 diagnostics table. New `GLOSSARY.md` terms: conditional row, in-cell condition span, conditional cell ([#126](https://github.com/quadralay/markdown-plus-plus/issues/126)).
+
+### Tooling
+
+- Added MDPP019 (warning) to `validate-mdpp.py`: a condition open/close tag embedded within a table row line -- an in-cell condition span or a conditional cell -- as opposed to full-line condition tags between rows, which remain the supported pattern. Detection skips fenced code blocks and backtick-quoted inline code (a quoted tag is verbatim text, not a live directive -- which also keeps the spec's own documentation tables clean). Added fixture `tests/sample-condition-in-table-cells.md` (three positive cases: multiline in-cell span, standard-table in-cell span, conditional cell; five negative cases: complete-logical-row wrap, complete-physical-row wrap, whole-table wrap, prose span, fenced example). Full MDPP019 entry in `references/error-codes.md`; `SKILL.md` gains Common Mistakes entry #5, an MDPP019 line in "Common errors detected," and a tightened extensions-in-cells summary; `references/best-practices.md` gains the do/don't note ([#126](https://github.com/quadralay/markdown-plus-plus/issues/126)).
+
 ## [1.10.0] - 2026-07-03
 
 ### Tooling

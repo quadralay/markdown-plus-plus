@@ -185,6 +185,39 @@ Click <!--condition:windows10-->Start<!--/condition--><!--condition:windows11-->
 <!--/condition-->
 ```
 
+**Conditions in tables: condition whole rows, not cells or cell fragments.** Conditional rows are the supported granularity for conditions in tables. A condition block may wrap complete physical rows (standard table), complete logical rows including the trailing whitespace-only separator row (multiline table), or the entire table. Two finer patterns are anti-patterns the validator flags as MDPP019 (warning):
+
+- **Don't author a conditional cell** -- a condition span that contains an unescaped `|` cell delimiter. Hiding it removes cell boundaries and changes the row's column count, so the table structure is corrupt. This one is a MUST NOT.
+- **Don't author an in-cell condition span** -- a span that opens and closes within a single cell on one physical line. Its behavior is well-defined (Visible strips the tags, Hidden removes the span, Unset passes it through as literal text), but the span is an unbreakable atomic unit that defeats line wrapping, and a wrapping tool that splits it across physical lines corrupts the table in the Hidden state. This one is a SHOULD NOT.
+- **Do condition whole rows** for structural differences (put the separator row *inside* the condition block so the logical row is complete), or **use variables** for value substitution such as platform names, key modifiers, and versions.
+
+Phase 1 condition evaluation is table-blind -- it operates on raw text before the table is recognized -- so these are authoring requirements surfaced by validation, not processor behavior.
+
+**Wrong -- in-cell condition spans (MDPP019):**
+```markdown
+<!-- multiline -->
+| Platform | Shortcut                                          |
+|----------|---------------------------------------------------|
+| Save     | <!--condition:mac-->Cmd+S<!--/condition--><!--condition:win-->Ctrl+S<!--/condition--> |
+```
+
+**Right -- condition-wrapped whole rows (separator row inside the block):**
+```markdown
+<!-- multiline -->
+| Platform | Shortcut |
+|----------|----------|
+<!--condition:mac-->
+| Save     | Cmd+S    |
+|          |          |
+<!--/condition-->
+<!--condition:win-->
+| Save     | Ctrl+S   |
+|          |          |
+<!--/condition-->
+```
+
+See [MDPP019](error-codes.md#mdpp019----condition-inside-a-table-cell).
+
 **Undefined condition names (Unset) — authoring guidance:**
 
 A condition name that is not included in the condition set at build time is **Unset** (see [GLOSSARY.md](../../../../../GLOSSARY.md#unset)). Unset condition blocks pass through the processor with their opening tags, content, and closing tags intact. This is intentional: it lets you author content for multiple output targets in a single source file, even if only some targets are active in a given build.
