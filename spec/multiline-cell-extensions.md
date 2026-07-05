@@ -28,7 +28,7 @@ This phase ordering is the organizing principle for the rest of this document. W
 | Extension | Phase | Category | Notes |
 |-----------|:-----:|----------|-------|
 | Variables | 1 | Supported | Resolved before table is recognized |
-| Conditions | 1 | Supported | Operate on raw text; partial row wrapping produces undefined structure |
+| Conditions | 1 | Supported | Operate on raw text; complete rows only -- partial row wrapping produces undefined structure, in-cell spans discouraged (MDPP019) |
 | Includes | 1 | Not supported | MUST NOT appear inside cell content |
 | Block styles | 2 | Supported | Directive on continuation row attaches to following content |
 | Inline styles | 2 | Supported | Standard inline attachment rule applies |
@@ -70,6 +70,10 @@ Phase 2 then parses the resolved table normally.
 ### Conditions
 
 Conditions work in multiline table cells at the raw-text level. Condition blocks are evaluated per-file in Phase 1, Step 1 before table parsing. Conditions see the table rows as plain text lines and remove, keep, or pass them through (with condition tags preserved) based on the condition set.
+
+Conditional rows are the supported granularity for conditions in tables. In a standard table, a condition block MAY wrap complete physical rows. In a multiline table, a condition block MAY wrap complete logical rows -- the first row, all of its continuation rows, and its trailing whitespace-only separator row. A condition block MAY also wrap an entire table. The three subsections that follow specialize this rule for the multiline case; two further subsections define the in-cell patterns that SHOULD NOT and MUST NOT be authored.
+
+**Standard (non-multiline) tables.** This document is scoped to multiline table cells, but the standard-table case follows directly from the same Phase 1 mechanism. Because Phase 1 sees lines, a condition block that wraps complete physical rows of a standard GFM table evaluates identically to a condition block anywhere else in the document -- each wrapped row is a single line that the condition engine removes, keeps, or passes through as a unit. Standard tables have no continuation rows, so the "complete logical row" refinement below applies only to multiline tables.
 
 #### Wrapping Complete Rows
 
@@ -138,6 +142,51 @@ When `advanced` is Hidden, the two continuation rows are removed, leaving "Basic
 |             |                          |
 <!--/condition-->
 ```
+
+#### Inline Conditions Within a Cell
+
+A condition span that opens and closes within a single cell on one physical line SHOULD NOT be authored. Its behavior is mechanically determined by Phase 1 raw-text evaluation -- Visible strips the tags, Hidden removes the span (the cell may become empty), Unset passes tags and content through as literal cell text -- but the pattern resists line wrapping (the span is an unbreakable atomic unit for any wrapping tool) and a span split across physical lines corrupts the table when Hidden (removal consumes the intervening newline and pipe delimiters). Prefer conditional row variants for structural differences and variables for value substitution.
+
+Phase 1 condition evaluation is table-blind (it operates on raw text), so this is an authoring requirement surfaced by validation (**MDPP019**, warning), not processor behavior.
+
+**Example -- in-cell condition span (avoid):**
+
+```markdown
+<!-- multiline -->
+| Platform | Shortcut                                                   |
+|----------|------------------------------------------------------------|
+| Save     | Press <!--condition:mac-->Cmd+S<!--/condition--><!--condition:win-->Ctrl+S<!--/condition--> to save. |
+```
+
+**Example -- conditional row variants (preferred):**
+
+```markdown
+<!-- multiline -->
+| Platform | Shortcut                 |
+|----------|--------------------------|
+<!--condition:mac-->
+| Save     | Press Cmd+S to save.     |
+|          |                          |
+<!--/condition-->
+<!--condition:win-->
+| Save     | Press Ctrl+S to save.    |
+|          |                          |
+<!--/condition-->
+```
+
+Each variant wraps a complete logical row, so the condition engine removes or keeps whole rows and the table structure is never corrupted. Where only a value differs (a key modifier, a platform name, a version), a variable is the lighter tool: `Press $SaveKey; to save.`
+
+#### Conditional Cells
+
+A condition span that contains an unescaped `|` cell delimiter MUST NOT be authored. Hiding such a span removes cell boundaries and changes the row's column count; the resulting table structure is corrupt.
+
+As with in-cell spans, Phase 1 condition evaluation is table-blind, so this is an authoring requirement surfaced by validation (**MDPP019**, warning), not processor behavior. The following illustrates the corrupting pattern -- a condition span crossing a `|` delimiter:
+
+```markdown
+| Feature <!--condition:pro-->| Availability <!--/condition-->|
+```
+
+When `pro` is Hidden, the span (including the `|` before `Availability`) is removed, so the row loses a column delimiter and no longer matches the table's column count. Express the difference as complete conditional rows or columns present in every state instead.
 
 ### Includes
 

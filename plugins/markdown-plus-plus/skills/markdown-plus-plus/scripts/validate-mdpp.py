@@ -222,6 +222,16 @@ MULTILINE_DIRECTIVE_LINE_RE = re.compile(
 # Split a row on unescaped pipes (a `\|` is a literal pipe inside a cell).
 TABLE_CELL_SPLIT_RE = re.compile(r'(?<!\\)\|')
 
+# --- In-cell / conditional-cell condition detection (MDPP019) ----------------
+# A condition open (`<!--condition:EXPR-->`) or close (`<!--/condition-->`) tag,
+# anchored anywhere within a line. Used to detect a condition tag embedded in a
+# table row (an in-cell span or a conditional cell), as opposed to a full-line
+# condition tag between rows -- the supported granularity, which never matches
+# TABLE_ROW_RE because it carries no pipes.
+CONDITION_TAG_RE = re.compile(
+    r'<!--\s*(?:condition:[^>]+?|/condition)\s*-->'
+)
+
 
 def _is_mdpp_tag_line(line: str) -> bool:
     """True if line's only non-whitespace content is an MDPP comment tag."""
@@ -396,6 +406,93 @@ def _scan_multiline_row_merge(
 
         i += 1
 
+    return issues
+
+
+def _scan_condition_in_table_cells(
+    lines: list[str], filepath: str
+) -> list[ValidationIssue]:
+    """Detect condition tags embedded in a table row line (MDPP019).
+
+    Conditional rows are the supported granularity for conditions in tables: a
+    condition block MAY wrap complete physical rows (standard table) or complete
+    logical rows (multiline table), or an entire table. Those supported forms
+    put the `<!--condition:EXPR-->` / `<!--/condition-->` tag on its **own line**
+    between rows, so the tag line carries no pipe delimiters.
+
+    Two unsupported patterns instead place a condition tag **inside** a table
+    row line:
+
+    - **In-cell condition span** -- a span that opens and closes within a single
+      cell on one physical line (e.g. `Contact <!--condition:web-->email<!--/condition--> now.`).
+      Its behavior is mechanically determined by Phase 1 raw-text evaluation, but
+      the span is an unbreakable atomic unit for line-wrapping tools and a split
+      across physical lines corrupts the table when Hidden. Authors SHOULD NOT
+      author it.
+    - **Conditional cell** -- a condition span that contains an unescaped `|`
+      cell delimiter. Hiding it removes cell boundaries and changes the row's
+      column count; the resulting table structure is corrupt. Authors MUST NOT
+      author it.
+
+    Phase 1 condition evaluation is table-blind (it operates on raw text), so a
+    processor cannot reject these -- they are authoring requirements surfaced by
+    validation, not processor behavior. Detection therefore keys on line shape:
+    a line that is both a pipe-table row (leading and trailing `|`, per
+    TABLE_ROW_RE) **and** contains a condition open or close tag. A full-line
+    condition tag between rows never matches (no border pipes), and an inline
+    condition span in prose never matches (no border pipes), so the row-shape
+    heuristic alone excludes every supported pattern -- a genuine
+    table-detection pass would add no precision here. One diagnostic is emitted
+    per offending row line, anchored to that line, regardless of how many tags
+    it carries or whether the span crosses a cell delimiter.
+
+    A condition tag written inside a backtick inline-code span is documentation
+    *about* the syntax, not a live directive -- inline code is verbatim, so
+    Phase 1 never treats it as a condition span. Such tags are excluded: a tag
+    preceded by an odd number of backticks on the line sits inside an open code
+    span. This keeps MDPP019 off the many spec and reference tables whose cells
+    quote `<!--condition:...-->` as example code.
+    """
+    issues: list[ValidationIssue] = []
+    for line_num, line in _iter_outside_fences(lines):
+        if not TABLE_ROW_RE.match(line):
+            continue
+        if TABLE_DELIMITER_RE.match(line):
+            # A GFM delimiter row cannot carry a condition tag (its interior is
+            # whitespace, dashes, and colons only); skip it defensively.
+            continue
+        # Fire only on a live directive tag -- one not inside a backtick
+        # inline-code span. A tag with an odd number of backticks before it on
+        # the line is inside an open code span and is verbatim documentation.
+        has_live_tag = any(
+            line[:m.start()].count('`') % 2 == 0
+            for m in CONDITION_TAG_RE.finditer(line)
+        )
+        if not has_live_tag:
+            continue
+        issues.append(ValidationIssue(
+            type=Severity.WARNING.value,
+            code="MDPP019",
+            message=(
+                "Condition tag inside a table row; conditional rows are the "
+                "supported granularity for conditions in tables, not in-cell "
+                "spans or conditional cells"
+            ),
+            file=filepath,
+            line=line_num,
+            context=line.strip()[:60],
+            suggestion=(
+                "A condition span that contains an unescaped | delimiter "
+                "(conditional cell) MUST NOT be authored -- hiding it removes "
+                "cell boundaries and corrupts the table. A span that opens and "
+                "closes within one cell (in-cell span) SHOULD NOT be authored -- "
+                "it resists line wrapping and corrupts the table if split across "
+                "lines. Wrap complete rows instead (a condition block MAY wrap "
+                "complete physical rows, or a multiline table's complete logical "
+                "rows including the trailing whitespace-only separator row, or an "
+                "entire table), or use a variable for value substitution."
+            ),
+        ))
     return issues
 
 
@@ -673,6 +770,10 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
 
     # MDPP018: Multiline tables with no separator rows (silent row merge).
     issues.extend(_scan_multiline_row_merge(lines, filepath))
+
+    # MDPP019: Condition tags embedded in a table row (in-cell span /
+    # conditional cell) rather than wrapping complete rows.
+    issues.extend(_scan_condition_in_table_cells(lines, filepath))
 
     # Check for unclosed conditions
     for opened_line, opened_expr in condition_stack:

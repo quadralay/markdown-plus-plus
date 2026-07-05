@@ -247,7 +247,7 @@ Enable block content (lists, blockquotes, styled elements) inside table cells.
 
 Every pipe-bearing row continues the current logical row. A row whose cells are all whitespace starts a new logical row — that's the only way to signal one. A no-pipe blank line ends the table. Cells on a continuation line appear empty when their column has no more content to flow there. Combine with style: `<!-- style:DataTable ; multiline -->`. See `references/syntax-reference.md` for multiline table rules.
 
-**Extensions in cells:** Variables, block/inline styles, markers, conditions (wrapping complete rows only — not partial rows), and combined commands work inside multiline table cells. Includes and nested multiline tables are not supported in cells. See `spec/multiline-cell-extensions.md`.
+**Extensions in cells:** Variables, block/inline styles, markers, conditions (conditional rows only — wrap complete rows or the whole table; don't author in-cell condition spans, and never a conditional cell that hides a `|` delimiter; MDPP019), and combined commands work inside multiline table cells. Includes and nested multiline tables are not supported in cells. See `spec/multiline-cell-extensions.md`.
 
 ### Combined Commands
 
@@ -319,6 +319,7 @@ python scripts/validate-mdpp.py document.md
 - Orphaned comment tags (tag not attached to element)
 - Duplicate link reference slugs across included files (MDPP014)
 - Multiline tables with no separator rows that silently merge data rows (MDPP018)
+- Condition open/close tags inside a table row line — in-cell spans or conditional cells (MDPP019)
 
 ## Alias Generation
 
@@ -425,6 +426,35 @@ See the [Attachment Rule specification](../../../../spec/attachment-rule.md) for
 ```
 
 See [MDPP018 -- Multiline Table Row Merge](references/error-codes.md#mdpp018----multiline-table-row-merge) for the detection logic.
+
+### 5. Conditions in Tables Below Row Granularity
+
+**Conditional rows are the supported granularity for conditions in tables.** A condition block MAY wrap complete physical rows (standard table) or complete logical rows including the trailing whitespace-only separator row (multiline table), or the whole table. Two finer patterns are authoring anti-patterns the validator flags as MDPP019 (warning): a **conditional cell** (a condition span containing an unescaped `|` delimiter) MUST NOT be authored -- hiding it removes cell boundaries and corrupts the row's column count; an **in-cell condition span** (opening and closing within one cell on one line) SHOULD NOT be authored -- it resists line wrapping and corrupts the table if a wrapping tool splits it across lines. Use conditional row variants for structural differences and variables for value substitution.
+
+**Wrong -- in-cell condition spans (MDPP019):**
+```markdown
+<!-- multiline -->
+| Platform | Shortcut                                          |
+|----------|---------------------------------------------------|
+| Save     | <!--condition:mac-->Cmd+S<!--/condition--><!--condition:win-->Ctrl+S<!--/condition--> |
+```
+
+**Right -- condition-wrapped whole rows (separator row inside the block):**
+```markdown
+<!-- multiline -->
+| Platform | Shortcut |
+|----------|----------|
+<!--condition:mac-->
+| Save     | Cmd+S    |
+|          |          |
+<!--/condition-->
+<!--condition:win-->
+| Save     | Ctrl+S   |
+|          |          |
+<!--/condition-->
+```
+
+See [MDPP019 -- Condition Inside a Table Cell](references/error-codes.md#mdpp019----condition-inside-a-table-cell) for the detection logic.
 
 </common_mistakes>
 

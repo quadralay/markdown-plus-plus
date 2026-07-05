@@ -30,6 +30,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP016 | Different major version in document | Warning | Document's `mdpp-version` major version differs from processor's supported major version |
 | MDPP017 | Invalid UTF-8 encoding | Error | File contains an invalid UTF-8 byte sequence |
 | MDPP018 | Multiline table row merge | Warning | `<!-- multiline -->` table has no separator rows; all data rows merge into one logical row |
+| MDPP019 | Condition inside a table cell | Warning | A condition open/close tag is embedded in a table row (in-cell span or conditional cell) instead of wrapping complete rows |
 
 ## General Rules
 
@@ -601,3 +602,65 @@ The first-cell test that distinguishes continuation rows from content-first rows
 ```
 
 **Suggested fix:** Use `<!-- multiline -->` only when a cell needs block content or wraps across lines. If the cells are single-line, drop the directive and use a plain table. If the rows genuinely need multiline cells, insert a whitespace-only separator row (e.g. `|  |  |`) between records so each renders as its own logical row.
+
+---
+
+## MDPP019 -- Condition Inside a Table Cell
+
+**Severity:** Warning
+
+**Description:** A condition open (`<!--condition:EXPR-->`) or close (`<!--/condition-->`) tag is embedded **within** a table row line, rather than sitting on its own line between rows. Two unsupported patterns produce this shape:
+
+- **In-cell condition span** -- a span that opens and closes within a single cell on one physical line (e.g. `| Support | Contact <!--condition:web-->email<!--/condition--> now. |`). A condition span that opens and closes within a single cell on one physical line SHOULD NOT be authored. Its behavior is mechanically determined by Phase 1 raw-text evaluation -- Visible strips the tags, Hidden removes the span (the cell may become empty), Unset passes tags and content through as literal cell text -- but the pattern resists line wrapping (the span is an unbreakable atomic unit for any wrapping tool) and a span split across physical lines corrupts the table when Hidden (removal consumes the intervening newline and pipe delimiters).
+- **Conditional cell** -- a span that contains an unescaped `|` cell delimiter (e.g. `| Pro | <!--condition:web-->email | phone<!--/condition--> | landline |`). A condition span that contains an unescaped `|` cell delimiter MUST NOT be authored. Hiding such a span removes cell boundaries and changes the row's column count; the resulting table structure is corrupt.
+
+Conditional rows are the supported granularity for conditions in tables. In a standard table, a condition block MAY wrap complete physical rows. In a multiline table, a condition block MAY wrap complete logical rows -- the first row, all of its continuation rows, and its trailing whitespace-only separator row. A condition block MAY also wrap an entire table. Those supported forms place the condition tag on its own line between rows, so the tag line carries no pipe delimiters and never triggers MDPP019.
+
+Phase 1 condition evaluation is table-blind (it operates on raw text), so these are authoring requirements surfaced by validation (MDPP019, warning), not processor behavior. Like MDPP018, the document still processes -- the diagnostic warns the author that the construct will not behave the way a table author expects.
+
+**Detection logic:** Pass over lines outside fenced code blocks. A line is flagged when it is both a pipe-table row (leading and trailing `|`, per the row shape used by MDPP018) and carries a **live** condition open or close tag. A condition tag written inside a backtick inline-code span is excluded: inline code is verbatim, so Phase 1 never treats a quoted `<!--condition:...-->` as a directive, and reference tables that document the syntax in a cell (grammar tables, error-code tables, comparison tables) must not be flagged. A tag preceded by an odd number of backticks on the line sits inside an open code span and is skipped.
+
+The line-shape heuristic is sufficient on its own -- a genuine table-detection pass would add no precision. Every supported pattern is excluded by construction: a full-line condition tag between rows carries no border pipes; an inline condition span in prose carries no border pipes; a fenced code example is skipped by the fence handling; and a documentation tag inside inline code is skipped by the backtick check. One diagnostic is emitted per offending row line, anchored to that line, regardless of how many tags it carries or whether the span crosses a cell delimiter.
+
+**Trigger examples:**
+
+```markdown
+<!-- WARNING: in-cell span in a multiline table -->
+<!-- multiline -->
+| Channel | How to reach us |
+| ------- | --------------- |
+| Support | Contact <!--condition:web-->email<!--/condition--> now. |
+| | |
+| Sales | Call the main office. |
+
+<!-- WARNING: in-cell span in a standard table -->
+| Channel | How to reach us |
+| ------- | --------------- |
+| Support | Contact <!--condition:web-->email<!--/condition--> now. |
+
+<!-- WARNING: conditional cell -- the span crosses a | delimiter -->
+| Plan | Web contact | Phone contact |
+| ---- | ----------- | ------------- |
+| Pro | <!--condition:web-->email | phone<!--/condition--> | landline |
+
+<!-- OK: condition wraps a complete logical row (tags on their own lines) -->
+<!-- multiline -->
+| Feature | Description |
+| ------- | ----------- |
+| Core | Available on all plans. |
+| | |
+<!--condition:enterprise-->
+| Enterprise | Premium features. |
+| | |
+<!--/condition-->
+
+<!-- OK: condition wraps a complete physical row of a standard table -->
+| Feature | Availability |
+| ------- | ------------ |
+| Core features | Included in every plan. |
+<!--condition:enterprise-->
+| Single sign-on | Enterprise plans only. |
+<!--/condition-->
+```
+
+**Suggested fix:** Wrap complete rows, not sub-row spans. In a standard table, wrap the complete physical row; in a multiline table, wrap the complete logical row (including its trailing whitespace-only separator row); or wrap the entire table. For value substitution inside one cell (platform names, key modifiers, versions), use a variable (`$name;`) instead of an in-cell condition span. For structural differences between variants, use conditional row variants. Never let a condition span contain an unescaped `|` -- that removes a cell boundary and corrupts the table.

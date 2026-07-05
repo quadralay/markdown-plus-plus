@@ -626,7 +626,7 @@ Conditions have the broadest interaction surface of any Markdown++ extension. Co
 
 **Conditions and Styles/Aliases/Markers:** All directive tags within a Hidden condition block are removed along with the content. Tags within Visible condition blocks follow normal attachment rules. Tags within Unset (pass-through) condition blocks are preserved as-is in the output.
 
-**Conditions and Multiline Tables:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
+**Conditions and Tables:** Conditional rows are the supported granularity for conditions in tables. In a standard table, a condition block MAY wrap complete physical rows; in a multiline table, a condition block MAY wrap complete logical rows (the first row, all continuation rows, and the trailing whitespace-only separator row); and a condition block MAY wrap an entire table. A condition span that contains an unescaped `|` cell delimiter MUST NOT be authored -- hiding it removes cell boundaries and corrupts the row's column count. A condition span that opens and closes within a single cell on one physical line SHOULD NOT be authored; its behavior is mechanically determined by Phase 1 raw-text evaluation, but the span resists line wrapping and corrupts the table when a wrap splits it across physical lines (prefer conditional row variants for structural differences and variables for value substitution). Because Phase 1 condition evaluation is table-blind (it operates on raw text), these are authoring requirements surfaced by validation (MDPP019, warning), not processor behavior. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2, and Unset condition blocks within table content pass through as-is, including the condition tags. See [Extensions in Multiline Table Cells](multiline-cell-extensions.md#conditions) for the row-granularity rules, examples, and rationale.
 
 **Conditions and Content Islands:** Conditions MAY wrap or appear within content islands (styled blockquotes). If a condition wrapping or within a content island is Unset, the condition block passes through as-is.
 
@@ -641,6 +641,7 @@ Condition tags are **exempt** from the attachment rule. Conditions wrap content 
 | **MDPP001** | Unclosed condition block (missing `<!-- /condition -->`) or unmatched closing tag | Error |
 | **MDPP007** | Invalid condition expression syntax | Error |
 | **MDPP012** | Condition block spans across an include boundary (opens in one file, closes in another) | Error |
+| **MDPP019** | Condition span authored within a table row (in-cell span, or a span containing an unescaped `\|` cell delimiter) | Warning |
 
 ### 11.7 Examples
 
@@ -936,7 +937,7 @@ Standard Markdown alignment syntax (`:---`, `:---:`, `---:`) works in multiline 
 
 **Multiline Tables and Variables:** Variable tokens within multiline table cells are substituted during Phase 1, before table parsing in Phase 2.
 
-**Multiline Tables and Conditions:** Condition blocks MAY appear within multiline table cells. Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags.
+**Multiline Tables and Conditions:** Conditional rows are the supported granularity -- a condition block MAY wrap complete logical rows (the first row, all continuation rows, and the trailing whitespace-only separator row) or an entire table. A condition span authored within a table row -- an in-cell span, or one containing an unescaped `|` cell delimiter -- SHOULD NOT or MUST NOT be authored respectively (MDPP019, warning). Defined condition content is evaluated during Phase 1 before table parsing in Phase 2. Unset condition blocks within table content pass through as-is, including the condition tags. See [section 11.4](#114-interaction-with-other-extensions) and [Extensions in Multiline Table Cells](multiline-cell-extensions.md#conditions).
 
 **Multiline Tables and Combined Commands:** In the recommended evaluation order, the `multiline` indicator is second (after style, before markers and alias). See [section 16](#16-combined-commands).
 

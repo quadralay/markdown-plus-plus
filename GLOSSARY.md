@@ -63,3 +63,21 @@ Full treatment: [Section 15 Content Islands](spec/specification.md#15-content-is
 Block-level content -- lists, blockquotes, styled elements, and other multi-line constructs -- inside a multiline table cell. Standard GFM tables limit each cell to a single line; the `<!-- multiline -->` directive enables continuation rows so that cells can hold block content. Multiline table cells are parsed as full Markdown documents with a separate parsing context per cell. Which extensions are valid inside a cell follows from the processing model's phase ordering: Phase 1 extensions (variables, conditions) operate on raw pipe-delimited text before the table is recognized; Phase 2 extensions (styles, aliases, markers, combined commands) operate during per-cell parsing.
 
 Full treatment: [Extensions in Multiline Table Cells](spec/multiline-cell-extensions.md).
+
+### conditional row
+
+The supported granularity for conditions in tables. A **conditional row** is a complete table row wrapped by a condition block: in a standard table, a condition block MAY wrap complete physical rows; in a multiline table, it MAY wrap complete logical rows -- the first row, all of its continuation rows, and its trailing whitespace-only separator row. A condition block MAY also wrap an entire table. Conditional rows evaluate identically to conditions anywhere else, because Phase 1 condition evaluation is table-blind (it operates on raw text before the table is recognized). Contrast with the in-cell condition span and conditional cell, which are authoring anti-patterns surfaced by validation (MDPP019).
+
+Full treatment: [Conditions in Multiline Table Cells](spec/multiline-cell-extensions.md).
+
+### in-cell condition span
+
+A condition span that opens and closes within a single table cell on one physical line. Authors **SHOULD NOT** author an in-cell condition span. Its behavior is mechanically determined by Phase 1 raw-text evaluation -- Visible strips the tags, Hidden removes the span (the cell may become empty), Unset passes tags and content through as literal cell text -- but the pattern resists line wrapping (the span is an unbreakable atomic unit for any wrapping tool) and a span split across physical lines corrupts the table when Hidden (removal consumes the intervening newline and pipe delimiters). Prefer conditional row variants for structural differences and variables for value substitution. The validator flags it as MDPP019 (warning).
+
+Full treatment: [Conditions in Multiline Table Cells](spec/multiline-cell-extensions.md).
+
+### conditional cell
+
+A condition span that contains an unescaped `|` cell delimiter. A conditional cell **MUST NOT** be authored: hiding such a span removes cell boundaries and changes the row's column count, so the resulting table structure is corrupt. Because Phase 1 condition evaluation is table-blind, a processor cannot reject the pattern -- it is an authoring requirement surfaced by validation (MDPP019, warning), not processor behavior. Use conditional rows for structural differences and variables for value substitution instead.
+
+Full treatment: [Conditions in Multiline Table Cells](spec/multiline-cell-extensions.md).
