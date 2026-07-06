@@ -16,23 +16,21 @@ invocation that doesn't match the column counts of the other fixtures.
 ## AE3 -- atomic inline-formatting token outsizes column
 
 <!-- multiline -->
-| Action | Detail               |
-| ------ | -------------------- |
-| Enable | Use the              |
+| Action | Detail                    |
+| ------ | ------------------------- |
+| Enable | Use the                   |
 |        | **`Set-ExecutionPolicy`** |
-|        | cmdlet to enable     |
-|        | scripts.             |
-|        |                      |
-| Save   | Click the            |
-|        | **Save and Continue** |
-|        | button to commit.    |
-|        |                      |
-| Run    | Run                  |
-|        | `npm install --save-dev` |
-|        | first.               |
-|        |                      |
-| Italic | Note the _emphasis_  |
-|        | form.                |
+|        | cmdlet to enable scripts. |
+|        |                           |
+| Save   | Click the                 |
+|        | **Save and Continue**     |
+|        | button to commit.         |
+|        |                           |
+| Run    | Run                       |
+|        | `npm install --save-dev`  |
+|        | first.                    |
+|        |                           |
+| Italic | Note the _emphasis_ form. |
 
 ## AE4 -- escaped pipe in a cell round-trips
 

@@ -1,17 +1,12 @@
-#120 red fixture: link atomicity + soft width rule.
+#120 fixture: link atomicity + soft width rule.
 
 args.txt sets --max-cell-width 12 so the link (21 chars) is wider than the requested cap,
 forcing the wrap/widen decision.
 
-Today: tokenize_inline() has no link class, so "[the guide](guide.md)" tokenizes as the
-words "[the" and "guide](guide.md)" and the wrapper breaks between them -> the link no
-longer renders. (Observed: "See [the" / "guide](guide" / ".md) here.".)
+"[the guide](guide.md)" is matched by the inline-link token class and is atomic -- never
+split. Per the #120 soft width rule, the Link column floors at its widest atomic token (the
+21-char link), so the whole column widens to 21 and every row in the column aligns at that
+width. Prose ("See", "here.") wraps around the intact link on its own continuation row.
 
-Desired (encoded in expected.md): the link is atomic and never split. Per the #120 soft
-width rule, the Link column floors at its widest atomic token (the 21-char link), so the
-column widens to 21 and every row in the column aligns at that width. Prose ("See", "here.")
-wraps around the intact link on its own continuation row.
-
-The desired continuation shape was derived with the same greedy wrap algorithm the tool
-already uses (format-tables.wrap_tokens), extended only with a link-atomic token class -- so
-the golden is consistent with the tool's own wrapping discipline.
+The continuation shape follows the tool's own greedy wrap algorithm
+(format-tables.wrap_tokens), extended with the link-atomic token class.

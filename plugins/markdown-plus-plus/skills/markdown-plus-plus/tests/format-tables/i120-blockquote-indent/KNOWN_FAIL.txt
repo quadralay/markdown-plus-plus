@@ -1,2 +1,0 @@
-#120
-A wrapped blockquote cell drops the "> " prefix on continuation lines, so the wrapped remainder no longer renders as part of the blockquote; continuation lines should carry the blockquote marker (including nested ">> ").

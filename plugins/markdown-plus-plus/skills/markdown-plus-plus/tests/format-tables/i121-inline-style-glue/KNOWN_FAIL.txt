@@ -1,2 +1,0 @@
-#121
-An inline style directive glued to its styled element (<!--style:Emphasis-->**important**) is split across rows when the pair does not fit, silently losing the style; the directive and its target must stay adjacent on the same row.

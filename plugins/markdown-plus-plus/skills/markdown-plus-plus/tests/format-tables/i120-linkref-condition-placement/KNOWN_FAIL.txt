@@ -1,2 +1,0 @@
-#120
-The link-reference definition for an unconditioned row must be emitted after the <!--/condition--> close tag, outside the condition span; today the scanner splits the table at the condition line and never rewrites or places the definition.

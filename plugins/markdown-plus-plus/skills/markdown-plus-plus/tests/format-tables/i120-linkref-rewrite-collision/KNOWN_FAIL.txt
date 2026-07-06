@@ -1,2 +1,0 @@
-#120
-Two long links whose reference IDs share the same base (table-config) must get distinct -1/-2 suffixes; today no rewrite happens at all.

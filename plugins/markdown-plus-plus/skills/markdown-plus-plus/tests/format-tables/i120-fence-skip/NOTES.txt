@@ -1,17 +1,14 @@
-#120 red fixture: in-cell code-fence skip.
+#120 fixture: in-cell code-fence skip.
 
 args.txt sets --max-cell-width 20 so the 22-char code line exceeds the cap and would be
 wrapped absent fence awareness.
 
-The Example cell contains a fenced code block spanning continuation rows: "```python",
-"print(\"hello, world!\")", "```". The formatter's current fence handling is document-level
-only (the block scanner), not per-cell, so inside a multiline cell the code line is treated
-as ordinary prose.
+The Example column contains a fenced code block spanning continuation rows: "```python",
+"print(\"hello, world!\")", "```". The formatter tracks fence state independently down each
+column across the table's data rows (mirroring the document-level fence scanner but scoped
+to a single column), so the fence delimiters and the content between them are emitted
+verbatim -- never re-wrapped.
 
-Today: the 22-char code line is hard-broken at width 20 (observed:
-"print(\"Hello, world!" / "..."), corrupting the code and the fence.
-
-Desired (encoded in expected.md): the formatter recognizes the in-cell code fence and emits
-its content verbatim -- fences intact, code line unwrapped. Under the soft width rule the
-Example column floors at the longest protected line (the 22-char code line) and widens to
-fit; every row aligns at width 22. "Greeting:" (prose above the fence) is unaffected.
+Under the soft width rule the Example column floors at the longest protected line (the
+22-char code line) and the whole column widens to fit; every row aligns at width 22.
+"Greeting:" (prose above the fence) is unaffected.

@@ -1,6 +1,16 @@
 Input copied verbatim from tests/sample-tables-multiline.md (carries its own
-mdpp-version frontmatter). AE3 / R8 at --max-cell-width 20.
+mdpp-version frontmatter). AE3 at --max-cell-width 20.
 
-Golden encodes current R8 local row widening. Issue #120's soft width rule intentionally
-replaces this behavior - the #120 PR must regenerate this golden (whole-column widening,
-full alignment) rather than treat a mismatch as a regression.
+Golden regenerated under the #120 soft width rule (Proposal item 4), replacing the old R8
+per-row local widening. The Detail column now floors at its widest atomic token
+(**`Set-ExecutionPolicy`** = 25 chars) and the WHOLE column renders at 25 -- header,
+separator, and every data/continuation row aligned at that width. The old behavior widened
+only the single continuation row holding the over-width token, leaving the rest of the
+column at width 20 with misaligned pipes; the soft width rule gives one width per column so
+pipes align on every row. The AE4 and AE7 sub-tables in the same fixture re-flow to their
+own soft-width columns as well.
+
+Note: under --max-cell-width 20 this fixture is non-idempotent (the documented auto-strategy
+limitation: a second pass reads the shorter wrapped fragments and reshrinks the column). The
+default-args output is idempotent, so the idempotency sweep -- which runs input.md with
+default flags -- is unaffected.

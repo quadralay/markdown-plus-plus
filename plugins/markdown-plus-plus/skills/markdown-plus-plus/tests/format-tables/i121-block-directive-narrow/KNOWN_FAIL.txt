@@ -1,2 +1,0 @@
-#121
-A block directive comment (<!-- style:Hobbies -->) in a cell tokenizes as three whitespace-separated tokens and is split across continuation rows at narrow widths; it should be atomic on its own row with the column widened to fit.

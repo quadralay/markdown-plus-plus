@@ -1,2 +1,0 @@
-#120
-A bare https:// URL longer than the column is hard-broken mid-character by the non-atomic hard-break path; the tokenizer has no URL class.

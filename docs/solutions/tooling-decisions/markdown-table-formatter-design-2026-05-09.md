@@ -121,6 +121,22 @@ token. Document this as an explicit behavior, not an accident -- a
 reader seeing a single row wider than the rest needs to understand it
 is intentional.
 
+**Superseded in #120/#121 (2026-07-05).** The four-class atomic set
+(compound/code/bold/italic) was too narrow and the per-row local widening
+misaligned pipes. #120/#121 extended the atomic classes to also cover
+inline links `[t](u)`, reference links `[t][ref]`, bare URLs
+(`https?://`, `file://`, `mailto:`), full HTML/directive comments, and
+whole same-line inline condition spans, plus a **glue rule** that fuses a
+directive comment to an immediately adjacent following token so an inline
+style is never split from what it styles. The per-row local widening was
+replaced by a **soft width rule**: each multiline column is floored at
+its widest atomic token (or verbatim in-cell fence line), so the *whole*
+column widens and pipes align on every row; when the capped widths still
+overrun `--max-line-width` the columns shrink toward those floors until
+the line fits. The original text above is kept as the historical record
+of the first implementation; the current rules live in
+`references/table-formatting.md` R5 and R8.
+
 **5. Define `--check` with a unique exit code distinct from generic
 errors.** `format-tables.py --check` exits **4** on diff mismatch, not
 1. Generic file errors are 1, argparse errors are 2, parse errors are 3,
@@ -230,7 +246,30 @@ doesn't re-discover them:
   when `--max-cell-width` is below the original cell length.**
   `plan_widths` reads the wrapped cell on the second pass and shrinks
   the column. Workaround for now: use `--col-width-strategy fixed
-  --col-widths ...` for tables that hit this case.
+  --col-widths ...` for tables that hit this case. **Still open after
+  #120/#121.** The wrap *corruption* those issues targeted (links split
+  at spaces, long URLs hard-broken mid-character, dropped list/blockquote
+  continuation indentation) is resolved -- links/URLs and directive
+  comments are now atomic, and `wrap_cell` re-prefixes list/blockquote
+  continuations. The residual fragment-shrink re-flow is a plain
+  auto-strategy limitation, not corruption; the idempotency sweep exempts
+  the two specimens that exhibit it via
+  `tests/format-tables/idempotency-allowlist.txt`, and each case's golden
+  pins the deterministic single-pass output.
+- **Links, bare URLs, and structure split when wrapping multiline cells
+  (#120) / directive comments split and inline styles detached (#121).**
+  The original tokenizer wrapped `[text](url)`, `https://…`, list
+  markers, blockquotes, and `<!-- … -->` directives as plain
+  whitespace-delimited text, so wrapping a `<!-- multiline -->` cell
+  could break a link, hard-break a URL mid-character, drop list/blockquote
+  continuation indentation, or detach an inline style from its target.
+  **Resolved in #120/#121:** links, reference links, bare URLs, HTML/
+  directive comments, and whole same-line condition spans are atomic;
+  a glue rule keeps a directive fused to its adjacent styled element;
+  `detect_content_prefix` preserves list/blockquote continuation
+  indentation; and in-cell fenced code is emitted verbatim. Over-budget
+  inline links are additionally rewritten to reference form with the
+  definition emitted after the table (outside any condition span).
 - **`IndexError` when a row has more cells than the header.** The
   renderer indexes `widths[c]` past the end. Add column-count
   validation before render.

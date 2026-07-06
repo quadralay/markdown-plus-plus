@@ -1,2 +1,0 @@
-#120
-Fenced code-block content inside a multiline cell is re-wrapped like prose today; the code line and fences should be emitted verbatim and never re-wrapped.
