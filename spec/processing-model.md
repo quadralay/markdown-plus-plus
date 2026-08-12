@@ -176,9 +176,22 @@ Each condition name has one of three states. Visible and Hidden are **assigned s
 
 ##### Unset Pre-Evaluation Check
 
-Before evaluating a condition expression, a processor MUST check whether all condition names in the expression are defined in the condition set. If any name is Unset, the processor MUST NOT evaluate the expression -- the entire condition block passes through as-is (opening tag, content, and closing tag are preserved in the output). As-is refers to condition evaluation only; variable substitution (Phase 1, Step 2) still applies to the block's content.
+Before evaluating a condition expression, a processor MUST check whether all condition names in the expression are defined in the condition set. If any name is Unset, the processor MUST NOT evaluate the expression. The check applies once per expression, before any operator logic runs.
 
-This allows implementations to surface or resolve undefined conditional content downstream rather than silently including it. The check applies once per expression, before any operator logic runs.
+What the processor does with the unevaluated block depends on the **processor mode** it implements. This specification defines two modes:
+
+| Mode | Applies to | Treatment of an unevaluated block |
+|------|------------|-----------------------------------|
+| **Source-preserving** | Linters, validators, converters, formatters, and other tools that round-trip Markdown++ source | The block passes through as-is -- opening tag, content, and closing tag are preserved in the output. |
+| **Publishing** | Processors that resolve a document to a final published deliverable | The block is treated as Visible -- the content is emitted and the condition tags are omitted. The result is indistinguishable from an explicitly Visible condition. |
+
+A processor operates in exactly one mode for any given processing run. A conformant processor MUST declare, in its conformance documentation, which mode it implements; a processor that offers both modes MUST document how the mode is selected.
+
+In both modes the expression is never evaluated, and variable substitution (Phase 1, Step 2) still applies to the block's content -- the content survives in both modes. The modes differ only in whether the condition tags, and with them the unevaluated status of the block, survive into the output.
+
+Source-preserving mode lets an implementation surface or resolve undefined conditional content downstream rather than silently including it. Publishing mode reflects that a published deliverable has no downstream consumer for raw condition tags, and that in a production pipeline Unset is commonly the default state of every condition not explicitly configured for a target -- emitting the content is the intended outcome, where emitting raw tags or discarding the content would not be.
+
+**Scope of "passes through as-is" elsewhere in this document.** Where this document describes an Unset block passing through as-is -- including the [Phase 2](#phase-2-markdown-parsing-with-extension-extraction) treatment of condition, include, and other directive tags carried by such a block -- it describes source-preserving mode. In publishing mode an Unset block resolves as Visible during Phase 1: its content is processed exactly as the content of an explicitly Visible block is processed (include directives within it are expanded, styles and markers within it attach normally), and no condition tags survive into Phase 2. Those descriptions therefore do not apply in publishing mode.
 
 For example, given the condition set `{web: Visible}` and input:
 
@@ -192,7 +205,7 @@ Mobile content here.
 <!--/condition-->
 ```
 
-The output is:
+A source-preserving processor produces:
 
 ```markdown
 Web content here.
@@ -202,9 +215,17 @@ Mobile content here.
 <!--/condition-->
 ```
 
-The `web` block is evaluated normally (Visible = true, so content is included without tags). The `mobile` block passes through as-is because `mobile` is not defined in the condition set -- the pre-evaluation check prevents evaluation.
+A publishing processor produces:
 
-For compound expressions, the same pre-check applies: `<!--condition:web mobile-->` with `web=Visible` and `mobile=Unset` passes through because `mobile` is not defined. The pre-check fires before the AND operator is evaluated.
+```markdown
+Web content here.
+
+Mobile content here.
+```
+
+In both modes the `web` block is evaluated normally (Visible = true, so content is included without tags), and the `mobile` block is not evaluated because `mobile` is not defined in the condition set -- the pre-evaluation check prevents evaluation. The modes differ only in the fate of the `mobile` block's condition tags.
+
+For compound expressions, the same pre-check applies: `<!--condition:web mobile-->` with `web=Visible` and `mobile=Unset` is not evaluated because `mobile` is not defined. The pre-check fires before the AND operator is evaluated, and the resulting block is handled according to the processor's mode.
 
 ##### Condition Expression Operators
 
@@ -539,7 +560,7 @@ This section defines what constitutes a conformant Markdown++ processor.
 A conformant Markdown++ processor MUST implement all of the following:
 
 1. **Include expansion** -- Recursive depth-first expansion with cycle detection and per-file condition evaluation, as specified in [Phase 1, Step 1](#phase-1-step-1-include-expansion).
-2. **Condition evaluation** -- Condition state model (two assigned states plus Unset) with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation).
+2. **Condition evaluation** -- Condition state model (two assigned states plus Unset) with NOT, AND, and OR operators at the specified precedence, as specified in [Per-File Condition Evaluation](#per-file-condition-evaluation). The processor MUST apply the [Unset Pre-Evaluation Check](#unset-pre-evaluation-check) and MUST declare which processor mode it implements for Unset condition blocks -- source-preserving or publishing.
 3. **Variable substitution** -- Token replacement from a variable map with both escaping mechanisms, as specified in [Phase 1, Step 2](#phase-1-step-2-variable-substitution).
 4. **Style extraction** -- Extraction and attachment of `style:Name` commands to target elements.
 5. **Alias extraction** -- Extraction and attachment of `#name` commands to target elements.
@@ -564,7 +585,7 @@ The following features are OPTIONAL. A conformant processor MAY implement them b
 
 ### Conformance Statement
 
-A processor that implements all required features, handles MDPP diagnostic codes at their specified severities for all features it implements, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
+A processor that implements all required features, handles MDPP diagnostic codes at their specified severities for all features it implements, declares its processor mode for Unset condition blocks, and produces deterministic output (same input yields same output tree) is a **conformant Markdown++ processor**.
 
 A processor that implements all required features plus one or more optional features is a **conformant Markdown++ processor with extensions** and SHOULD document which optional features are supported.
 

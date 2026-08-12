@@ -514,7 +514,16 @@ Each condition name has one of three states:
 | **Hidden** | Content inside the block is removed from output. |
 | **Unset** | The condition name is not defined in the condition set. |
 
-**Unset pre-evaluation check:** Before evaluating a condition expression, the processor checks whether all condition names are defined. If any name is Unset, the entire block passes through as-is (opening tag, content, closing tag preserved). As-is refers to condition evaluation only; variable substitution still applies. The check fires once per expression, before any operator logic runs.
+**Unset pre-evaluation check:** Before evaluating a condition expression, the processor checks whether all condition names are defined. If any name is Unset, the expression is not evaluated. The check fires once per expression, before any operator logic runs.
+
+What happens to the unevaluated block depends on the processor's declared mode (see [GLOSSARY.md](../../../../../GLOSSARY.md#processor-mode)):
+
+| Mode | Unevaluated block |
+|------|-------------------|
+| **Source-preserving** (linters, converters, formatters) | Passes through as-is — opening tag, content, and closing tag preserved. |
+| **Publishing** (processors producing final deliverables) | Treated as Visible — content emitted, condition tags omitted. |
+
+Either way the content survives, and variable substitution still applies to it. Do not rely on an Unset condition to hide content or to keep its tags in published output; set the condition Hidden when content must be removed.
 
 ### Condition Expressions
 
@@ -536,8 +545,8 @@ Once all names pass the Unset pre-check, operators use standard boolean logic (V
 | `web,print` | Show when "web" OR "print" is Visible |
 | `!internal,web` | Show when "internal" is Hidden OR "web" is Visible |
 | `!draft,web production` | `(!draft) OR (web AND production)` |
-| `mobile` | **Pass through** — "mobile" is Unset; pre-check prevents evaluation |
-| `web mobile` | **Pass through** — "mobile" is Unset; pre-check prevents evaluation even though "web" is defined |
+| `mobile` | **Not evaluated** — "mobile" is Unset; pre-check prevents evaluation (mode decides the block's fate) |
+| `web mobile` | **Not evaluated** — "mobile" is Unset; pre-check prevents evaluation even though "web" is defined |
 
 ### Condition Name Rules
 
@@ -600,11 +609,11 @@ This appears when draft is Hidden.
 
 ### Interaction with Other Extensions for Unset Blocks
 
-When a condition block passes through (Unset), its content and tags interact with other extensions as follows:
+The table below describes a **source-preserving** processor, where the Unset block and its tags survive. In **publishing** mode the block resolves as Visible, so its content is processed like any other Visible content (includes expanded, styles and markers attached) and no condition tags reach Phase 2.
 
-| Extension | Behavior inside an Unset condition block |
+| Extension | Behavior inside an Unset condition block (source-preserving mode) |
 |-----------|------------------------------------------|
-| **Variables** | Variable substitution (`$name;`) IS applied. Phase 1, Step 2 resolves `$variable;` tokens inside Unset blocks because the content survives into that step. "Pass-through" means the condition is not evaluated — not that the content is frozen at Phase 1 input. |
+| **Variables** | Variable substitution (`$name;`) IS applied. Phase 1, Step 2 resolves `$variable;` tokens inside Unset blocks because the content survives into that step. "Pass-through" means the condition is not evaluated — not that the content is frozen at Phase 1 input. This holds in both modes. |
 | **Includes** | Include directives (`<!--include:path-->`) inside an Unset block are NOT processed. The include tag passes through as literal text in the output along with the condition tags. The referenced file is never read. |
 | **Styles / Aliases / Markers** | Tags inside Unset blocks survive into Phase 2 output as HTML comments that Phase 2 does not act on. They do not attach to elements and do not produce diagnostics. |
 | **Phase 2 recognition** | Condition opening/closing tags that pass through Phase 1 are NOT recognized as Markdown++ directives in Phase 2. Phase 2 treats them as regular HTML comments and ignores them. |
@@ -619,7 +628,7 @@ Download version $version; for mobile.
 <!--/condition-->
 ```
 
-Output:
+Source-preserving output:
 
 ```markdown
 <!--condition:mobile-->
@@ -627,7 +636,13 @@ Download version 2.0 for mobile.
 <!--/condition-->
 ```
 
-The `mobile` condition is Unset so the block passes through, but `$version;` is still resolved to `2.0` by variable substitution.
+Publishing output:
+
+```markdown
+Download version 2.0 for mobile.
+```
+
+The `mobile` condition is Unset so the block is never evaluated, but `$version;` is still resolved to `2.0` by variable substitution in either mode.
 
 ---
 

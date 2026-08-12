@@ -670,7 +670,7 @@ This section has a custom style, marker metadata, and a stable alias for linking
 
 ## Example 12: Unset Condition Pass-Through
 
-Unset conditions pass through with their tags intact, allowing downstream tools or build stages to process them. This example shows a document built with condition set `{web: Visible, print: Visible}` — the `mobile` and `tablet` conditions are not defined and therefore Unset.
+Unset conditions are never evaluated. A source-preserving processor (linter, converter, formatter) keeps the block with its tags intact so a downstream tool or build stage can process it; a publishing processor emits the content without the tags. This example shows a document built with condition set `{web: Visible, print: Visible}` — the `mobile` and `tablet` conditions are not defined and therefore Unset. The walkthrough below traces source-preserving mode; in publishing mode every block listed appears in the output with its tags removed.
 
 ```markdown
 <!--markers:{"Keywords": "installation, setup", "Description": "Installation guide for all platforms"} ; #installation-guide-->
@@ -720,7 +720,7 @@ Given condition set `{web: Visible, print: Visible}` and variable map `{product_
 - The `web production` block passes through as-is — `production` is Unset, so the AND expression is not evaluated even though `web` is Visible.
 - The `web mobile` block passes through as-is — same reason.
 
-The resulting output contains the Unset blocks verbatim, with `$version;` already substituted, ready for a mobile-aware downstream processor to evaluate.
+The resulting source-preserving output contains the Unset blocks verbatim, with `$version;` already substituted, ready for a mobile-aware downstream processor to evaluate. A publishing processor produces the same text minus every condition tag — mobile and tablet content included in the deliverable. Author accordingly: content in an Unset block is published content unless the condition is defined and set Hidden.
 
 ---
 

@@ -220,20 +220,22 @@ See [MDPP019](error-codes.md#mdpp019----condition-inside-a-table-cell).
 
 **Undefined condition names (Unset) — authoring guidance:**
 
-A condition name that is not included in the condition set at build time is **Unset** (see [GLOSSARY.md](../../../../../GLOSSARY.md#unset)). Unset condition blocks pass through the processor with their opening tags, content, and closing tags intact. This is intentional: it lets you author content for multiple output targets in a single source file, even if only some targets are active in a given build.
+A condition name that is not included in the condition set at build time is **Unset** (see [GLOSSARY.md](../../../../../GLOSSARY.md#unset)). An Unset condition is never evaluated, and the block's content is never removed. What happens to the block's tags depends on the processor's [mode](../../../../../GLOSSARY.md#processor-mode): a source-preserving processor (linter, converter, formatter) keeps the block with its tags intact, while a publishing processor emits the content without them, exactly as if the condition were Visible.
 
-- **Define all active conditions explicitly.** An omitted name is not "off" — it is undefined. If you intend a block to be removed, set the condition to Hidden. If you leave it undefined, the block passes through to the output, which may not be what you want.
-- **Unset is useful for staged or multi-pass builds.** A `mobile` condition block that passes through in a web build can be processed by a separate mobile pipeline in a later stage.
-- **Variables inside Unset blocks are still resolved.** Even when the condition block passes through, `$variable;` tokens inside the block are substituted during Phase 1. Do not rely on pass-through to preserve unresolved variable references.
-- **Compound expressions with any Unset operand always pass through.** `<!--condition:web mobile-->` passes through even if `web` is Visible, because `mobile` is Unset. Add all required condition names to the condition set before build if you need a compound block to be evaluated.
+- **Never treat Unset as a way to hide content.** An omitted name is not "off" — it is undefined, and its content reaches the output in both modes. If you intend a block to be removed, define the condition and set it to Hidden.
+- **Never treat Unset as a way to preserve tags in published output.** A publishing processor strips them. If a later stage must see the tags, run that stage against the source or against a source-preserving processor's output.
+- **Define all conditions your document uses.** Leaving a name undefined makes the block's fate depend on which tool processes it — the one thing single-sourced content should not depend on.
+- **Unset is useful for staged or multi-pass builds.** A `mobile` condition block preserved by a source-preserving stage can be processed by a separate mobile pipeline later.
+- **Variables inside Unset blocks are still resolved.** `$variable;` tokens inside the block are substituted during Phase 1 in both modes. Do not rely on an unevaluated block to preserve unresolved variable references.
+- **Compound expressions with any Unset operand are never evaluated.** `<!--condition:web mobile-->` is not evaluated even if `web` is Visible, because `mobile` is Unset. Add all required condition names to the condition set before build if you need a compound block to be evaluated.
 
 ```markdown
-<!-- Pass-through: mobile is Unset — block preserved with variable resolved -->
+<!-- Unset: mobile is undefined — never evaluated, content reaches output either way -->
 <!--condition:mobile-->
 Download version $version; for mobile.
 <!--/condition-->
 
-<!-- Pass-through: tablet is Unset — even though print is Visible, OR is not evaluated -->
+<!-- Unset: tablet is undefined — even though print is Visible, OR is not evaluated -->
 <!--condition:print,tablet-->
 Available in print and tablet editions.
 <!--/condition-->

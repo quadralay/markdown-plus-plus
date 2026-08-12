@@ -195,9 +195,11 @@ Means: (!draft) OR (web AND production)
 
 **Per-file scoping:** Condition blocks must open and close within the same file — they cannot span across an include boundary (MDPP012). See `spec/processing-model.md`.
 
-**Condition state model:** Each condition name is either Visible or Hidden (assigned states); a name not defined in the condition set is Unset (see [GLOSSARY.md](../../../../GLOSSARY.md#unset)) — not an assigned state, but the absence of one. Unset conditions are not evaluated — the condition block passes through as-is (opening tag, content, and closing tag preserved), allowing the implementation to surface or resolve undefined conditional content downstream. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block passes through without evaluation.
+**Condition state model:** Each condition name is either Visible or Hidden (assigned states); a name not defined in the condition set is Unset (see [GLOSSARY.md](../../../../GLOSSARY.md#unset)) — not an assigned state, but the absence of one. Unset conditions are never evaluated. What happens to the block then depends on the processor's declared [mode](../../../../GLOSSARY.md#processor-mode): a source-preserving processor (linter, converter, formatter) keeps the block as-is with its tags; a publishing processor emits the content without the tags, indistinguishable from Visible. In compound expressions (NOT/AND/OR), if any operand is Unset, the entire block goes unevaluated.
 
-**Variable substitution inside Unset blocks:** "Passes through as-is" refers to condition evaluation only. Variable substitution (Phase 1, Step 2) still resolves `$variable;` tokens inside Unset blocks because the content survives into that processing step. Include directives inside Unset blocks are NOT processed — the include tag passes through as literal text.
+**Authoring takeaway:** do not rely on an Unset condition to hide or to preserve anything in published output. If content must be dropped, define the condition and set it Hidden.
+
+**Variable substitution inside Unset blocks:** the content of an Unset block survives in both modes, so variable substitution (Phase 1, Step 2) still resolves `$variable;` tokens inside it. An include directive inside an Unset block is NOT processed in source-preserving mode — the include tag survives as literal text. In publishing mode the block resolves as Visible, so the include is expanded like any other.
 
 ### File Includes
 
