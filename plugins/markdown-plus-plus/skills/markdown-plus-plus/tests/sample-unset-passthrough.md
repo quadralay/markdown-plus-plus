@@ -7,9 +7,11 @@ status: active
 
 This file exercises Unset condition pass-through behavior. The expected condition set for evaluating this file is `{web: Visible, print: Hidden}`. The condition names `mobile`, `tablet`, and `kiosk` are intentionally **not** defined — they are Unset.
 
+The expected outputs described below are those of a **source-preserving** processor. The Unset pre-evaluation check is identical in both processor modes — no Unset expression is ever evaluated — but a **publishing** processor treats each Unset block as Visible, emitting its content with the condition tags omitted. See [GLOSSARY.md](../../../../../GLOSSARY.md#processor-mode).
+
 ## Simple Unset Pass-Through
 
-The block below uses an undefined condition name. A conformant processor MUST preserve the opening tag, content, and closing tag unchanged.
+The block below uses an undefined condition name. A conformant source-preserving processor MUST preserve the opening tag, content, and closing tag unchanged.
 
 <!--condition:mobile-->
 This content is for mobile users. It should pass through with its condition tags intact.
@@ -81,7 +83,7 @@ This content appears when the kiosk condition is Hidden.
 
 ## Include Inside Unset Block
 
-The include directive below is inside an Unset condition block. The include MUST NOT be processed; the entire block — condition tags, include directive, and surrounding content — passes through as literal text.
+The include directive below is inside an Unset condition block. In source-preserving mode the include MUST NOT be processed; the entire block — condition tags, include directive, and surrounding content — passes through as literal text. In publishing mode the block resolves as Visible, so the include is expanded like any other.
 
 <!--condition:mobile-->
 Mobile-specific preamble.
