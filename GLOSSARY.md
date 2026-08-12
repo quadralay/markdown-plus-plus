@@ -81,3 +81,21 @@ Full treatment: [Conditions in Multiline Table Cells](spec/multiline-cell-extens
 A condition span that contains an unescaped `|` cell delimiter. A conditional cell **MUST NOT** be authored: hiding such a span removes cell boundaries and changes the row's column count, so the resulting table structure is corrupt. Because Phase 1 condition evaluation is table-blind, a processor cannot reject the pattern -- it is an authoring requirement surfaced by validation (MDPP019, warning), not processor behavior. Use conditional rows for structural differences and variables for value substitution instead.
 
 Full treatment: [Conditions in Multiline Table Cells](spec/multiline-cell-extensions.md).
+
+### command
+
+A Markdown++ instruction carried inside an HTML comment: `style:`, `#alias`, `marker:`/`markers:`, `multiline`, `condition:`/`/condition`, or `include:`. The command is the payload; the [comment tag](#comment-tag) is the `<!-- -->` container that carries it. An HTML comment whose content matches at least one recognized command pattern is an extension comment (synonym: **directive**) and is subject to Markdown++ processing; a comment matching no pattern is a regular HTML comment and is ignored. Vocabulary discipline: describe payloads as commands and reserve "tag" for the comment container -- combining is always "commands in the same comment tag, separated by `;`", never one tag placed above another (stacked tags orphan the upper tag, MDPP009).
+
+Full treatment: [Section 5 Extension Comment Syntax](spec/specification.md#5-extension-comment-syntax).
+
+### comment tag
+
+The `<!-- ... -->` HTML comment container that carries one or more Markdown++ [commands](#command). Comment syntax keeps Markdown++ extensions invisible in standard Markdown renderers -- the core backward-compatibility principle of the format. A comment tag MUST stay on a single physical line, and it binds to its target element under the [attachment rule](#attachment-rule): block-level on the line directly above the element, inline immediately before the syntax with no space between. Placement rules are stated about the comment tag; payload semantics are stated about its commands.
+
+Full treatment: [Section 5 Extension Comment Syntax](spec/specification.md#5-extension-comment-syntax).
+
+### combined command
+
+A single HTML comment containing multiple Markdown++ [commands](#command) separated by semicolons, e.g. `<!-- style:DataTable ; multiline -->` or `<!-- style:Heading2 ; #200020 -->`. Combined commands exist because the [attachment rule](#attachment-rule) makes stacked tags orphan the top tag -- one comment tag attaches to one element, so a combined command is the only way to apply several commands to the same element. Styles, the `multiline` indicator, markers, and aliases MAY combine; conditions and includes MUST NOT appear in a combined command. The recommended evaluation order is style, multiline, marker(s), alias, regardless of the order written in the comment.
+
+Full treatment: [Section 16 Combined Commands](spec/specification.md#16-combined-commands).

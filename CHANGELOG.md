@@ -13,7 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
-## [1.13.0] - 2026-07-05
+## [1.14.0] - 2026-08-11
+
+### Spec
+
+- Corrected § 9.4 "Styles and Multiline Tables": the paragraph described applying a table style "by placing it above the `<!-- multiline -->` tag via a combined command" -- self-contradictory phrasing that reads as stacked tags, which the attachment rule orphans (MDPP009). Now states that the style command and the `multiline` indicator combine **in a single combined command** attached directly above the table, with an explicit MUST NOT for stacking, matching § 14.4's existing wording. The old phrasing had already misled a RAG assistant grounded on a derived copy of this spec into answering "put the style tag above the multiline tag" ([#131](https://github.com/quadralay/markdown-plus-plus/issues/131)).
+- New `GLOSSARY.md` terms pinning the container/payload vocabulary: **command** (the instruction inside the comment), **comment tag** (the `<!-- -->` container), **combined command** (multiple commands in one tag, `;`-separated) -- each lifted from §§ 3/5/16 with the vocabulary discipline that combining is stated as "commands in the same comment tag," never as one tag placed above another. `SKILL.md`'s Combined Commands section now links the new anchors ([#131](https://github.com/quadralay/markdown-plus-plus/issues/131)).
 
 ### Tooling
 

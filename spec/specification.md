@@ -433,7 +433,7 @@ When styling a nested list item, the tag MUST be indented to match the nesting l
 
 **Styles and Combined Commands:** A style MAY be combined with markers, aliases, and the multiline indicator using combined command syntax. In the recommended evaluation order, the style is evaluated first. See [section 16](#16-combined-commands).
 
-**Styles and Multiline Tables:** A style MAY apply to a multiline table by placing it above the `<!-- multiline -->` tag via a combined command (`<!-- style:DataTable ; multiline -->`), or to content within table cells using inline or block placement within the cell.
+**Styles and Multiline Tables:** A style MAY apply to a multiline table as a whole by combining the style command and the `multiline` indicator in a single combined command (`<!-- style:DataTable ; multiline -->`) attached directly above the table, or to content within table cells using inline or block placement within the cell. The style and `multiline` commands MUST NOT be stacked as separate comment tags -- the upper tag would be orphaned (MDPP009).
 
 **Styles and Content Islands:** A style above a blockquote creates a content island -- a styled, self-contained content block. See [section 15](#15-content-islands).
 
