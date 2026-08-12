@@ -251,7 +251,7 @@ Every pipe-bearing row continues the current logical row. A row whose cells are 
 
 ### Combined Commands
 
-Multiple commands in a single comment, separated by semicolons. Order: style, multiline, marker(s), #alias.
+Multiple [commands](../../../../GLOSSARY.md#command) in a single [comment tag](../../../../GLOSSARY.md#comment-tag), separated by semicolons (see [combined command](../../../../GLOSSARY.md#combined-command)). Order: style, multiline, marker(s), #alias.
 
 ```markdown
 <!-- style:CustomHeading ; marker:Keywords="intro" ; #introduction -->
