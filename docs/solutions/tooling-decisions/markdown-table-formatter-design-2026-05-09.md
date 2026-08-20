@@ -272,7 +272,13 @@ doesn't re-discover them:
   definition emitted after the table (outside any condition span).
 - **`IndexError` when a row has more cells than the header.** The
   renderer indexes `widths[c]` past the end. Add column-count
-  validation before render.
+  validation before render. **Resolved:** the column count now comes
+  from the widest row rather than the header, via
+  `TableBlock.normalize_columns()`, so the surplus cell widens the
+  table -- header and separator included -- and every per-column list
+  is sized for it. The multiline path reached the count a second time
+  in `rewrite_table_links()` (the fence-flag matrix) and crashed there
+  before width planning ran; both sites share the one normalizer now.
 - **Cell-split regex misses escaped pipes after even backslash counts**
   (e.g., `C:\\path\\|\\thing`). Use a stateful split rather than a
   lookbehind regex.

@@ -122,6 +122,24 @@ class TableBlock:
         """The genuine data rows (header + data), comment members excluded."""
         return [cells for kind, cells in self.members if kind == 'row']
 
+    def normalize_columns(self) -> int:
+        """Pad every row out to the widest row's cell count; return that count.
+
+        The count comes from the widest row, not the header: a data row may
+        carry more cells than the header, and a header-derived count leaves
+        those cells outside every per-column list (width plan, fence flags),
+        so the consumers index past the end. Padding the short rows is the
+        benign repair already applied to ragged tables.
+        """
+        rows = self.rows
+        if not rows:
+            return 0
+        n_cols = max(len(r) for r in rows)
+        for r in rows:
+            while len(r) < n_cols:
+                r.append('')
+        return n_cols
+
 
 @dataclass
 class TextBlock:
@@ -751,7 +769,7 @@ def rewrite_table_links(
     if not table.is_multiline or not table.rows:
         return []
 
-    n_cols = len(table.rows[0])
+    n_cols = table.normalize_columns()
     protected = column_protected_flags(table.rows, n_cols)
     slug = table_slug(table, heading_slug)
     counter = [1]  # per-table link counter (n starts at 1)
@@ -866,12 +884,7 @@ def plan_widths(table: TableBlock, config: FormatterConfig) -> list[int]:
     """
     if not table.rows:
         return []
-    n_cols = len(table.rows[0])
-
-    # Pad shorter rows with empty cells for column-count consistency.
-    for r in table.rows:
-        while len(r) < n_cols:
-            r.append('')
+    n_cols = table.normalize_columns()
 
     # Default: auto.
     strategy = config.col_width_strategy

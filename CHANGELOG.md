@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.15.1] - 2026-08-20
+
+### Tooling
+
+- `format-tables.py` no longer aborts on a table whose data row carries more cells than its header. The column count is now taken from the widest row rather than the header (`TableBlock.normalize_columns()`), so the surplus cell **widens the table** -- header and separator padded to the new count, every row rendered aligned -- which is the benign pad/render repair already applied to shorter rows, and the resolution the design-doc known limitation "`IndexError` when a row has more cells than the header" called for. Previously `plan_widths()` sized `widths` from the header and `_render_row()` indexed past its end, so the CLI exited 1 with a traceback and **zero bytes on stdout** -- the `format-tables.py file.md > file.md.new` shape from the design doc therefore truncated the output file. The multiline path reached the column count a second time in `rewrite_table_links()`, whose fence-flag matrix was sized from the header and indexed per data cell; that site raised the same `IndexError` *before* width planning ran, so a `<!-- multiline -->` table with a ragged row crashed even with the planner fixed. Both sites share the one normalizer now. Downstream effects of no longer crashing: `--check` reports exit 4 (would reformat) on a ragged table, `--in-place` rewrites it and re-checks clean, and `--col-width-strategy fixed` with a mismatched `--col-widths` gives the documented exit-3 parse error naming the true column count. Flipped the `kl-extra-cells-row` `KNOWN_FAIL` fixture to green against its hand-authored golden byte-for-byte, and added `kl-extra-cells-row-multiline` pinning the second crash site. Design-doc limitation bullet marked resolved; the rule set's "No malformed-table repair" note now states the widening. Suite: 34 pass / 2 known-fail / 0 unexpected-pass; idempotency sweep clean (51/0/2 allowlisted).
+
 ## [1.15.0] - 2026-08-12
 
 ### Spec
