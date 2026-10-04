@@ -121,7 +121,7 @@ The following terms are used normatively throughout this specification.
 
 **Block-level element** -- A CommonMark structural element that occupies its own line(s): headings, paragraphs, lists, blockquotes, code blocks, tables, and thematic breaks.
 
-**Combined command** -- A single HTML comment containing multiple Markdown++ commands separated by semicolons. See [section 16](#16-combined-commands).
+**Combined command** -- A single HTML comment containing multiple Markdown++ commands separated by semicolons. A semicolon inside a quoted marker value or inside a `markers:` JSON object belongs to that command and does not separate commands. See [section 16](#16-combined-commands).
 
 **Condition set** -- A collection of condition names, each assigned a state of **Visible** or **Hidden**. A condition name not defined in the condition set is **Unset** (undefined). Provided to the processor at build time.
 
@@ -213,7 +213,7 @@ Multiple commands MAY be joined in a single comment using semicolons as separato
 <!-- command1 ; command2 ; command3 -->
 ```
 
-Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives. See [section 16](#16-combined-commands) for the complete definition.
+Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A semicolon inside a quoted marker value or inside a `markers:` JSON object is part of that command, not a delimiter. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives. See [section 16](#16-combined-commands) for the complete definition.
 
 **Edge case:** A comment containing semicolons where no segment matches any recognized command pattern is treated as a regular HTML comment under section 5.2 — it is not a combined command, is not subject to the attachment rule, and produces no diagnostics. The combined command path is only entered when at least one segment matches a recognized command pattern.
 
@@ -230,7 +230,7 @@ The attachment rule governs the positional relationship between Markdown++ comme
 ### 6.1 Core Rules
 
 1. **Block-level tags** MUST appear on the line directly above the target element with no intervening blank line.
-2. **Inline tags** MUST appear immediately before the styled element on the same line, with no space between the closing `-->` and the element.
+2. **Inline tags** (`style:`, `marker:`, `markers:`) MUST appear immediately before the target inline element on the same line, with no space between the closing `-->` and the element.
 3. A single blank line between a tag and its target breaks attachment. Multiple blank lines have the same effect as one.
 4. Tags attach **downward only** -- a tag placed below content does not attach to the content above it.
 
@@ -240,7 +240,7 @@ The attachment rule governs the positional relationship between Markdown++ comme
 |---------|:-------------------:|-------|
 | `style:` (block and inline) | Yes | Block: line above. Inline: immediately before, no space. |
 | `#alias` | Yes | Block-level only. Line directly above target. |
-| `marker:` / `markers:` | Yes | Line directly above target. |
+| `marker:` / `markers:` (block and inline) | Yes | Block: line above. Inline: immediately before, no space. |
 | `multiline` | Yes | Line directly above the table. |
 | Combined commands (`;`) | Yes | Same rules as the individual commands within. |
 | `condition:` / `/condition` | No | Wraps content. Blank lines within the block are permitted. |
@@ -445,7 +445,7 @@ When styling a nested list item, the tag MUST be indented to match the nesting l
 
 Style commands require attachment. Block-level styles follow the standard block attachment rule. Inline styles follow the inline attachment rule (no space between `-->` and the element). An unattached style is orphaned.
 
-Inline placement applies only to `style:` commands; all other commands that require attachment operate at block level only, as specified in the [Formal Grammar structural constraints](formal-grammar.md#structural-constraints).
+Inline placement applies to `style:` commands and to `marker:` and `markers:` commands (see [section 13.3](#133-semantics)). Aliases and the `multiline` indicator operate at block level only, as specified in the [Formal Grammar structural constraints](formal-grammar.md#structural-constraints).
 
 ### 9.6 Diagnostics
 
@@ -822,7 +822,7 @@ Include directives are **exempt** from the attachment rule. An include is a stan
 
 ### 13.1 Purpose
 
-Markers attach metadata key-value pairs to block-level elements. Markers provide a mechanism for associating structured data (keywords, descriptions, index entries, passthrough content) with content elements for use by publishing processors.
+Markers attach metadata key-value pairs to content elements, usually block-level elements. Markers provide a mechanism for associating structured data (keywords, descriptions, index entries, passthrough content) with content elements for use by publishing processors.
 
 ### 13.2 Syntax
 
@@ -836,7 +836,14 @@ For a single key-value pair:
 <!-- marker:Key="value" -->
 ```
 
-The key MUST match the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Embedded spaces are permitted in marker keys. The value is enclosed in double quotes. Empty values (`""`) are permitted. Escaped double quotes within values are not supported.
+The key MUST match the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Embedded spaces are permitted in marker keys. The value is enclosed in double quotes and runs to the next double quote. It MAY be empty (`""`), and it MAY contain `=` and `;` characters:
+
+```
+<!-- marker:DropDownEnd="" -->
+<!-- marker:Hyperlink="https://example.com/page?id=42" -->
+```
+
+Escaped double quotes within values are not supported, so a simple-form value cannot contain a double quote. A processor MAY trim leading and trailing whitespace from a simple-form value. A value whose surrounding whitespace matters SHOULD be written in the JSON form.
 
 #### JSON Markers
 
@@ -848,20 +855,63 @@ For multiple key-value pairs:
 
 The JSON content MUST be a valid JSON object as defined by [RFC 8259][rfc8259]. Keys within the JSON object MUST be strings conforming to the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Values MAY be any JSON type (string, number, boolean, array, object, null). A conformant processor MUST use a standards-compliant JSON parser for the JSON markers production.
 
+#### Characters That Need the JSON Form
+
+A processor finds the comment boundary before it parses the commands (see the [Formal Grammar](formal-grammar.md#comment-directives)), so a value in either form cannot contain the literal character sequence `-->`. A value that needs `-->`, a double quote, or a line break MUST be written in the JSON form, where each of these is carried by an RFC 8259 escape in the JSON string:
+
+| Character | JSON escape |
+|-----------|-------------|
+| `"` | `\"` |
+| The `>` of `-->` | `\u003e` |
+| Line break | `\n` |
+
+Writing a line break as `\n` also keeps the comment tag on a single line.
+
+```markdown
+<!-- markers:{"Description": "Covers the \"Quick Start\" steps"} -->
+## Getting Started
+```
+
+#### Writing Marker Values (Informative)
+
+This note is guidance for tools that write Markdown++, such as converters and publishing tools with a Markdown++ output. It is not a processor requirement.
+
+- Write a marker in the simple form only when its value reads back exactly in that form: no double quote, no `-->`, no line break, and no leading or trailing whitespace. Otherwise, write it in the JSON form.
+- In the JSON form, write a semicolon as `\u003b`. A conformant parser does not split a JSON object at a semicolon, but the escape is the safest choice for interoperability with simpler tools that split a comment at every `;`.
+- Write the `>` of `-->` as `\u003e`. Escaping every `>` is also acceptable.
+
 ### 13.3 Semantics
 
 Markers are extracted and attached to elements during Phase 2 parsing. The marker key-value pairs become metadata on the attached element in the output tree.
 
-#### Passthrough Marker
+#### PassThrough Marker
 
-The `Passthrough` marker key has special semantics. Its value is emitted as-is in the output with no Markdown parsing or variable substitution. The Passthrough marker enables injection of format-specific markup (e.g., custom HTML elements, processing instructions) that should not be interpreted as Markdown.
+The `PassThrough` marker key has special semantics. Its value is emitted as-is in the output with no Markdown parsing or variable substitution. The PassThrough marker enables injection of format-specific markup (e.g., custom HTML elements, processing instructions) that should not be interpreted as Markdown. Marker keys are case-sensitive: the key is `PassThrough`, with a capital T.
 
 ```markdown
-<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+<!-- marker:PassThrough="<a id='legacy-anchor'></a>" -->
 ## Migration Guide
 ```
 
-The Passthrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the general behavior where standalone unrecognized HTML comments are ignored (section 5.2) and from unrecognized segments in combined commands (section 16.4), whose disposition is implementation-defined.
+The PassThrough marker is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is distinct from the general behavior where standalone unrecognized HTML comments are ignored (section 5.2) and from unrecognized segments in combined commands (section 16.4), whose disposition is implementation-defined.
+
+#### Inline Markers
+
+A `marker:` or `markers:` command MAY also be placed inline, immediately before an inline element on the same line, with no space between the closing `-->` and the element. The markers attach to the inline element that follows, under the same inline attachment rule as inline styles (see [section 6](#6-the-attachment-rule)).
+
+```markdown
+Add a custom <!--marker:Keywords="inline"-->**marker** to this phrase.
+```
+
+On a link, an inline marker tag goes inside the link text brackets, as an inline style tag does: `[<!--marker:Keywords="api"-->API Reference](api.md)`.
+
+An inline marker tag's text MUST NOT contain `--`, because CommonMark 0.30 does not recognize an inline HTML comment whose text contains `--`; such a tag renders as literal text and carries no commands. A marker value that contains `--` (including one that needs `-->`) MUST be carried by a block-level tag.
+
+Aliases and the `multiline` indicator remain block-level only.
+
+#### Markers on Lists and Blockquotes
+
+A marker command attached to a list or a blockquote attaches to that container. **Note (informative):** a processor whose output has no place for container metadata may carry a list's or blockquote's markers on the first paragraph inside it. Authors who need a marker on a later paragraph should attach it to that paragraph directly.
 
 #### Index Markers
 
@@ -885,7 +935,7 @@ The `IndexMarker` key creates entries in generated indexes. Index entries use co
 
 ### 13.5 Attachment Requirements
 
-Marker commands require block-level attachment. The marker tag MUST appear on the line directly above the target element with no blank line. At the start of a file, markers are typically placed above the title paragraph -- they are attached to the title, not floating standalone.
+Marker commands require attachment. A block-level marker tag MUST appear on the line directly above the target element with no blank line. An inline marker tag MUST appear immediately before the target inline element, with no space between the closing `-->` and the element. At the start of a file, markers are typically placed above the title paragraph -- they are attached to the title, not floating standalone.
 
 ### 13.6 Diagnostics
 
@@ -907,8 +957,16 @@ Marker commands require block-level attachment. The marker tag MUST appear on th
 <!-- marker:IndexMarker="creating projects" -->
 ## Creating Projects
 
-<!-- marker:Passthrough="<custom-element />" -->
+<!-- marker:Hyperlink="https://example.com/page?id=42" -->
+## Related Links
+
+<!-- markers:{"Description": "Covers the \"Quick Start\" steps"} -->
+## Getting Started
+
+<!-- marker:PassThrough="<custom-element />" -->
 ## Custom Section
+
+Add a custom <!--marker:Keywords="inline"-->**marker** to this phrase.
 ```
 
 ---
@@ -1090,6 +1148,8 @@ Multiple commands are joined in a single comment using semicolons as separators:
 
 Whitespace around semicolons is optional but RECOMMENDED for readability.
 
+A semicolon separates commands only outside a command's own value. A semicolon inside a quoted marker value, or inside a `markers:` JSON object, is part of that command: `<!-- marker:Note="a; b" ; #n1 -->` holds two commands, not three.
+
 The following commands MAY appear in a combined command:
 
 | Command | Syntax |
@@ -1097,6 +1157,7 @@ The following commands MAY appear in a combined command:
 | Style | `style:StyleName` |
 | Multiline | `multiline` |
 | Marker (simple) | `marker:Key="value"` |
+| Markers (JSON) | `markers:{...}` |
 | Alias | `#alias-name` |
 
 Conditions (`condition:`/`/condition`) and includes (`include:`) MUST NOT appear in combined commands. They are standalone directives with distinct scoping rules.
@@ -1109,12 +1170,12 @@ When a combined command contains multiple recognized commands, a processor SHOUL
 |:-----:|---------|--------|
 | 1 | `style:Name` | Associates a custom style with the target element |
 | 2 | `multiline` | Marks the target table for multiline cell processing |
-| 3 | `marker:Key="value"` | Attaches metadata key-value pairs |
+| 3 | `marker:Key="value"` or `markers:{...}` | Attaches metadata key-value pairs |
 | 4 | `#alias` | Assigns a navigational alias anchor |
 
 ### 16.4 Unrecognized Segments
 
-Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A processor MUST interpret recognized segments normally. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives.
+Within a combined command, each semicolon-delimited segment is either a recognized command or unrecognized text. A semicolon inside a quoted marker value or inside a `markers:` JSON object does not delimit a segment. A processor MUST interpret recognized segments normally. Unrecognized segments MUST NOT affect the CommonMark processing of the attached content. The disposition of unrecognized segments is implementation-defined — implementations MAY pass them through as HTML comments, inject them as markers, or discard them. This allows authors to embed metadata (status notes, review flags, tracking info) alongside directives.
 
 ```markdown
 <!-- style:CustomHeading ; #alias-here ; TODO: add Keywords markers -->

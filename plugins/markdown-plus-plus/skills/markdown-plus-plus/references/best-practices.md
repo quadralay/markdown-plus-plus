@@ -268,7 +268,7 @@ Available in print and tablet editions.
 - Search keywords for web output
 - Document metadata (author, category)
 - Content that needs special processing
-- Passthrough text for output formats
+- `PassThrough` content for output formats
 
 **Avoid markers for:**
 - Information already in document content

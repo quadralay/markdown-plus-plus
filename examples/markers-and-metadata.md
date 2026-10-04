@@ -96,6 +96,33 @@ Markers compose with styles and aliases in combined commands. Follow the order: 
 
 This heading has a custom style, a keywords marker, and a stable alias -- all in one comment directive.
 
+<!-- style:Heading2; #300009 -->
+## Special characters in marker values
+
+[special-characters-in-marker-values]: #300009 "Special characters in marker values"
+
+A simple-format value can be empty, and it can contain `=` and `;`:
+
+<!--marker:Hyperlink="https://example.com/page?id=42"-->
+This paragraph carries a URL with a query string in its marker.
+
+A double quote, the characters `-->`, or a line break needs the JSON format, with the character written as a JSON escape (`\"`, `\u003e` for the `>`, `\n`):
+
+<!--markers:{"Description": "Covers the \"Quick Start\" steps"}-->
+This paragraph's description marker contains quotation marks.
+
+A marker can also be placed inline, immediately before an inline element. This sentence has an <!--marker:Keywords="inline"-->**inline marker** on its bold phrase.
+
+```markdown
+<!--marker:Hyperlink="https://example.com/page?id=42"-->
+This paragraph carries a URL with a query string in its marker.
+
+<!--markers:{"Description": "Covers the \"Quick Start\" steps"}-->
+This paragraph's description marker contains quotation marks.
+
+This sentence has an <!--marker:Keywords="inline"-->**inline marker** on its bold phrase.
+```
+
 <!-- style:Heading2; #300007 -->
 ## Common marker keys
 
@@ -109,23 +136,23 @@ This heading has a custom style, a keywords marker, and a stable alias -- all in
 | `IndexMarker` | Generated index entries | `"authentication:OAuth 2.0"` |
 | `Author` | Document author | `"Documentation Team"` |
 | `Category` | Content categorization | `"Reference"` |
-| `Passthrough` | Content that bypasses processing (see [Passthrough content](#passthrough-content) below) | `"<custom-element />"` |
+| `PassThrough` | Content that bypasses processing (see [PassThrough content](#passthrough-content) below) | `"<custom-element />"` |
 
 <!-- style:Heading2; #300008 -->
-## Passthrough content
+## PassThrough content
 
-[passthrough-content]: #300008 "Passthrough content"
+[passthrough-content]: #300008 "PassThrough content"
 
-The `Passthrough` marker injects literal content into published output without any Markdown or Markdown++ processing. The marker value is emitted as-is.
+The `PassThrough` marker injects literal content into published output without any Markdown or Markdown++ processing. The marker value is emitted as-is.
 
-<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+<!-- marker:PassThrough="<a id='legacy-anchor'></a>" -->
 ### Injecting a custom HTML element
 
-The heading above has a Passthrough marker that injects a legacy anchor tag into the output. The heading itself is processed normally -- only the marker value bypasses processing.
+The heading above has a PassThrough marker that injects a legacy anchor tag into the output. The heading itself is processed normally -- only the marker value bypasses processing.
 
 ```markdown
-<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+<!-- marker:PassThrough="<a id='legacy-anchor'></a>" -->
 ### Injecting a custom HTML element
 ```
 
-**Note:** The `Passthrough` marker is a recognized Markdown++ directive. It is distinct from regular HTML comments, which are simply ignored by Markdown++ processors. See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#comment-disambiguation) section of the syntax reference for details.
+**Note:** The `PassThrough` marker is a recognized Markdown++ directive. It is distinct from regular HTML comments, which are simply ignored by Markdown++ processors. See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-plus-plus/references/syntax-reference.md#comment-disambiguation) section of the syntax reference for details.

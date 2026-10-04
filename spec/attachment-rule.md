@@ -14,7 +14,7 @@ A blank line between a tag and its intended target **breaks attachment silently*
 ## Formal Statement
 
 1. **Block-level tags** MUST appear on the line directly **above** the target element with no intervening blank line.
-2. **Inline tags** MUST appear immediately **before** the styled element on the same line, with no space between the closing `-->` and the element. **Exception:** For links, the style tag is placed *inside* the link text brackets (`[<!--style:Name-->text](url)`), not before the opening `[`. See the [Element Interactions specification](element-interactions.md#links) for the full link placement rule.
+2. **Inline tags** (`style:`, `marker:`, `markers:`) MUST appear immediately **before** the target inline element on the same line, with no space between the closing `-->` and the element. **Exception:** For links, the tag is placed *inside* the link text brackets (`[<!--style:Name-->text](url)`), not before the opening `[`. See the [Element Interactions specification](element-interactions.md#links) for the full link placement rule.
 3. A single blank line between a tag and its target breaks the attachment. Multiple blank lines have the same effect as one.
 4. Tags attach **downward only** -- a tag placed below content does not attach to the content above it.
 
@@ -25,7 +25,8 @@ A blank line between a tag and its intended target **breaks attachment silently*
 | `style:` (block) | Yes | Line directly above target element |
 | `style:` (inline) | Yes | Immediately before target, no space |
 | `#alias` | Yes | Line directly above target element |
-| `marker:` / `markers:` | Yes | Line directly above target element |
+| `marker:` / `markers:` (block) | Yes | Line directly above target element |
+| `marker:` / `markers:` (inline) | Yes | Immediately before target, no space |
 | `multiline` | Yes | Line directly above the table |
 | Combined commands (`;`) | Yes | Same rules as individual commands |
 
@@ -50,6 +51,8 @@ The target element is the first content-bearing line immediately following the t
 | Code fence | ` ``` ` | ` ```python ` |
 | Table | `\|` (header row) | `\| Column A \| Column B \|` |
 | Setext heading | Text followed by `===` or `---` | `Title` (with underline on next line) |
+
+Inside a container, "the line directly above" is read within the container's content: a tag inside a blockquote carries the blockquote's `>` prefix, and a tag can start a list item on the item's marker line. See edge cases [8](#8-tags-inside-a-blockquote) and [9](#9-a-tag-on-a-list-items-marker-line).
 
 ## Edge Cases
 
@@ -184,6 +187,37 @@ Multiple blank lines have the same effect as a single blank line -- attachment i
 ```
 
 All three are broken. Only zero blank lines preserves attachment.
+
+### 8. Tags Inside a Blockquote
+
+Inside a blockquote, a tag carries the same `>` prefix as its target and sits on the line directly above it. The `>` prefix belongs to the container, so it does not break attachment.
+
+**Right:**
+```markdown
+> <!-- style:Note ; #n1 -->
+> This paragraph inside the blockquote receives the style and the alias.
+```
+
+A line holding only `>` is a blank line inside the blockquote, and it breaks attachment the same way a blank line does outside one.
+
+**Wrong:**
+```markdown
+> <!-- style:Note -->
+>
+> This paragraph does not receive the style.
+```
+
+### 9. A Tag on a List Item's Marker Line
+
+A tag can start a list item, on the item's marker line. Its target is the item's next block, on the line directly below, indented to the item's content column:
+
+```markdown
+1. First step.
+2. <!-- style:BQ_Note ; #q -->
+   > Quote opens this item.
+```
+
+In CommonMark, the comment is the item's first block and the blockquote is its second, so the tag is on the line directly above its target within the item. The blockquote receives the style and the alias; the list item itself does not.
 
 ## Validation
 

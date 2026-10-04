@@ -191,7 +191,7 @@ unrecognized_text  ::= [^;]+
                           from within the comment delimiters. */
 ```
 
-**Parsing note:** A conformant parser MUST first attempt to match each recognized command production against a segment. Only if no command production matches should the segment be classified as `unrecognized_text`. The `markers_cmd` production greedily consumes its JSON object (including any semicolons within JSON string values) before the next segment delimiter is considered.
+**Parsing note:** A conformant parser MUST first attempt to match each recognized command production against a segment. Only if no command production matches should the segment be classified as `unrecognized_text`. The `markers_cmd` production greedily consumes its JSON object (including any semicolons within JSON string values) before the next segment delimiter is considered. The `marker_cmd` production likewise consumes its whole quoted value, including any semicolons, up to the closing double quote. A semicolon inside a quoted marker value or inside a JSON object is therefore part of that command and MUST NOT be treated as a segment delimiter: `marker:K="a; b"` is one `marker_cmd`, not two `unrecognized_text` segments. The PEG transliteration resolves this through ordered choice, because `command` is tried before `unrecognized_text`.
 
 **Whitespace around semicolons** is optional but recommended for readability:
 
@@ -268,10 +268,15 @@ marker_cmd         ::= "marker:" style_name '="' marker_value '"'
 marker_value       ::= [^"]*
                        /* Any sequence of characters except double quote.
                           Escaped double quotes within marker values are
-                          not supported. An empty value ("") is permitted. */
+                          not supported. An empty value ("") is permitted.
+                          "=" and ";" are ordinary value characters. A comment
+                          tag stays on one line, so the value contains no
+                          line break. */
 ```
 
-**Examples:** `marker:Keywords="api, documentation"`, `marker:IndexMarker="setup:initial"`, `marker:Passthrough="<a id='legacy-anchor'></a>"`, `marker:Index Entry="setup"`
+**Value content:** Because the comment boundary is determined first, a `marker_value` cannot contain the sequence `-->`. A value that needs a double quote, `-->`, or a line break MUST be written with `markers_cmd`, using JSON escapes (`\"`, `\u003e` for the `>`, `\n`). A processor MAY trim leading and trailing whitespace from a `marker_value`.
+
+**Examples:** `marker:Keywords="api, documentation"`, `marker:IndexMarker="setup:initial"`, `marker:PassThrough="<a id='legacy-anchor'></a>"`, `marker:Index Entry="setup"`, `marker:Hyperlink="https://example.com/page?id=42"`, `marker:DropDownEnd=""`
 
 #### JSON Markers Command
 
@@ -288,13 +293,14 @@ json_object        ::= /* A JSON object as defined by RFC 8259.
 
 The `json_object` production references [RFC 8259 (The JavaScript Object Notation Data Interchange Format)](https://www.rfc-editor.org/rfc/rfc8259). Inlining a JSON grammar would be redundant and error-prone. Conformant parsers MUST use a standards-compliant JSON parser for this production.
 
-**Note:** The `json_object` may contain semicolons within JSON string values. A conformant parser MUST parse the complete JSON object (matching balanced braces) before looking for the next segment delimiter. The current reference implementation (`validate-mdpp.py`) uses a simplified regex pattern that does not handle nested braces -- this is a known implementation limitation, not a grammar limitation.
+**Note:** The `json_object` may contain semicolons within JSON string values. A conformant parser MUST parse the complete JSON object (matching balanced braces) before looking for the next segment delimiter. Because the comment boundary is determined first, a JSON string cannot contain a literal `-->`; write its `>` as `\u003e`. The current reference implementation (`validate-mdpp.py`) uses a simplified regex pattern that does not handle nested braces -- this is a known implementation limitation, not a grammar limitation.
 
 **Examples:**
 
 - `markers:{"Keywords": "api, docs"}`
 - `markers:{"Keywords": "test", "Priority": "high", "Published": true}`
 - `markers:{"Keywords": "markers, metadata", "Description": "How to use markers"}`
+- `markers:{"Description": "Covers the \"Quick Start\" steps"}`
 
 #### Multiline Table Indicator
 
@@ -356,7 +362,7 @@ The following table summarizes which grammar productions require attachment:
 | `condition_close_cmd` | No (wraps content) | Yes |
 | `include_cmd` | No (standalone directive) | Yes |
 
-**Inline placement:** The `style_cmd` production may also appear in inline position, immediately before the styled inline element on the same line with no intervening space between the closing `-->` and the element. Inline placement applies only to `style_cmd`; all other commands that require attachment operate at block level only.
+**Inline placement:** The `style_cmd`, `marker_cmd`, and `markers_cmd` productions may also appear in inline position, immediately before the target inline element on the same line with no intervening space between the closing `-->` and the element. An inline marker attaches to the inline element that follows; on a link, the tag goes inside the link text brackets. The text of an inline tag MUST NOT contain `--`, because CommonMark 0.30 does not recognize an inline HTML comment whose text contains `--`, so a marker value containing `--` MUST be carried by a block-level tag. The `alias_cmd` and `multiline_cmd` productions operate at block level only.
 
 **Condition pairing:** `condition_open_cmd` and `condition_close_cmd` form matched pairs. Every `condition_open_cmd` MUST have a corresponding `condition_close_cmd`. Condition blocks MUST NOT nest or overlap.
 
@@ -581,7 +587,7 @@ All constructs in the five example files (`examples/*.md`) parse correctly under
 
 - **`styles-and-variables.md`** -- Variables, escaped variables (`\$not_a_variable;`), block styles, inline styles, combined commands with style and alias
 - **`includes-and-conditions.md`** -- Include directives (in examples), condition blocks with both compact (`<!--/condition-->`) and spaced (`<!-- /condition -->`) close syntax
-- **`markers-and-metadata.md`** -- Simple markers, JSON markers, index markers, Passthrough markers, combined commands with style + markers + alias
+- **`markers-and-metadata.md`** -- Simple markers, JSON markers, index markers, PassThrough markers, combined commands with style + markers + alias
 - **`multiline-tables.md`** -- Multiline directives, combined commands with style + multiline + alias
 - **`semantic-cross-references.md`** -- Combined commands with style + markers + alias, numeric alias IDs (`#200001` through `#200005`)
 
@@ -596,6 +602,12 @@ All constructs in the five example files (`examples/*.md`) parse correctly under
 4. **Empty condition block:** `<!--condition:test--><!--/condition-->` is syntactically valid -- the condition wraps zero content lines.
 
 5. **Condition close whitespace:** Both `<!--/condition-->` and `<!-- /condition -->` are valid -- the `ws?` in `mdpp_comment` accommodates the whitespace.
+
+6. **Semicolon in a quoted marker value:** `<!-- marker:Note="a; b" ; #alias -->` parses as two commands, a `marker_cmd` whose value is `a; b` and an `alias_cmd`. The quoted value is consumed whole before the next segment delimiter is considered.
+
+7. **Equals sign in a marker value:** `<!--marker:Hyperlink="https://example.com/page?id=42"-->` is one `marker_cmd`. Only the first `="` after the key separates the key from the value.
+
+8. **Inline marker:** `Add a custom <!--marker:Keywords="inline"-->**marker**.` is a `marker_cmd` in inline position, attached to the bold span that follows.
 
 ## References
 

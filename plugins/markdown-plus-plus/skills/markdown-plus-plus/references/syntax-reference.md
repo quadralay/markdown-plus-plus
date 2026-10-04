@@ -162,9 +162,9 @@ Neither comment above matches a command pattern, so both are treated as plain HT
 
 Without this rule, any comment placed on a line above content could be misinterpreted as having directive intent. The pattern-matching rule ensures that authors can freely use standard HTML comments for notes, TODOs, and documentation without affecting Markdown++ processing.
 
-### Passthrough Marker (Distinct Concept)
+### PassThrough Marker (Distinct Concept)
 
-The `Passthrough` marker key (`<!-- marker:Passthrough="content" -->`) is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is unrelated to the pass-through behavior of unrecognized comments. See [Markers > Passthrough Marker](#passthrough-marker) for details.
+The `PassThrough` marker key (`<!-- marker:PassThrough="content" -->`) is a recognized Markdown++ directive -- it matches the `marker:Key="value"` pattern. It is unrelated to the pass-through behavior of unrecognized comments. See [Markers > PassThrough Marker](#passthrough-marker) for details.
 
 ---
 
@@ -406,7 +406,7 @@ The style comment tag must be indented to match the nested list item.
 
 ### Inline Placement
 
-For most inline elements, place the style tag immediately before the element with no space:
+For most inline elements, place the style tag immediately before the element with no space. Marker commands can be placed inline the same way (see [Markers > Placement](#placement)):
 
 ```markdown
 This is <!--style:Emphasis-->**bold text**.
@@ -732,14 +732,36 @@ Use `marker:key="value"` for single markers, JSON format for multiple.
 - Key followed by `=` and quoted value
 - Value in double quotes
 - No spaces around `=`
+- The value may be empty (`""`) and may contain `=` and `;`
+- The value cannot contain `"`, `-->`, or a line break -- use the JSON format (see [Special Characters in Marker Values](#special-characters-in-marker-values))
+- A processor may trim leading and trailing whitespace from the value
 
 ```markdown
 <!--marker:Keywords="api, documentation"-->
+<!--marker:Hyperlink="https://example.com/page?id=42"-->
+<!--marker:DropDownEnd=""-->
 ```
+
+### Special Characters in Marker Values
+
+A processor finds the end of the comment tag before it reads the commands, so no value can contain the characters `-->`. When a value needs `-->`, a double quote, or a line break, write it in the JSON format and use a JSON escape:
+
+| Character | JSON escape |
+|-----------|-------------|
+| `"` | `\"` |
+| The `>` of `-->` | `\u003e` |
+| Line break | `\n` |
+
+```markdown
+<!--markers:{"Description": "Covers the \"Quick Start\" steps"}-->
+## Getting Started
+```
+
+Tools that write Markdown++ should switch to the JSON format whenever the simple format would not read back exactly, and write a `;` inside a JSON value as `\u003b`.
 
 ### Placement
 
-Markers must be on the line directly above the target element with no blank line between. See [Attachment Rules](#attachment-rules) for placement requirements.
+Block-level markers must be on the line directly above the target element with no blank line between. See [Attachment Rules](#attachment-rules) for placement requirements.
 
 At the start of a file, markers are typically placed above the Title paragraph -- they are attached to the Title, not floating standalone.
 
@@ -756,6 +778,16 @@ API Reference
 =============
 ```
 
+**Inline placement:** A `marker:` or `markers:` command can also go immediately before an inline element, with no space, like an inline style. The markers attach to the inline element that follows:
+
+```markdown
+Add a custom <!--marker:Keywords="inline"-->**marker** to this phrase.
+```
+
+On a link, put the marker tag inside the link text brackets, like a style tag: `[<!--marker:Keywords="api"-->API Reference](api.md)`. An inline marker tag must not contain `--` anywhere in its text -- CommonMark does not recognize an inline comment that contains `--`, so the tag would show as literal text. Put a value that contains `--` in a block-level marker tag.
+
+**Lists and blockquotes:** A marker in a list's or blockquote's comment tag attaches to that container. A processor may carry it on the first paragraph inside the container instead, so attach a marker meant for a later paragraph to that paragraph.
+
 ### Common Use Cases
 
 | Marker | Purpose |
@@ -765,17 +797,19 @@ API Reference
 | `IndexMarker` | Index entries (see below) |
 | `Author` | Document author |
 | `Category` | Content categorization |
-| `Passthrough` | Content that bypasses processing (see below) |
+| `PassThrough` | Content that bypasses processing (see below) |
 
-### Passthrough Marker
+### PassThrough Marker
 
-The `Passthrough` marker injects literal content into published output without Markdown or Markdown++ processing. The marker value is passed directly to the output format.
+The `PassThrough` marker injects literal content into published output without Markdown or Markdown++ processing. The marker value is passed directly to the output format.
 
 **Syntax:**
 ```markdown
-<!-- marker:Passthrough="<custom-element />" -->
+<!-- marker:PassThrough="<custom-element />" -->
 ## Section Title
 ```
+
+Marker keys are case-sensitive: the key is `PassThrough`, with a capital T.
 
 **Semantics:**
 
@@ -794,11 +828,11 @@ The `Passthrough` marker injects literal content into published output without M
 
 **Example -- injecting a custom HTML element:**
 ```markdown
-<!-- marker:Passthrough="<a id='legacy-anchor'></a>" -->
+<!-- marker:PassThrough="<a id='legacy-anchor'></a>" -->
 ## Migration Guide
 ```
 
-**Note:** The `Passthrough` marker is a recognized Markdown++ directive (it matches the `marker:Key="value"` pattern). It is distinct from the general behavior where unrecognized HTML comments are ignored -- see [Comment Disambiguation](#comment-disambiguation).
+**Note:** The `PassThrough` marker is a recognized Markdown++ directive (it matches the `marker:Key="value"` pattern). It is distinct from the general behavior where unrecognized HTML comments are ignored -- see [Comment Disambiguation](#comment-disambiguation).
 
 **CommonMark rendering:** Marker directives are hidden (HTML comments are invisible). Metadata is simply absent from the rendered view.
 
@@ -1039,7 +1073,7 @@ When combining commands, use this order for consistency:
 
 1. `style:StyleName` - Custom style
 2. `multiline` - Multiline table indicator
-3. `marker:Key="value"` - Markers (one or more)
+3. `marker:Key="value"` or `markers:{...}` - Markers (one or more)
 4. `#alias-name` - Custom alias
 
 ### Supported Combinations
@@ -1049,7 +1083,10 @@ When combining commands, use this order for consistency:
 | Style | `style:StyleName` |
 | Multiline | `multiline` |
 | Marker (simple) | `marker:Key="value"` |
+| Markers (JSON) | `markers:{...}` |
 | Alias | `#alias-name` |
+
+A `;` inside a quoted marker value, or inside a `markers:{...}` JSON object, is part of that command. Only a `;` outside them separates commands: `<!-- marker:Note="a; b" ; #n1 -->` holds two commands.
 
 ### Examples
 

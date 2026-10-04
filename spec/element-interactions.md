@@ -424,6 +424,8 @@ A processor MUST assign "Blockquote" as the default style name when no custom st
 
 The blockquote receives the custom style "NoteBox" (Paragraph type). Content nested inside the blockquote receives compound style names (see [Compound Style Naming](#compound-style-naming)).
 
+A tag on content inside a blockquote carries the blockquote's `>` prefix, on the line directly above its target: `> <!-- style:NoteHeading -->` above `> ## Custom Heading`. See [Attachment Rule edge case 8](attachment-rule.md#8-tags-inside-a-blockquote).
+
 ### Ordered Lists
 
 **Style type:** Paragraph
@@ -489,6 +491,15 @@ For nested lists, the style tag MUST be indented to match the nesting level of t
 ```
 
 Each nesting level requires its own style tag. See [Nested List Style Non-Inheritance](#nested-list-style-non-inheritance) for why styles do not cascade across nesting levels.
+
+A tag can also start a list item, on the item's marker line, to style the item's first nested block:
+
+```markdown
+2. <!-- style:BQ_Note ; #q -->
+   > Quote opens this item.
+```
+
+The blockquote, not the list item, receives the style and the alias. See [Attachment Rule edge case 9](attachment-rule.md#9-a-tag-on-a-list-items-marker-line).
 
 ## Compound Style Naming
 
@@ -657,7 +668,7 @@ A processor MUST NOT propagate a container's custom style to nested containers. 
 
 ## Inline Elements
 
-Inline elements appear within a line of text. Inline style tags MUST appear immediately before the styled element on the same line, with no space between the closing `-->` and the element, as defined by the [Attachment Rule](attachment-rule.md).
+Inline elements appear within a line of text. Inline style tags MUST appear immediately before the styled element on the same line, with no space between the closing `-->` and the element, as defined by the [Attachment Rule](attachment-rule.md). Inline `marker:` and `markers:` commands use the same placement and attach to the inline element that follows.
 
 **Link exception:** Links are an exception to this general placement rule. For links, the style tag is placed *inside* the link text brackets (`[...]`), not immediately before the opening bracket. See [Links](#links) for the full rule and rationale.
 
@@ -706,6 +717,8 @@ Link exception:       [<!--style:Name-->link text](url)
 The tag appears after the opening `[` and before the link text. This placement is required because the style applies to the *text content* of the link, not to the link as a structural element. Placing the tag before the opening `[` is not valid for link styling.
 
 A processor MUST recognize style tags inside link text brackets. A processor MUST NOT require style tags to appear before the opening `[` of a link.
+
+Inline `marker:` and `markers:` commands on a link use the same placement: `[<!--marker:Keywords="api"-->API Reference](api.md)`.
 
 #### Examples
 

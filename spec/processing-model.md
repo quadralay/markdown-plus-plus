@@ -426,7 +426,7 @@ See the [Comment Disambiguation](../plugins/markdown-plus-plus/skills/markdown-p
 For each recognized Markdown++ comment tag, the processor extracts one or more commands. The processor MUST resolve attachment for block-level tags using the rules defined in the [Attachment Rule](attachment-rule.md) specification:
 
 1. **Block-level tags** MUST appear on the line directly above the target element with no intervening blank line.
-2. **Inline tags** MUST appear immediately before the styled element on the same line, with no space between the closing `-->` and the element.
+2. **Inline tags** (`style:`, `marker:`, `markers:`) MUST appear immediately before the target inline element on the same line, with no space between the closing `-->` and the element.
 3. A tag that fails attachment (blank line below, end of file, another tag on the next line) is **orphaned**. Orphaned tags produce diagnostic **MDPP009** (severity: Warning) and have no effect on the output tree.
 
 #### Combined Command Evaluation Order
@@ -437,7 +437,7 @@ When a single comment contains multiple commands separated by semicolons (`;`), 
 |:-----:|---------|--------|
 | 1 | `style:Name` | Associates a custom style with the target element |
 | 2 | `multiline` | Marks the target table for multiline cell processing |
-| 3 | `marker:Key="value"` | Attaches one or more metadata key-value pairs |
+| 3 | `marker:Key="value"` or `markers:{...}` | Attaches one or more metadata key-value pairs |
 | 4 | `#alias` | Assigns a navigational alias anchor to the target element |
 
 **Example:**
@@ -476,7 +476,7 @@ In addition to the standard tree structure, the output tree carries Markdown++ m
 |----------------|----------------|-------------|---------|
 | Style | `style:Name` | Any block or inline element | Style name (string) |
 | Alias | `#name` | Any block element | Alias identifier (string) |
-| Marker | `marker:Key="value"` | Any block element | Key-value pair(s) |
+| Marker | `marker:Key="value"`, `markers:{...}` | Any block element, or an inline element (inline placement) | Key-value pair(s) |
 | Multiline | `multiline` | Table element | Multiline processing flag |
 
 A single element MAY carry multiple annotations (e.g., a heading with both a style and an alias).

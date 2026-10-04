@@ -281,7 +281,7 @@ The alias `#basic-plan` is recognized but does not produce a useful navigational
 
 ### Markers
 
-Markers (`marker:Key="value"`, `markers:{json}`) are syntactically valid inside multiline table cells. Markers attach metadata to block elements, and attaching them to elements within a cell is a valid use case -- for example, marking specific cell content for indexing or conditional processing by downstream tools.
+Markers (`marker:Key="value"`, `markers:{json}`) are syntactically valid inside multiline table cells. Markers attach metadata to elements, and attaching them to elements within a cell is a valid use case -- for example, marking specific cell content for indexing or conditional processing by downstream tools.
 
 A conformant processor MUST recognize marker directives within cells and attach them to the target element per the standard [Attachment Rule](attachment-rule.md).
 
