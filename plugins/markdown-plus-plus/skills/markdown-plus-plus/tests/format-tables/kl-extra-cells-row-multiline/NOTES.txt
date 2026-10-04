@@ -1,0 +1,20 @@
+Multiline twin of kl-extra-cells-row: the same over-long data row, on a table
+carrying a <!-- multiline --> directive.
+
+The multiline path reached the column count through a second, earlier site.
+rewrite_table_links() sized its fence-flag matrix from the header row and then
+indexed it per cell of each data row, so a row with a surplus cell raised
+IndexError there -- before width planning ran at all. Both sites now take the
+count from TableBlock.normalize_columns(), so the surplus cell widens the table
+instead of ending the run.
+
+The whitespace-only row between Alpha and Beta is the multiline record separator
+(#125 / MDPP018): under <!-- multiline --> every pipe-bearing row continues the
+current logical row, so without it the two records would merge into one.
+
+Desired (encoded in expected.md): identical to the standard-table golden's
+repair -- the header and separator widen to three columns, the surplus cell
+lands in the third, every row is aligned, and the separator row is preserved
+with whitespace-only cells padded to full width (R3). The directive line is
+preserved verbatim above the table (R4); no cell exceeds max_cell_width, so
+nothing wraps.

@@ -781,10 +781,12 @@ code: it comes back byte-for-byte. Tables inside a blockquote
   per invocation. Multi-file batches are the shell's job (`for f in
   *.md; do ...`).
 - **No malformed-table repair.** When a table's column counts are
-  inconsistent across rows, the formatter pads the shorter rows with
-  empty cells (a benign repair) but does not attempt to detect or fix
-  more serious malformations. A header row without a matching separator
-  row is treated as prose, not as a malformed table.
+  inconsistent across rows, the formatter takes the widest row's cell
+  count as the table's column count and pads every shorter row -- the
+  header and separator included -- with empty cells (a benign repair),
+  but does not attempt to detect or fix more serious malformations. A
+  header row without a matching separator row is treated as prose, not
+  as a malformed table.
 
 ## CLI Quick Reference
 

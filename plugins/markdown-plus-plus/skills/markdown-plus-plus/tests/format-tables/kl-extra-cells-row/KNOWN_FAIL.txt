@@ -1,2 +1,0 @@
-design-doc known limitation
-A data row with more cells than the header crashes the renderer with IndexError today; desired behavior is a benign pad/render that widens the table to the maximum column count and exits 0.
