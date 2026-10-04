@@ -1,0 +1,5 @@
+#136 fixture: a code fence indented four spaces under "1. " is a fence, not indented
+code, because fences are recognized at list-relative indentation (up to three spaces
+past the list item's content column). The table inside it is code and must come back
+byte-for-byte. Tables inside a blockquote ("> | ... |") are not tables to the
+formatter and are also left alone. expected.md is identical to input.md.

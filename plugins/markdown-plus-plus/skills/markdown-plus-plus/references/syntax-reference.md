@@ -354,7 +354,7 @@ Variables remain as literals in the source and are resolved during publishing by
 
 ### Block-Level Placement
 
-```markdown
+````markdown
 <!--style:CustomHeading-->
 # Heading Text
 
@@ -374,7 +374,7 @@ code here
 | A | B |
 |---|---|
 | 1 | 2 |
-```
+````
 
 **Important:** Block commands must be attached to the element (no blank line between). Comment tags must be associated with a paragraph - they cannot float alone separated by whitespace.
 

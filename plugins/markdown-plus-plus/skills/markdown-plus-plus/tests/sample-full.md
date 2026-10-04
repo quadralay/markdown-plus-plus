@@ -160,7 +160,7 @@ Version: $version; <!--condition:!production-->(Development Build)<!--/condition
 
 The following would include files (commented for testing):
 
-<!-- Note: These are example includes - files don't exist in test -->
+<!-- Note: These are example includes - files don't exist in test. HTML comments don't nest, so each line below leaves a stray closing delimiter (expect MDPP021 three times). -->
 <!-- <!--include:shared/header.md--> -->
 <!-- <!--include:../common/footer.md--> -->
 <!-- <!--include:chapters/introduction.md--> -->

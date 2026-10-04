@@ -13,6 +13,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.17.0] - 2026-10-03
+
+### Tooling
+
+- **`validate-mdpp.py` checks every command in a combined comment tag.** The tag's content is split at each `;` outside a quoted marker value and outside a `markers:` JSON object (a string-aware, balanced-brace scan), and each command is checked wherever it appears. Previously only the first command was seen, so these passed silently: an invalid marker key after a style (`<!-- style:Note ; marker:1Bad="x" -->`), broken JSON followed by an alias (`markers:{...} ; #a1`), an invalid JSON key followed by an alias, and every alias written after another command -- which also escaped the MDPP002 name check and the MDPP008 duplicate check. A simple marker with an empty value now gets the key check (`marker:123Bad=""`).
+- **Two new warnings.** **MDPP020** flags a simple marker value that contains a double quote, has no closing quote, or lacks `="`. **MDPP021** flags a `-->` with no `<!--` that opens it -- the usual symptom of a `-->` inside a marker value, or of one comment nested in another. MDPP020 is added to the spec's § 13.6 diagnostics table; both have full entries in `references/error-codes.md`.
+- **Tags inside containers.** Blockquote prefixes and list-item markers are stripped before the attachment check and the table checks, so MDPP009 fires for `> <!-- style:X -->` followed by a blank `>` line, MDPP018 fires for a multiline table inside a blockquote, and a tag on a list item's marker line (`2. <!-- style:BQ_Note ; #q -->`) is checked like any other. A tag above a list or blockquote whose first line is itself a tag (`<!--style:CustomUList-->` above `- <!--style:CustomParagraph-->`) still counts as attached.
+- **List-relative code fences** in both scripts. A fence may be indented up to three spaces past the content column of its list item, so a fence indented four spaces under `1.` is a fence. The validator no longer raises false MDPP002 errors for `$1bad;` or `<!-- style:123Bad -->` inside such a fence, and recognizes fences inside blockquotes. Closing fences now follow CommonMark 0.30 (no info string after them), and a backtick fence's info string cannot contain a backtick. A fence runs to its closing fence; a dedented line does not end it early.
+- The validator skips YAML front matter, and comment-tag checks skip tags quoted inside inline code spans, which document the syntax rather than use it. This removes false positives across the repository's own spec and reference files.
+- **`format-tables.py` keeps tables inside list items in place.** Every row is written with the header row's leading indent (the indent counts against `--max-line-width`), so a table indented under `- item:` or a `   <!-- multiline -->` table under `1. item:` no longer comes back at column 0, breaking the list and orphaning the directive; `--check` no longer reports a difference on input that is already correct. Link-reference definitions minted for an indented table (R18) keep its indent, so the list item continues after them. A table inside a fence indented under a list item is left byte-for-byte. New rule R21 in `references/table-formatting.md`; new golden cases `i136-list-item-table-indent`, `i136-list-item-table-check`, `i136-list-item-fence-skip`, and `i136-list-item-linkref-indent`.
+- New fixture `tests/sample-combined-commands.md` and unit tests `scripts/test_validate_mdpp.py` (command splitting, list-relative fences, container tags). `tests/sample-full.md` now documents the three MDPP021 warnings its nested-comment include examples produce. The formal grammar's note on the validator's limits is updated ([#136](https://github.com/quadralay/markdown-plus-plus/issues/136)).
+
+### Project
+
+- Four examples nested a ```` ```python ```` fence inside a ```` ```markdown ```` fence of the same length, which CommonMark closes at the inner fence, so they rendered broken: `references/examples.md` (three examples), `references/syntax-reference.md`, `spec/element-interactions.md`, and `spec/specification.md`. Their outer fences now use four backticks. The stricter fence detection surfaced them.
+
 ## [1.16.0] - 2026-10-03
 
 ### Spec

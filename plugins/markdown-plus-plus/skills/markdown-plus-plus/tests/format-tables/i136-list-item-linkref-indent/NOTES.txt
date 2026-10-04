@@ -1,0 +1,7 @@
+#136 fixture: link-reference definitions minted for an indented table keep the
+table's indent.
+
+The multiline table is indented three spaces under "1. " and its inline link is over
+budget, so R18 rewrites it to reference form. The definition is written with the same
+three-space indent after the table, so it stays inside the list item and the list
+continues at "2. ". A column-0 definition after a blank line would end the list item.

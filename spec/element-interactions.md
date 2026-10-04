@@ -164,13 +164,13 @@ Fenced code blocks (delimited by `` ``` `` or `~~~`) accept style tags. A custom
 
 A processor MUST assign "Code Fence" as the default style name for fenced code blocks when no custom style tag is present.
 
-```markdown
+````markdown
 <!-- style:CodeExample -->
 ```python
 def hello():
     print("Hello, World!")
 ```
-```
+````
 
 The code fence receives the custom style "CodeExample" (Paragraph type) instead of the default "Code Fence". The language info string `python` is preserved separately.
 

@@ -293,7 +293,7 @@ json_object        ::= /* A JSON object as defined by RFC 8259.
 
 The `json_object` production references [RFC 8259 (The JavaScript Object Notation Data Interchange Format)](https://www.rfc-editor.org/rfc/rfc8259). Inlining a JSON grammar would be redundant and error-prone. Conformant parsers MUST use a standards-compliant JSON parser for this production.
 
-**Note:** The `json_object` may contain semicolons within JSON string values. A conformant parser MUST parse the complete JSON object (matching balanced braces) before looking for the next segment delimiter. Because the comment boundary is determined first, a JSON string cannot contain a literal `-->`; write its `>` as `\u003e`. The current reference implementation (`validate-mdpp.py`) uses a simplified regex pattern that does not handle nested braces -- this is a known implementation limitation, not a grammar limitation.
+**Note:** The `json_object` may contain semicolons within JSON string values. A conformant parser MUST parse the complete JSON object (matching balanced braces) before looking for the next segment delimiter. Because the comment boundary is determined first, a JSON string cannot contain a literal `-->`; write its `>` as `\u003e`. The reference validator (`validate-mdpp.py`) splits a combined tag this way: it takes a quoted marker value and a JSON object whole, matching balanced braces and skipping braces and semicolons inside JSON strings, and checks every command it finds.
 
 **Examples:**
 

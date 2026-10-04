@@ -396,7 +396,7 @@ A style command associates a named style with the attached content element. The 
 
 A block-level style tag MUST appear on the line directly above the target element with no blank line between them. The target element may be any block-level element: heading, paragraph, list, blockquote, code block, or table.
 
-```markdown
+````markdown
 <!-- style:CustomHeading -->
 # Heading Text
 
@@ -407,7 +407,7 @@ A block-level style tag MUST appear on the line directly above the target elemen
 ```python
 code here
 ```
-```
+````
 
 #### Inline Placement
 
@@ -944,6 +944,7 @@ Marker commands require attachment. A block-level marker tag MUST appear on the 
 | **MDPP002** | Marker key does not match the style/marker name pattern | Error |
 | **MDPP003** | Malformed JSON in `markers:` command | Error |
 | **MDPP009** | Orphaned marker tag (not attached to an element) | Warning |
+| **MDPP020** | Simple marker value contains a double quote or has no closing quote | Warning |
 
 ### 13.7 Examples
 

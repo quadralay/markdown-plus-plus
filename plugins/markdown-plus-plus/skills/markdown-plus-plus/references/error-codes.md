@@ -31,10 +31,16 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP017 | Invalid UTF-8 encoding | Error | File contains an invalid UTF-8 byte sequence |
 | MDPP018 | Multiline table row merge | Warning | `<!-- multiline -->` table has no separator rows; all data rows merge into one logical row |
 | MDPP019 | Condition inside a table cell | Warning | A condition open/close tag is embedded in a table row (in-cell span or conditional cell) instead of wrapping complete rows |
+| MDPP020 | Invalid simple marker value | Warning | A `marker:Key="value"` value contains a double quote, has no closing quote, or the command has no `="` |
+| MDPP021 | Stray comment close | Warning | A `-->` appears with no `<!--` that opens it, usually because a `-->` inside a marker value ended the tag early |
 
 ## General Rules
 
-All line-based checks skip lines inside fenced code blocks. A fenced code block opens with three or more backticks or tildes and closes with the same character at the same or greater count (per CommonMark 0.30).
+All line-based checks skip YAML front matter and lines inside fenced code blocks. A fenced code block opens with three or more backticks or tildes and closes with the same character at the same or greater count, with nothing after it (per CommonMark 0.30). Fences are recognized at list-relative indentation -- up to three spaces past the content column of the list item they belong to, so a fence indented four spaces under `1.` is a fence -- and inside blockquotes.
+
+Every command in a combined comment tag is checked, not only the first. The tag's content is split at each `;` that is outside a quoted marker value and outside a `markers:` JSON object; the JSON scan is string-aware and matches balanced braces. A comment with no recognized command is a regular HTML comment and is not checked. Comment-tag checks skip tags quoted inside inline code spans, which document the syntax rather than use it.
+
+Blockquote prefixes (`>`) are stripped before the attachment check (MDPP009) and the table checks (MDPP018, MDPP019), and a list-item marker is also stripped for the attachment check and the multiline directive line, so a tag inside a blockquote or on a list item's marker line is checked like any other.
 
 ## Naming Rule
 
@@ -152,7 +158,9 @@ Nested content — not permitted.
 - **Condition names:** Individual names within condition expressions (standard identifier rule; see also MDPP007)
 - **Alias names:** The name in `<!--#name-->` (alias rule — digit-first allowed; XML NCName letter class in first position; full XML NCName `NameChar` -- including `.`, middle dot, combining marks, and connector punctuation -- in non-first positions)
 - **Style names:** The name in `<!--style:name-->` (style/marker rule — embedded spaces allowed)
-- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->` (style/marker rule — embedded spaces allowed)
+- **Marker key names:** Keys inside `<!--markers:{...}-->` and `<!--marker:key="value"-->`, including one with an empty value (style/marker rule — embedded spaces allowed)
+
+Style, alias, and marker names are checked in every command of a combined comment tag, wherever the command appears.
 
 **Trigger examples:**
 
@@ -204,7 +212,7 @@ $my variable;
 
 **Description:** The JSON payload inside a `<!--markers:{...}-->` directive fails to parse.
 
-**Detection logic:** The JSON substring (the `{...}` portion) is extracted and passed to a JSON parser. If parsing fails, the decode error is emitted. If parsing succeeds, individual key names are further validated against the style/marker name rule (see MDPP002).
+**Detection logic:** The `markers:` command is found in any position of a combined comment tag, and its JSON object is taken whole by a string-aware, balanced-brace scan, so a `;` inside a JSON string does not split it. A payload that is not a single object in braces -- for example one cut short because a `-->` inside a value ended the comment -- is reported as malformed. The JSON substring is passed to a JSON parser. If parsing fails, the decode error is emitted. If parsing succeeds, individual key names are further validated against the style/marker name rule (see MDPP002).
 
 **Trigger examples:**
 
@@ -299,7 +307,7 @@ $my variable;
 
 **Description:** The same alias name appears more than once in a single file. Alias names must be unique within a file to allow unambiguous cross-referencing.
 
-**Detection logic:** A dictionary tracks aliases to their first-seen line number, keyed by a normalized form -- Unicode NFC followed by case-fold -- so canonical-equivalent variants are detected as duplicates. When an alias is encountered, it is normalized and looked up; if already present, emit MDPP008 referencing the first occurrence. Otherwise, record the alias (with its original spelling for the error message) and its line number. The normalization matches the equivalence relation used by CommonMark 0.30 link-reference-definition slug matching, so cross-reference resolution and duplicate detection agree.
+**Detection logic:** A dictionary tracks aliases to their first-seen line number, keyed by a normalized form -- Unicode NFC followed by case-fold -- so canonical-equivalent variants are detected as duplicates. When an alias is encountered, it is normalized and looked up; if already present, emit MDPP008 referencing the first occurrence. Otherwise, record the alias (with its original spelling for the error message) and its line number. Aliases in combined comment tags (`<!-- style:X ; #name -->`) are tracked with the rest. The normalization matches the equivalence relation used by CommonMark 0.30 link-reference-definition slug matching, so cross-reference resolution and duplicate detection agree.
 
 The MDPP008 emission distinguishes three sub-states so authors can self-diagnose:
 
@@ -353,9 +361,9 @@ The two `Café` aliases below are visually identical but use different Unicode b
 
 1. Check if the next line exists
 2. Check if the next line is a non-blank, non-tag content line
-3. If the next line is blank, missing, or another MDPP tag without intervening content, emit MDPP009
+3. If the next line is blank, missing, or another MDPP tag without intervening content, emit MDPP009. A next line that opens a list item, or a blockquote deeper than the tag's, is content even when its own first block is a tag: `<!--style:CustomUList-->` above `- <!--style:CustomParagraph-->` styles the list.
 
-Tags checked: `<!--style:...-->`, `<!--#alias-->`, `<!--markers:...-->`, `<!--marker:...-->`, `<!--multiline-->`
+Tags checked: any comment tag with a `style:`, `#alias`, `markers:`, `marker:`, or `multiline` command, in any position. A tag inside a blockquote (`> <!--style:Note-->`) or on a list item's marker line (`2. <!--style:Note-->`) is checked too; inside a blockquote, a line holding only `>` is a blank line.
 
 Tags exempt from this check: `<!--condition:...-->`, `<!--/condition-->`, `<!--include:...-->`, variable references (`$name;`)
 
@@ -559,7 +567,7 @@ python validate-mdpp.py document.md
 
 Under `<!-- multiline -->`, every pipe-bearing row *continues* the current logical row; a new logical row begins only on a whitespace-only separator row. Authors who add the directive cosmetically and then write single-line rows get the opposite of what they expect. (See [Multiline Tables](syntax-reference.md) for the full row-continuation mechanism, which keys on whole-row whitespace, not on any single cell.)
 
-**Detection logic:** Second pass over lines outside fenced code blocks. A multiline table is identified by a multiline directive line -- bare (`<!-- multiline -->`) or combined-commands form (`<!-- style:X ; multiline ; #y -->`) -- immediately above a header row, immediately above a GFM delimiter row. Each body row (after the delimiter, up to the first non-pipe line) is classified by cell content into one of three buckets:
+**Detection logic:** Second pass over lines outside fenced code blocks, with blockquote prefixes stripped so a table inside a blockquote is checked. A multiline table is identified by a multiline directive line -- bare (`<!-- multiline -->`) or combined-commands form (`<!-- style:X ; multiline ; #y -->`) -- immediately above a header row, immediately above a GFM delimiter row. Each body row (after the delimiter, up to the first non-pipe line) is classified by cell content into one of three buckets:
 
 - **Separator row** -- every cell is whitespace-only. Starts a new logical row.
 - **Continuation row** -- the first cell is blank but at least one other cell has content. The hallmark of a deliberate continuation in the label-column idiom.
@@ -664,3 +672,48 @@ The line-shape heuristic is sufficient on its own -- a genuine table-detection p
 ```
 
 **Suggested fix:** Wrap complete rows, not sub-row spans. In a standard table, wrap the complete physical row; in a multiline table, wrap the complete logical row (including its trailing whitespace-only separator row); or wrap the entire table. For value substitution inside one cell (platform names, key modifiers, versions), use a variable (`$name;`) instead of an in-cell condition span. For structural differences between variants, use conditional row variants. Never let a condition span contain an unescaped `|` -- that removes a cell boundary and corrupts the table.
+
+---
+
+## MDPP020 -- Invalid Simple Marker Value
+
+**Severity:** Warning
+
+**Description:** A `marker:Key="value"` command cannot carry its value. A simple-form value runs to the next double quote, so it cannot contain a double quote; it also cannot contain `-->`, which ends the comment tag. The command is flagged when:
+
+- the value contains a double quote (`marker:Keywords="say "hi""`);
+- the value has no closing double quote, usually because a `-->` inside it ended the comment tag early (`marker:Note="a-->b"`);
+- the command has no `="` after the key (`marker:Keywords`).
+
+**Detection logic:** Each `marker:` command in a comment tag, in any position of a combined tag, is split at the first `="` into a key and a value. The value must end with the tag's last `"` and contain no other double quote. The key is checked separately (MDPP002). An empty value (`marker:DropDownEnd=""`) and values containing `=` or `;` are valid.
+
+**Trigger examples:**
+
+```markdown
+<!-- marker:Keywords="say "hi"" -->
+Quote inside the value.
+
+<!-- marker:Note="a-->b" -->
+The first --> ends the tag; also triggers MDPP021.
+```
+
+**Suggested fix:** Use the JSON form, where the value is a JSON string: write a double quote as `\"`, the `>` of `-->` as `\u003e`, and a line break as `\n`, for example `<!-- markers:{"Keywords": "say \"hi\""} -->`.
+
+---
+
+## MDPP021 -- Stray Comment Close
+
+**Severity:** Warning
+
+**Description:** A `-->` appears with no `<!--` that opens it. HTML comments do not nest and end at the first `-->`, so the text after it -- including the tag's own `-->` -- is left in the document as visible text. The usual cause is a `-->` inside a marker value; nesting one comment inside another has the same effect.
+
+**Detection logic:** Pass over lines outside fenced code blocks, tracking comment state across lines (an HTML comment may span lines). Inline code spans are skipped, so `-->` quoted in backticks is not flagged. A `-->` found while no comment is open is flagged, once per line.
+
+**Trigger examples:**
+
+```markdown
+<!-- marker:Note="a-->b" -->
+<!-- <!--include:chapter.md--> -->
+```
+
+**Suggested fix:** Carry a value that contains `-->` in the `markers:` JSON form, writing the `>` as `\u003e`. Don't nest comments.

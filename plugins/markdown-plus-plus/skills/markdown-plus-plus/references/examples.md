@@ -13,7 +13,7 @@ Real-world examples demonstrating common patterns and use cases.
 
 A typical product documentation page with variables, conditions, and styles.
 
-```markdown
+````markdown
 <!--markers:{"Keywords": "product overview, installation, configuration", "Description": "Complete product documentation for installation and setup"} ; #product-overview-->
 # $product_name; Overview
 
@@ -77,7 +77,7 @@ Visit our [knowledge base](https://kb.example.com) or [community forum](https://
 <!--condition:print-->
 See Appendix B for troubleshooting guides.
 <!--/condition-->
-```
+````
 
 ---
 
@@ -85,7 +85,7 @@ See Appendix B for troubleshooting guides.
 
 API documentation with code examples and conditional content.
 
-```markdown
+````markdown
 <!--markers:{"Keywords": "authentication, oauth, token, api", "Description": "API authentication guide using OAuth 2.0"} ; #authentication-->
 # Authentication API
 
@@ -154,7 +154,7 @@ export DEBUG=true
 ```
 
 <!--/condition-->
-```
+````
 
 ---
 
@@ -261,7 +261,7 @@ Complex tables with rich content in cells. Each logical row may span multiple ph
 
 Documentation that adapts to different platforms.
 
-```markdown
+````markdown
 # Installation Guide
 
 ## Download
@@ -328,7 +328,7 @@ $product_name; --version
 <!--/condition-->
 
 You should see: `$product_name; version $version;`
-```
+````
 
 ---
 

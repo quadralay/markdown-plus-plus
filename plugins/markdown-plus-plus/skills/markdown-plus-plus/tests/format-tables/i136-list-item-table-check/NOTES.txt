@@ -1,0 +1,6 @@
+#136 fixture: --check on already-formatted tables inside list items exits 0.
+
+input.md is the formatted output of i136-list-item-table-indent. Before #136 the
+formatter rebuilt the rows at column 0, so --check reported a difference (exit 4) on
+input that was already correct. No expected.md: the runner asserts the default exit
+code 0.

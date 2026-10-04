@@ -700,6 +700,48 @@ The `<!-- multiline -->` line closes the first (standard) table and
 becomes the directive of the second (multiline) table; each plans its
 widths from its own rows only.
 
+### R21 -- Tables in list items keep their indentation; fences are list-relative
+
+A table indented inside a list item is formatted in place. Every row,
+including the separator row, is written with the **header row's leading
+indent**, so the table stays inside its list item and an indented
+`<!-- multiline -->` directive stays attached to it. Link-reference
+definitions minted for the table (R18) keep the same indent. The indent
+counts against `--max-line-width`.
+
+Document-level code fences are recognized at **list-relative**
+indentation: a fence may be indented up to three spaces past the content
+column of the list item it belongs to. A fence indented four spaces under
+`1.` is therefore a fence, not indented code, and a table inside it is
+code: it comes back byte-for-byte. Tables inside a blockquote
+(`> | ... |`) are not formatted.
+
+**Input:**
+
+````markdown
+1. A multiline table under an ordered item:
+
+   <!-- multiline -->
+   | Term | Meaning |
+   |---|---|
+   | one | first entry |
+   |  |  |
+   | two | second entry |
+````
+
+**Output:**
+
+````markdown
+1. A multiline table under an ordered item:
+
+   <!-- multiline -->
+   | Term | Meaning      |
+   | ---- | ------------ |
+   | one  | first entry  |
+   |      |              |
+   | two  | second entry |
+````
+
 ## Known Limitations
 
 - **ASCII-dominant width measurement.** The formatter measures column
@@ -731,6 +773,10 @@ widths from its own rows only.
   inside**`) still falls back to whitespace tokenization for the
   unrecognized structure. The cell wraps; the nested formatting may end
   up split across rows.
+- **Tables in blockquotes are not formatted.** A table whose rows carry a
+  `>` prefix is left as written (R21). Formatting it would need the
+  prefix stripped and re-applied on every row, including continuation
+  rows.
 - **Single-file invocation.** `format-tables.py` accepts one input file
   per invocation. Multi-file batches are the shell's job (`for f in
   *.md; do ...`).

@@ -1,0 +1,6 @@
+#136 fixture: a table inside a list item keeps its indentation.
+
+The standard table is indented two spaces under "- ", the multiline table (and its
+directive) three spaces under "1. ". Every formatted row is written with the header
+row's leading indent, so both tables stay inside their list items and the indented
+multiline directive stays attached. Previously every row was rebuilt from column 0.

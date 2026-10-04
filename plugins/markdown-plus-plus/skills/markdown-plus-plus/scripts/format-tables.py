@@ -36,7 +36,7 @@ import os
 import re
 import sys
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Optional
 
 
@@ -79,8 +79,97 @@ TABLE_ROW_RE = re.compile(r'^\s*\|.*\|\s*$')
 # Separator row: cells contain only whitespace, dashes, colons, and pipes.
 SEPARATOR_RE = re.compile(r'^\s*\|[\s:|\-]+\|\s*$')
 
-# Code fence opening/closing pattern (CommonMark 0.30) -- mirrors validate-mdpp.py.
+# Code fence opening/closing pattern (CommonMark 0.30). Document-level fences
+# are found by fence_mask(), which applies it at list-relative indentation.
 CODE_FENCE_RE = re.compile(r'^\s{0,3}(`{3,}|~{3,})')
+
+# Container prefixes and fence runs for fence_mask() -- mirrors validate-mdpp.py.
+BLOCKQUOTE_PREFIX_RE = re.compile(r'^[ \t]*>[ ]?')
+LIST_ITEM_RE = re.compile(r'^([ ]*)([-*+]|\d{1,9}[.)])([ \t]+|$)')
+FENCE_RUN_RE = re.compile(r'(`{3,}|~{3,})(.*)$')
+LEADING_INDENT_RE = re.compile(r'^[ \t]*')
+
+
+def _strip_blockquote_prefixes(line: str) -> str:
+    """Remove leading blockquote markers (`>`, `> >`)."""
+    while True:
+        m = BLOCKQUOTE_PREFIX_RE.match(line)
+        if not m:
+            return line
+        line = line[m.end():]
+
+
+def fence_mask(lines: list[str]) -> list[bool]:
+    """Per line, True when the line is a code fence delimiter or inside a fence.
+
+    Fences follow CommonMark 0.30 at **list-relative** indentation: a fence
+    may be indented up to three spaces past the content column of the list
+    item it belongs to, so a fence indented four spaces under `1.` is a fence,
+    not indented code, and a table inside it is never reformatted. Blockquote
+    prefixes are stripped first. A backtick fence's info string cannot contain
+    a backtick. A closing fence uses the opening character at least as many
+    times, with nothing after it; a fence also ends when a non-blank line falls
+    outside its list item. Mirrors validate-mdpp.py.
+    """
+    mask = [False] * len(lines)
+    in_fence = False
+    fence_char = ''
+    fence_len = 0
+    fence_col = 0
+    list_cols: list[int] = []   # content columns of the open list items
+
+    for idx, raw in enumerate(lines):
+        body = _strip_blockquote_prefixes(raw.expandtabs(4)).rstrip('\r')
+        stripped = body.strip()
+        indent = len(body) - len(body.lstrip(' '))
+
+        if in_fence:
+            # A fence runs to its closing fence. (A dedented line is not taken
+            # to end the list item: content indented with non-breaking spaces
+            # would close the fence early and mis-pair every later fence.)
+            m = FENCE_RUN_RE.match(stripped)
+            if (
+                m
+                and m.group(1)[0] == fence_char
+                and len(m.group(1)) >= fence_len
+                and not m.group(2).strip()
+                and indent - fence_col <= 3
+            ):
+                in_fence = False
+            mask[idx] = True
+            continue
+
+        if not stripped:
+            continue
+
+        rest = body
+        m = LIST_ITEM_RE.match(body)
+        if m and m.group(3):
+            marker_indent = len(m.group(1))
+            while list_cols and list_cols[-1] > marker_indent:
+                list_cols.pop()
+            gap = len(m.group(3).expandtabs(4))
+            width = gap if 1 <= gap <= 4 else 1
+            content_col = marker_indent + len(m.group(2)) + width
+            list_cols.append(content_col)
+            base = content_col
+            rest = ' ' * content_col + body[m.end():] if gap <= 4 else body
+        else:
+            while list_cols and indent < list_cols[-1]:
+                list_cols.pop()
+            base = list_cols[-1] if list_cols else 0
+
+        rest_indent = len(rest) - len(rest.lstrip(' '))
+        if 0 <= rest_indent - base <= 3:
+            fm = FENCE_RUN_RE.match(rest.lstrip(' '))
+            if fm and not (fm.group(1)[0] == '`' and '`' in fm.group(2)):
+                in_fence = True
+                fence_char = fm.group(1)[0]
+                fence_len = len(fm.group(1))
+                fence_col = base
+                mask[idx] = True
+
+    return mask
 
 # A line that is *only* a multiline directive (or combined-commands form
 # including multiline) and nothing else.
@@ -112,6 +201,7 @@ class TableBlock:
     lines land at their original position.
     """
     start_line: int = 0          # 1-based line number of header row
+    indent: str = ''             # header row's leading whitespace; every row keeps it
     directive_line: Optional[str] = None  # original directive line, if any
     is_multiline: bool = False
     members: list[tuple] = field(default_factory=list)
@@ -160,36 +250,16 @@ def _scan_blocks(lines: list[str]) -> list[object]:
     """
     blocks: list[object] = []
     text_buf: list[str] = []
-    in_fence = False
-    fence_char: Optional[str] = None
-    fence_count = 0
+    mask = fence_mask(lines)
 
     i = 0
     n = len(lines)
     while i < n:
         line = lines[i]
 
-        # Code fence handling: pass through fenced blocks unchanged.
-        m = CODE_FENCE_RE.match(line)
-        if m:
-            char = m.group(1)[0]
-            count = len(m.group(1))
-            if not in_fence:
-                in_fence = True
-                fence_char = char
-                fence_count = count
-                text_buf.append(line)
-                i += 1
-                continue
-            elif char == fence_char and count >= fence_count:
-                in_fence = False
-                fence_char = None
-                fence_count = 0
-                text_buf.append(line)
-                i += 1
-                continue
-
-        if in_fence:
+        # Code fence handling: pass through fenced blocks unchanged, including
+        # fences indented under a list item.
+        if mask[i]:
             text_buf.append(line)
             i += 1
             continue
@@ -213,6 +283,7 @@ def _scan_blocks(lines: list[str]) -> list[object]:
 
             tb = TableBlock(
                 start_line=i + 1,
+                indent=LEADING_INDENT_RE.match(line).group(0),
                 directive_line=directive_line,
                 is_multiline=directive_line is not None,
             )
@@ -222,7 +293,7 @@ def _scan_blocks(lines: list[str]) -> list[object]:
             tb.separator_cells = split_cells(sep_line)
 
             j = i + 2
-            while j < n and not CODE_FENCE_RE.match(lines[j]):
+            while j < n and not mask[j]:
                 if TABLE_ROW_RE.match(lines[j]):
                     tb.members.append(('row', split_cells(lines[j])))
                     j += 1
@@ -1071,7 +1142,7 @@ def render_standard(
 
         if not header_emitted:
             # Header row.
-            out.append(_render_row(cells, widths))
+            out.append(table.indent + _render_row(cells, widths))
             # Separator row: derive alignments from the original separator cells.
             alignments = [_alignment_marker(c) for c in table.separator_cells]
             while len(alignments) < n_cols:
@@ -1080,13 +1151,13 @@ def render_standard(
                 _format_separator_cell(widths[c], alignments[c])
                 for c in range(n_cols)
             ]
-            out.append(_render_row(sep_cells, widths))
+            out.append(table.indent + _render_row(sep_cells, widths))
             header_emitted = True
             continue
 
         if _is_blank_row(cells):
             # Preserve as whitespace-only padded row (R3).
-            out.append(_render_row(['' for _ in widths], widths))
+            out.append(table.indent + _render_row(['' for _ in widths], widths))
             continue
 
         # Standard-table over-width warning (R7).
@@ -1098,7 +1169,7 @@ def render_standard(
                     f"({len(cell)} chars > {config.max_cell_width}) "
                     f"at row {r_idx}, column {c+1} (\"{header_label}\")"
                 )
-        out.append(_render_row(cells, widths))
+        out.append(table.indent + _render_row(cells, widths))
 
     return out, warnings
 
@@ -1148,7 +1219,7 @@ def render_multiline(
 
         if not header_emitted:
             # Header row (no wrapping for the header — headers fit by design).
-            out.append(_render_row(cells, widths))
+            out.append(table.indent + _render_row(cells, widths))
             # Separator row.
             alignments = [_alignment_marker(c) for c in table.separator_cells]
             while len(alignments) < n_cols:
@@ -1157,12 +1228,12 @@ def render_multiline(
                 _format_separator_cell(widths[c], alignments[c])
                 for c in range(n_cols)
             ]
-            out.append(_render_row(sep_cells, widths))
+            out.append(table.indent + _render_row(sep_cells, widths))
             header_emitted = True
             continue
 
         if _is_blank_row(cells):
-            out.append(_render_row(['' for _ in widths], widths))
+            out.append(table.indent + _render_row(['' for _ in widths], widths))
             continue
 
         # Wrap each cell.
@@ -1192,7 +1263,7 @@ def render_multiline(
                     cell_text = ''
                 row_cells.append(cell_text)
             # One planned width per column on every row: pipes always align.
-            out.append(_render_row(row_cells, widths))
+            out.append(table.indent + _render_row(row_cells, widths))
 
     return out, warnings
 
@@ -1254,18 +1325,28 @@ def format_text(text: str, config: FormatterConfig) -> tuple[str, list[str]]:
         # (#120 Proposal item 1). Definitions are emitted after the fully
         # rendered table -- for a condition-wrapped tail that lands after the
         # <!--/condition--> close tag, outside the span (#120 <-> #122).
+        # A table indented under a list item keeps its indent on every row,
+        # so the indent comes out of the line-width budget.
+        table_config = config
+        if block.indent:
+            table_config = replace(
+                config,
+                max_line_width=max(config.max_line_width - len(block.indent), 1),
+            )
         definitions = rewrite_table_links(
-            block, config, last_heading_slug, used_ids
+            block, table_config, last_heading_slug, used_ids
         )
-        widths = plan_widths(block, config)
+        widths = plan_widths(block, table_config)
         if block.is_multiline:
-            rendered, warnings = render_multiline(block, widths, config)
+            rendered, warnings = render_multiline(block, widths, table_config)
         else:
-            rendered, warnings = render_standard(block, widths, config)
+            rendered, warnings = render_standard(block, widths, table_config)
         out_lines.extend(rendered)
         if definitions:
             out_lines.append('')
-            out_lines.extend(definitions)
+            # Definitions under an indented table keep its indent, so a
+            # table in a list item stays in the list item.
+            out_lines.extend(block.indent + d for d in definitions)
         all_warnings.extend(warnings)
 
     formatted = '\n'.join(out_lines)

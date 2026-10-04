@@ -326,6 +326,10 @@ python scripts/validate-mdpp.py document.md
 - Duplicate link reference slugs across included files (MDPP014)
 - Multiline tables with no separator rows that silently merge data rows (MDPP018)
 - Condition open/close tags inside a table row line — in-cell spans or conditional cells (MDPP019)
+- A double quote inside, or a missing closing quote on, a simple marker value (MDPP020)
+- A `-->` with no `<!--` that opens it, usually a `-->` inside a marker value (MDPP021)
+
+Every command in a combined comment tag is checked, tags inside blockquotes and on list-item marker lines are checked, and code fences indented under list items are skipped.
 
 ## Alias Generation
 
