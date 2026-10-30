@@ -28,6 +28,7 @@ import sys
 import unicodedata
 from dataclasses import dataclass, asdict
 from enum import Enum
+from collections import Counter
 from collections.abc import Iterator
 
 
@@ -738,6 +739,9 @@ def _check_comment_commands(
         if not any(_is_recognized_segment(s) for s in segments):
             continue
         context = tag.group(0)
+        # Marker keys seen in this tag, across all of its marker: and
+        # markers: commands, in order (MDPP022).
+        tag_marker_keys: list[str] = []
 
         for seg in segments:
             if seg.startswith('style:'):
@@ -772,6 +776,10 @@ def _check_comment_commands(
                         add(Severity.ERROR, "MDPP002",
                             f"Invalid marker key name: {key}", context,
                             MARKER_KEY_SUGGESTION)
+                # json.loads keeps only the last value of a repeated key, so
+                # read the object's top-level pairs in order to see repeats.
+                tag_marker_keys.extend(
+                    k for k, _v in json.loads(payload, object_pairs_hook=lambda pairs: pairs))
 
             elif seg.startswith('marker:'):
                 body = seg[len('marker:'):]
@@ -788,6 +796,7 @@ def _check_comment_commands(
                     add(Severity.ERROR, "MDPP002",
                         f"Invalid marker key name: {key.strip()}", context,
                         MARKER_KEY_SUGGESTION)
+                tag_marker_keys.append(key.strip())
                 value_part = body[split_at + 2:]
                 if not value_part.endswith('"'):
                     add(Severity.WARNING, "MDPP020",
@@ -847,6 +856,20 @@ def _check_comment_commands(
                     alias_display[key] = alias_name
                     if verbose:
                         print(f"{Colors.CYAN}[VERBOSE]{Colors.NC} Line {line_num}: Alias defined: #{alias_name}")
+
+        # MDPP022: a marker key used more than once in one tag. JSON parsers
+        # commonly keep the last value, and a processor that stores markers
+        # by key keeps one marker per key, so all but one are dropped.
+        for key, count in Counter(tag_marker_keys).items():
+            if count > 1:
+                add(Severity.WARNING, "MDPP022",
+                    f"Marker key {key} appears {count} times in one comment "
+                    "tag; a processor that keeps one marker per key keeps only "
+                    "the last", context,
+                    "Use each marker key once per comment tag. Put each value "
+                    "on its own element (the heading, a paragraph, a table "
+                    "row), or, for a key whose value is a list such as "
+                    "IndexMarker or Keywords, combine the values in one value")
 
     return issues
 
@@ -1028,7 +1051,7 @@ def validate_file(filepath: str, verbose: bool = False) -> list[ValidationIssue]
 
         # Check every style, marker, markers, and alias command in every
         # comment tag, including combined tags (MDPP002, MDPP003,
-        # MDPP008, MDPP020).
+        # MDPP008, MDPP020, MDPP022).
         issues.extend(_check_comment_commands(
             line, line_num, filepath, alias_locations, alias_display, verbose
         ))

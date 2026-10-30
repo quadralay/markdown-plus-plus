@@ -855,6 +855,29 @@ For multiple key-value pairs:
 
 The JSON content MUST be a valid JSON object as defined by [RFC 8259][rfc8259]. Keys within the JSON object MUST be strings conforming to the style/marker name pattern (`[a-zA-Z_][a-zA-Z0-9_ -]*`, trimmed). Values MAY be any JSON type (string, number, boolean, array, object, null). A conformant processor MUST use a standards-compliant JSON parser for the JSON markers production.
 
+#### One Value per Key in a Comment Tag
+
+A marker key MUST NOT appear more than once in one comment tag, across all of the tag's `marker:` and `markers:` commands. RFC 8259 leaves the result of a repeated object name to the parser, common JSON parsers keep only the last value, and a processor that stores an element's markers by key keeps one marker per key, so all but one value would be lost. Keys are compared exactly, as names are case-sensitive.
+
+To attach the same key with two values, attach each value to a different element, such as the heading and the paragraph after it. For a key whose value is itself a list, such as `IndexMarker` (comma-separated entries) or `Keywords`, combine the entries in one value.
+
+A tag that repeats a key, in either form:
+
+```
+<!-- markers:{"TopicAlias": "job_info_stationery", "TopicAlias": "job_info_project"} -->
+<!-- marker:TopicAlias="job_info_stationery" ; marker:TopicAlias="job_info_project" -->
+```
+
+Each value on its own element instead:
+
+```markdown
+<!-- marker:TopicAlias="job_info_stationery" ; #job-info-window -->
+# Job Info Window
+
+<!-- marker:TopicAlias="job_info_project" -->
+This window lets you specify information about a job.
+```
+
 #### Characters That Need the JSON Form
 
 A processor finds the comment boundary before it parses the commands (see the [Formal Grammar](formal-grammar.md#comment-directives)), so a value in either form cannot contain the literal character sequence `-->`. A value that needs `-->`, a double quote, or a line break MUST be written in the JSON form, where each of these is carried by an RFC 8259 escape in the JSON string:
@@ -945,6 +968,7 @@ Marker commands require attachment. A block-level marker tag MUST appear on the 
 | **MDPP003** | Malformed JSON in `markers:` command | Error |
 | **MDPP009** | Orphaned marker tag (not attached to an element) | Warning |
 | **MDPP020** | Simple marker value contains a double quote or has no closing quote | Warning |
+| **MDPP022** | Marker key appears more than once in one comment tag | Warning |
 
 ### 13.7 Examples
 

@@ -33,6 +33,7 @@ Implementation-independent reference for all Markdown++ validation error codes. 
 | MDPP019 | Condition inside a table cell | Warning | A condition open/close tag is embedded in a table row (in-cell span or conditional cell) instead of wrapping complete rows |
 | MDPP020 | Invalid simple marker value | Warning | A `marker:Key="value"` value contains a double quote, has no closing quote, or the command has no `="` |
 | MDPP021 | Stray comment close | Warning | A `-->` appears with no `<!--` that opens it, usually because a `-->` inside a marker value ended the tag early |
+| MDPP022 | Duplicate marker key in one tag | Warning | A marker key appears more than once in one comment tag, across its `marker:` and `markers:` commands; all but one value may be lost |
 
 ## General Rules
 
@@ -717,3 +718,29 @@ The first --> ends the tag; also triggers MDPP021.
 ```
 
 **Suggested fix:** Carry a value that contains `-->` in the `markers:` JSON form, writing the `>` as `\u003e`. Don't nest comments.
+
+---
+
+## MDPP022 -- Duplicate Marker Key in One Tag
+
+**Severity:** Warning
+
+**Description:** A marker key appears more than once in one comment tag. RFC 8259 leaves the result of a repeated JSON object name to the parser, and common parsers keep only the last value. A processor that stores an element's markers by key keeps one marker per key, so the other values are lost, with no diagnostic. The usual cause is an attempt to give one element several values of the same marker, such as several context-sensitive help `TopicAlias` IDs. The spec requires each key to appear once per tag (§ 13.2, One Value per Key in a Comment Tag).
+
+**Detection logic:** The marker keys of every `marker:` and `markers:` command in a comment tag, in any position of a combined tag, are collected in order. A `markers:` object is read pair by pair, so a key repeated inside one JSON object is seen. Each key that occurs more than once is reported once, with its count. Keys are compared exactly (names are case-sensitive), so `Keywords` and `keywords` are different keys. Repeated identical values are reported too: the extra copies have no effect. The same key in two different tags is not a duplicate.
+
+**Trigger examples:**
+
+```markdown
+<!-- markers:{"TopicAlias": "new_project_job", "TopicAlias": "new_stationery_job"} -->
+Two values of one key in a JSON object.
+
+<!-- marker:TopicAlias="a" ; marker:TopicAlias="b" -->
+The same key in two simple commands.
+
+<!-- marker:Keywords="setup" ; markers:{"Keywords": "install"} -->
+The same key across the two forms.
+```
+
+**Suggested fix:** Use each marker key once per comment tag. To attach two values of the same key, put each on a different element, such as the heading and the paragraph after it, or one row each in a multiline table. For a key whose value is itself a list, such as `IndexMarker` or `Keywords`, combine the entries in one comma-separated value.
+
