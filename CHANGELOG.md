@@ -13,6 +13,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tooling** -- Changes to the Claude Code plugin, validation scripts, and other tools.
 - **Project** -- Repository structure, documentation, and governance changes.
 
+## [1.18.0] - 2026-10-30
+
+### Spec
+
+- **One value per marker key in a comment tag.** New § 13.2 subsection, "One Value per Key in a Comment Tag": a marker key MUST NOT appear more than once in one comment tag, across all of the tag's `marker:` and `markers:` commands. RFC 8259 leaves a repeated JSON object name to the parser, common parsers keep only the last value, and a processor that stores markers by key keeps one marker per key, so the other values were lost without a diagnostic. To attach two values of one key, attach each to a different element; for a list-valued key such as `IndexMarker` or `Keywords`, combine the entries in one value. Keys are compared exactly (names are case-sensitive). MDPP022 is added to the § 13.6 diagnostics table ([#139](https://github.com/quadralay/markdown-plus-plus/issues/139)).
+
+### Tooling
+
+- **New warning MDPP022 (duplicate marker key in one tag).** `validate-mdpp.py` collects the keys of every `marker:` and `markers:` command in a comment tag, reading a JSON object pair by pair (`object_pairs_hook`) so a key repeated inside one object is seen, and reports each key used more than once with its count. Repeated identical values are reported too; the same key in two different tags is not a duplicate. Full entry in `references/error-codes.md`; the rule is also in `SKILL.md` and `references/syntax-reference.md`. New unit tests in `scripts/test_validate_mdpp.py` and two new sections in `tests/sample-combined-commands.md`. No file in this repository triggers the new warning.
+
 ## [1.17.1] - 2026-10-04
 
 ### Tooling

@@ -134,5 +134,44 @@ class ContainerTagTests(unittest.TestCase):
             '> <!-- style:B -->', tag_line='> <!-- style:A -->'))
 
 
+def codes(line):
+    """Issue codes _check_comment_commands reports for one line."""
+    issues = validate_mdpp._check_comment_commands(line, 1, 'test.md', {}, {}, False)
+    return [i.code for i in issues]
+
+
+class DuplicateMarkerKeyTests(unittest.TestCase):
+    """MDPP022: a marker key used more than once in one comment tag."""
+
+    def test_repeated_key_in_json(self):
+        self.assertEqual(codes('<!-- markers:{"TopicAlias":"a", "TopicAlias":"b"} -->'), ['MDPP022'])
+
+    def test_repeated_simple_commands(self):
+        self.assertEqual(codes('<!-- marker:TopicAlias="a" ; marker:TopicAlias="b" -->'), ['MDPP022'])
+
+    def test_repeated_across_simple_and_json_forms(self):
+        self.assertEqual(
+            codes('<!-- marker:Keywords="x" ; markers:{"Keywords":"y", "Description":"d"} -->'),
+            ['MDPP022'])
+
+    def test_identical_repeated_values_warn_once(self):
+        self.assertEqual(codes('<!-- markers:{"P":"same", "P":"same", "P":"same"} -->'), ['MDPP022'])
+
+    def test_inline_tag(self):
+        self.assertEqual(codes('Run <!--marker:Keywords="a" ; marker:Keywords="b"-->**this**.'), ['MDPP022'])
+
+    def test_distinct_keys_do_not_warn(self):
+        self.assertEqual(codes('<!-- marker:Keywords="x" ; markers:{"A":"1", "B":"2"} ; #k1 -->'), [])
+
+    def test_keys_are_case_sensitive(self):
+        self.assertEqual(codes('<!-- marker:Keywords="x" ; marker:keywords="y" -->'), [])
+
+    def test_same_key_in_separate_tags_does_not_warn(self):
+        self.assertEqual(codes('<!-- marker:TopicAlias="a" --> <!-- marker:TopicAlias="b" -->'), [])
+
+    def test_malformed_json_reports_mdpp003_only(self):
+        self.assertEqual(codes('<!-- markers:{"A":"1", "A": } -->'), ['MDPP003'])
+
+
 if __name__ == '__main__':
     unittest.main()

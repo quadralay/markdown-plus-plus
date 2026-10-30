@@ -742,6 +742,28 @@ Use `marker:key="value"` for single markers, JSON format for multiple.
 <!--marker:DropDownEnd=""-->
 ```
 
+### One Value per Key in a Comment Tag
+
+Use each marker key once in a comment tag, across all of its `marker:` and `markers:` commands. A repeated key is ambiguous: common JSON parsers keep only the last value, and a processor that stores markers by key keeps one marker per key. The validator reports a repeated key as MDPP022.
+
+Wrong, two values of one key in one tag:
+
+```markdown
+<!--markers:{"TopicAlias": "job_info_stationery", "TopicAlias": "job_info_project"}-->
+```
+
+To attach two values of the same key, put each on its own element:
+
+```markdown
+<!--marker:TopicAlias="job_info_stationery" ; #job-info-window-->
+# Job Info Window
+
+<!--marker:TopicAlias="job_info_project"-->
+This window lets you specify information about a job.
+```
+
+For a key whose value is a list, such as `IndexMarker` or `Keywords`, combine the entries in one comma-separated value instead.
+
 ### Special Characters in Marker Values
 
 A processor finds the end of the comment tag before it reads the commands, so no value can contain the characters `-->`. When a value needs `-->`, a double quote, or a line break, write it in the JSON format and use a JSON escape:

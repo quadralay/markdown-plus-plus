@@ -6,7 +6,7 @@ status: active
 
 # Combined-command and container fixture
 
-Fixtures for issue #136: the validator checks every command in a combined comment
+Fixtures for issues #136 and #139: the validator checks every command in a combined comment
 tag, sees tags inside blockquotes and on list-item marker lines, and recognizes
 code fences at list-relative indentation. Run the validator against this file;
 each section states its expected outcome.
@@ -19,9 +19,10 @@ Expected, in line order: MDPP002 (marker key), MDPP003 (broken JSON), MDPP008
 (duplicate alias), MDPP002 (alias name), MDPP002 (empty-value marker key),
 MDPP003 (unescaped quotes in JSON), MDPP002 (JSON key), MDPP020 (quote in a
 simple value), MDPP018 (multiline table in a blockquote), MDPP009 (orphaned tag
-in a blockquote), and MDPP020 plus MDPP021 for a `-->` inside a simple value:
-seven errors and five warnings, exit code 3. The "Right" sections produce
-nothing.
+in a blockquote), MDPP020 plus MDPP021 for a `-->` inside a simple value, and
+MDPP022 for a marker key repeated in one tag, once in JSON and once across
+simple commands: seven errors and seven warnings, exit code 3. The "Right"
+sections produce nothing.
 
 ## Wrong -- a marker key in a non-first command (MDPP002)
 
@@ -84,6 +85,22 @@ A simple-form value cannot contain a double quote.
 
 <!-- marker:Note="a-->b" -->
 The first `-->` ends the comment tag and leaves the rest of it as text.
+
+## Wrong -- a marker key repeated in one tag (MDPP022)
+
+<!-- markers:{"TopicAlias": "job_info_stationery", "TopicAlias": "job_info_project"} -->
+Common JSON parsers keep only the last value, so one TopicAlias is lost.
+
+<!-- style:Note ; marker:TopicAlias="a" ; marker:TopicAlias="b" -->
+The same key in two simple commands of one tag.
+
+## Right -- the same key on different elements
+
+<!-- marker:TopicAlias="job_info_stationery" ; #job-info-window -->
+### Job Info Window
+
+<!-- marker:TopicAlias="job_info_project" -->
+Each element carries one value of the key.
 
 ## Right -- a fence indented under a list item
 
